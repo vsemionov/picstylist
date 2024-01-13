@@ -2,9 +2,10 @@ FROM python:3.11.7
 
 WORKDIR /app
 
-COPY requirements.txt app.py ./
+COPY requirements.txt app.py conf ./
 
-RUN pip install pip==23.3.2 setuptools==69.0.3 wheel==0.42.0
+RUN pip install -U pip setuptools wheel
 RUN pip install -r requirements.txt
 
-# CMD ["python", "app.py"]
+CMD ["gunicorn", "-c", "/app/conf/gunicorn.py", "app:app"]
+EXPOSE 8000

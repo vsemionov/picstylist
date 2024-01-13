@@ -16,4 +16,6 @@ services:
       - 80:80
     logging:
       driver: "local"
+    depends_on:
+      - picstylist
     restart: always

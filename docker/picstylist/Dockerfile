@@ -2,7 +2,7 @@ FROM python:3.11.7
 
 WORKDIR /app
 
-COPY requirements.txt app.py conf ./
+COPY . ./
 
 RUN pip install -U pip setuptools wheel
 RUN pip install -r requirements.txt

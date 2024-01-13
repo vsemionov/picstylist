@@ -14,6 +14,8 @@ services:
       - 80:80
     logging:
       driver: "local"
+    volumes:
+      - ./conf/ssl:/etc/nginx/ssl:ro
     depends_on:
       - picstylist
     restart: always

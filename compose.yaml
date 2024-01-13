@@ -1,0 +1,11 @@
+services:
+  picstylist:
+    build:
+      context: .
+      dockerfile: docker/picstylist/Dockerfile
+    ports:
+      - 8080:8080
+  nginx:
+    build: docker/nginx
+    ports:
+      - 80:80

@@ -3,7 +3,17 @@ services:
     build:
       context: .
       dockerfile: docker/picstylist/Dockerfile
+    ports:
+      - 8000:8000
+    logging:
+      driver: "local"
+    restart: always
   nginx:
-    build: docker/nginx
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
     ports:
       - 80:80
+    logging:
+      driver: "local"
+    restart: always

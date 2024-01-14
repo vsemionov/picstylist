@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: docker/nginx/Dockerfile
     ports:
-      - 80:80
+      - 443:443
     logging:
       driver: "local"
     volumes:

@@ -1,10 +1,14 @@
 #!/bin/sh
 
-set -e
-
 docker-compose up -d --build
+ret=$?
 
 docker image prune -f >/dev/null
 docker buildx prune -f >/dev/null
+
+if [ $ret -ne 0 ];
+then
+    exit 1
+fi
 
 echo "Deploy successful."

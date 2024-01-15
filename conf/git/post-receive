@@ -1,0 +1,18 @@
+#!/bin/bash
+
+MAIN_BRANCH="main"
+
+while read oldrev newrev refname
+do
+    branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
+    if [ "$branch" == "$MAIN_BRANCH" ]; then
+        build_dir=$(mktemp -d)
+        (
+            set -e
+            git --work-tree="$build_dir" checkout -f
+            cd "$build_dir"
+            bin/deploy
+        )
+        rm -rf "$build_dir" || exit 1
+    fi
+done

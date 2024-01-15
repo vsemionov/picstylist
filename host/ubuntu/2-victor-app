@@ -23,7 +23,7 @@ cd /opt/$APP_NAME.git/
 git --work-tree=/opt/$APP_NAME checkout
 cp /opt/$APP_NAME/host/git/* hooks/
 
-echo "$REG_USER ALL=(ALL:ALL) /opt/$APP_NAME/bin/deploy" | sudo tee /etc/sudoers.d/101-picstylist
+echo "$REG_USER ALL=(ALL:ALL) NOPASSWD: /opt/$APP_NAME/bin/deploy" | sudo tee /etc/sudoers.d/101-picstylist
 sudo chmod 440 /etc/sudoers.d/101-picstylist
 
 echo "Done."

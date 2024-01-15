@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/web/Dockerfile
     logging:
-      driver: "local"
+      driver: 'local'
     restart: always
   nginx:
     build:
@@ -13,7 +13,7 @@ services:
     ports:
       - 443:443
     logging:
-      driver: "local"
+      driver: 'local'
     volumes:
       - ./conf/ssl:/etc/nginx/ssl:ro
     depends_on:

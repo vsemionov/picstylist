@@ -4,7 +4,4 @@ set -e
 
 docker-compose up -d --build
 
-if [[ $(docker image ls -f "dangling=true" -q) ]];
-then
-    docker image ls -f "dangling=true" -q | xargs docker image rm >/dev/null
-fi
+docker image prune -f >/dev/null

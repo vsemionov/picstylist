@@ -4,8 +4,8 @@ WORKDIR /app
 
 # install packages before copying the whole project to make use of docker cache
 COPY requirements.txt .
-RUN pip install -U pip setuptools wheel
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -U pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 

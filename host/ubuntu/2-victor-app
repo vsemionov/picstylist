@@ -4,6 +4,7 @@ set -e
 
 GH_USER="vsemionov"
 APP_NAME="picstylist"
+REG_USER="victor"
 
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
 echo "Public key:"
@@ -21,6 +22,9 @@ rmdir "$temp_dir"
 cd /opt/$APP_NAME.git/
 git --work-tree=/opt/$APP_NAME checkout
 cp /opt/$APP_NAME/host/git/* hooks/
+
+echo "$REG_USER ALL=(ALL:ALL) /opt/$APP_NAME/bin/deploy" | sudo tee /etc/sudoers.d/101-picstylist
+sudo chmod 440 /etc/sudoers.d/101-picstylist
 
 echo "Done."
 echo "Please add any necessary files under /opt/$APP_NAME now."

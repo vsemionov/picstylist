@@ -11,7 +11,7 @@ do
             set -e
             git --work-tree="$build_dir" checkout -f
             cd "$build_dir"
-            bin/deploy
+            sudo bin/deploy
         )
         rm -rf "$build_dir" || exit 1
     fi

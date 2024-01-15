@@ -1,8 +1,8 @@
 services:
-  picstylist:
+  web:
     build:
       context: .
-      dockerfile: docker/picstylist/Dockerfile
+      dockerfile: docker/web/Dockerfile
     logging:
       driver: "local"
     restart: always
@@ -17,5 +17,5 @@ services:
     volumes:
       - ./conf/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - picstylist
+      - web
     restart: always

@@ -2,6 +2,7 @@
 
 set -e
 
+GH_USER="vsemionov"
 APP_NAME="picstylist"
 
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
@@ -13,7 +14,7 @@ read
 temp_dir=$(mktemp -d)
 cd "$temp_dir"
 mkdir $APP_NAME
-git clone --bare git@github.com:vsemionov/$APP_NAME.git
+git clone --bare git@github.com:$GH_USER/$APP_NAME.git
 sudo mv $APP_NAME $APP_NAME.git /opt/
 rmdir "$temp_dir"
 

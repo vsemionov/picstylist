@@ -2,6 +2,8 @@
 
 set -e
 
+REG_USER=victor
+
 cat >/etc/ssh/sshd_config.d/101-custom.conf <<EOF
 PermitRootLogin no
 PubkeyAuthentication yes
@@ -21,13 +23,13 @@ echo '/swapfile none swap sw 0 0' >>/etc/fstab
 echo 'vm.swappiness=10' >>/etc/sysctl.conf
 echo 'vm.vfs_cache_pressure=50' >>/etc/sysctl.conf
 
-adduser victor
-usermod -aG sudo victor
+adduser $REG_USER
+usermod -aG sudo $REG_USER
 
-mkdir ~victor/.ssh
-chmod 700 ~victor/.ssh
-mv ~/.ssh/authorized_keys ~victor/.ssh/
-chown -R victor:victor ~victor/.ssh
+mkdir ~$REG_USER/.ssh
+chmod 700 ~$REG_USER/.ssh
+mv ~/.ssh/authorized_keys ~$REG_USER/.ssh/
+chown -R $REG_USER:$REG_USER ~$REG_USER/.ssh
 
 apt-get update
 apt-get upgrade -y

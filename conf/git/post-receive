@@ -5,7 +5,8 @@ MAIN_BRANCH="main"
 while read oldrev newrev refname
 do
     branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
-    if [ "$branch" == "$MAIN_BRANCH" ]; then
+    if [ "$branch" == "$MAIN_BRANCH" ]
+    then
         build_dir=$(mktemp -d)
         (
             set -e

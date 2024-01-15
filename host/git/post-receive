@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -8,7 +8,7 @@ MAIN_BRANCH="main"
 while read oldrev newrev refname
 do
     branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
-    if [ "$branch" == "$MAIN_BRANCH" ]
+    if [ "$branch" = "$MAIN_BRANCH" ]
     then
         git checkout -f "$MAIN_BRANCH"
         if [ -n "$(git status --porcelain)" ]

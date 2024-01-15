@@ -10,7 +10,7 @@ do
     branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
     if [ "$branch" == "$MAIN_BRANCH" ]
     then
-        git checkout -f
+        git checkout -f "$MAIN_BRANCH"
         if [ -n "$(git status --porcelain)" ]
         then
             echo "Work tree at $GIT_WORK_TREE is dirty."

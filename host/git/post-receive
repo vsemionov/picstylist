@@ -2,8 +2,9 @@
 
 set -e
 
-export GIT_WORK_TREE="/opt/picstylist"
+APP_NAME="picstylist"
 MAIN_BRANCH="main"
+export GIT_WORK_TREE="/opt/$APP_NAME"
 
 while read oldrev newrev refname
 do

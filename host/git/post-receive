@@ -16,7 +16,6 @@ do
             echo "Work tree at $GIT_WORK_TREE is dirty."
             exit 1
         fi
-        cd "$WORK_TREE"
-        sudo bin/deploy
+        sudo "$GIT_WORK_TREE"/bin/deploy
     fi
 done

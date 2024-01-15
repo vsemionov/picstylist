@@ -20,7 +20,7 @@ rmdir "$temp_dir"
 
 cd /opt/$APP_NAME.git/
 git --work-tree=/opt/$APP_NAME checkout
-cp /opt/$APP_NAME/conf/git/* hooks/
+cp /opt/$APP_NAME/host/git/* hooks/
 
 echo "Done."
 echo "Please add any necessary files under /opt/$APP_NAME now."

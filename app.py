@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 
-# TODO: secret key
 # TODO: ProxyFix middleware
 # TODO: prepend www to domain
 # TODO: review settings reference

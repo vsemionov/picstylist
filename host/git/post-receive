@@ -17,6 +17,6 @@ do
             exit 1
         fi
         cd "$WORK_TREE"
-        sudo -S bin/deploy
+        sudo bin/deploy
     fi
 done

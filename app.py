@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 
 # TODO: ProxyFix middleware
-# TODO: prepend www to domain
 # TODO: review settings reference
 # TODO: review potohub settings
 # TODO: check if this is per file or total

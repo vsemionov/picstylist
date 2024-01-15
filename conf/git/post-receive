@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+
+export GIT_WORK_TREE="/opt/picstylist"
 MAIN_BRANCH="main"
 
 while read oldrev newrev refname
@@ -7,13 +10,13 @@ do
     branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
     if [ "$branch" == "$MAIN_BRANCH" ]
     then
-        build_dir=$(mktemp -d)
-        (
-            set -e
-            git --work-tree="$build_dir" checkout -f
-            cd "$build_dir"
-            sudo bin/deploy
-        )
-        rm -rf "$build_dir" || exit 1
+        git checkout -f
+        if [ -n "$(git status --porcelain)" ]
+        then
+            echo "Work tree at $GIT_WORK_TREE is dirty."
+            exit 1
+        fi
+        cd "$WORK_TREE"
+        sudo bin/deploy
     fi
 done

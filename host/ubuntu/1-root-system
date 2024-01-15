@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+cat >/etc/ssh/sshd_config.d/101-custom.conf <<EOF
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+UsePAM no
+X11Forwarding no
+EOF
+chmod 600 /etc/ssh/sshd_config.d/101-custom.conf
+
+# https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-22-04
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >>/etc/fstab
+echo 'vm.swappiness=10' >>/etc/sysctl.conf
+echo 'vm.vfs_cache_pressure=50' >>/etc/sysctl.conf
+
+adduser victor
+usermod -aG sudo victor
+
+mkdir ~victor/.ssh
+chmod 700 ~victor/.ssh
+mv ~/.ssh/authorized_keys ~victor/.ssh/
+chown -R victor:victor ~victor/.ssh
+
+apt-get update
+apt-get upgrade -y
+snap refresh
+apt-get dist-upgrade -y
+
+sync
+echo "Rebooting in 15s"
+sleep 15
+reboot

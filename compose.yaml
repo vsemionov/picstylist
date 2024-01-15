@@ -15,7 +15,7 @@ services:
     logging:
       driver: "local"
     volumes:
-      - /opt/picstylist/etc/ssl:/etc/nginx/ssl:ro
+      - ./conf/ssl:/etc/nginx/ssl:ro
     depends_on:
       - web
     restart: always

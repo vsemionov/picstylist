@@ -2,6 +2,8 @@
 /.vscode
 .DS_Store
 
+/conf/ssl
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

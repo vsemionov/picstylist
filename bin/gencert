@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+APP_NAME="picstylist"
+COMPANY="PicStylist"
+DOMAIN="picstylist.com"
+
+cd "$(dirname "$0")"/..
+
+if [ ! -d /etc/$APP_NAME/ssl ]
+then
+    mkdir -p /etc/$APP_NAME/ssl
+    openssl req -x509 -newkey rsa:4096 -keyout /etc/$APP_NAME/ssl/server.key -out /etc/$APP_NAME/ssl/server.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/CN=$DOMAIN/CN=*.$DOMAIN"
+    curl https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem >/etc/$APP_NAME/ssl/client.pem
+fi

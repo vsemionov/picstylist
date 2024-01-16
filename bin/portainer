@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+PORTAINER_VERSION="2.19.4"
+
+cd "$(dirname "$0")"/..
+
+docker volume create portainer_data
+docker pull portainer/portainer-ce:$PORTAINER_VERSION
+docker run -d -p 9443:9443 --name portainer --restart=always \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    -v "$(pwd)"/conf/ssl:/certs \
+    portainer/portainer-ce:$PORTAINER_VERSION \
+    --sslcert /certs/server.pem --sslkey /certs/server.key

@@ -10,8 +10,9 @@ cd "$(dirname "$0")"/..
 if [ ! -d conf/ssl ]
 then
     mkdir -p conf/ssl
-    openssl req -x509 -newkey rsa:2048 -keyout conf/ssl/server.key -out conf/ssl/server.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/CN=$DOMAIN/CN=*.$DOMAIN"
+    openssl req -x509 -newkey rsa:2048 -keyout conf/ssl/server.key -out conf/ssl/server.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/OU=Server/CN=$DOMAIN/CN=*.$DOMAIN"
+    openssl req -x509 -newkey rsa:2048 -keyout conf/ssl/healthcheck.key -out conf/ssl/healthcheck.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/OU=Health Check/CN=$DOMAIN/CN=*.$DOMAIN"
     curl https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem >conf/ssl/client.pem
     echo >>conf/ssl/client.pem
-    cat conf/ssl/server.pem >>conf/ssl/client.pem
+    cat conf/ssl/healthcheck.pem >>conf/ssl/client.pem
 fi

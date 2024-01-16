@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, request, url_for, abort, redirect, render_template, make_response, send_from_directory
 from werkzeug.utils import secure_filename
+from flask_log_request_id import RequestID, current_request_id
 import sentry_sdk
 
 
@@ -17,10 +18,12 @@ app = Flask(__name__)
 # TODO: check if this is per file or total
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+RequestID(app)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    app.logger.error('Test') ###
+    app.logger.info(current_request_id()) ###
     if request.method == 'POST':
         content_file = request.files['content']
         style_file = request.files['style']

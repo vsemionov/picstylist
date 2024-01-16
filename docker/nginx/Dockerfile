@@ -5,3 +5,5 @@ WORKDIR /app
 COPY . .
 
 RUN cp conf/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 443

@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"/.. || exit 1
 
-bin/gencert
+bin/gencert || exit 1
 
 docker-compose up -d --build
 ret=$?

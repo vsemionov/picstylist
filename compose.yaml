@@ -6,6 +6,8 @@ services:
     logging:
       driver: 'local'
     restart: always
+    healthcheck:
+      test: curl -f http://localhost:8000/ || exit 1
     deploy:
       resources:
         limits:
@@ -23,6 +25,8 @@ services:
     depends_on:
       - web
     restart: always
+    healthcheck:
+      test: curl -f -o /dev/null --cert /etc/nginx/ssl/server.pem --key /etc/nginx/ssl/server.key --cacert /etc/nginx/ssl/server.pem --connect-to www.picstylist.com:443:localhost https://www.picstylist.com/static/favicon.png || exit 1
     deploy:
       resources:
         limits:

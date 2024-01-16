@@ -18,6 +18,8 @@ services:
       - 443:443
     logging:
       driver: 'local'
+    volumes:
+      - ./conf/ssl:/etc/nginx/ssl:ro
     depends_on:
       - web
     restart: always

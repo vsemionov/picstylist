@@ -8,9 +8,10 @@ cd "$(dirname "$0")"/..
 
 docker volume create portainer_data
 docker pull portainer/portainer-ce:$PORTAINER_VERSION
-docker run -d -p 9443:9443 --name portainer --restart=always \
+docker run -d -p 8443:9443 --name portainer --restart=always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v portainer_data:/data \
     -v "$(pwd)"/conf/ssl:/certs \
+    --log-driver local \
     portainer/portainer-ce:$PORTAINER_VERSION \
     --sslcert /certs/server.pem --sslkey /certs/server.key

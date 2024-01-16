@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
+    environment:
+      - APP_ENV=${APP_ENV}
+      - SENTRY_DSN=${SENTRY_DSN}
     logging:
       driver: local
     restart: always

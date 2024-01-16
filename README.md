@@ -1,9 +1,10 @@
-# Pic Stylist
+# PicStylist
 
 ## Resources
- - Digital Ocean: https://www.digitalocean.com/
- - Cloudflare: https://www.cloudflare.com/
- - Portainer: https://www.portainer.io/
+ - Digital Ocean
+ - Cloudflare
+ - Sentry
+ - Portainer (optional)
 
 ### Tech Notes
  - Cloudflare authenticated origin pulls: https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/set-up/zone-level/

@@ -1,10 +1,16 @@
+import os
+
 from flask import Flask, request, url_for, abort, redirect, render_template, make_response, send_from_directory
 from werkzeug.utils import secure_filename
+import sentry_sdk
 
+
+VERSION = '0.1.0'
+
+
+sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.environ['APP_ENV'])
 
 app = Flask(__name__)
-
-
 # TODO: ProxyFix middleware
 # TODO: review settings reference
 # TODO: review potohub settings

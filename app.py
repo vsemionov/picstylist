@@ -20,6 +20,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    app.logger.error('Test') ###
     if request.method == 'POST':
         content_file = request.files['content']
         style_file = request.files['style']

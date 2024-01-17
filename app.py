@@ -5,6 +5,8 @@ from werkzeug.utils import secure_filename
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+from web import settings
+
 
 VERSION = '0.1.0'
 
@@ -13,16 +15,13 @@ sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.enviro
     integrations=[FlaskIntegration()])
 
 app = Flask(__name__)
-# TODO: ProxyFix middleware
-# TODO: review settings reference
-# TODO: review potohub settings
-# TODO: check if this is per file or total
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+settings.configure(app)
 
 
 @app.before_request
 def before_request():
-    g.request_id = request.headers.get('X-Request-ID')
+    g.request_id = request.headers.get('X-Request-ID') or 'none'
 
 
 @app.route('/', methods=['GET', 'POST'])

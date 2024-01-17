@@ -1,3 +1,4 @@
+version: '3.9'
 services:
 
   web:
@@ -27,7 +28,7 @@ services:
     volumes:
       - ./conf/ssl:/etc/nginx/ssl:ro
     ports:
-      - 443:443
+      - '443:443'
     logging:
       driver: local
     depends_on:

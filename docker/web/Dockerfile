@@ -8,7 +8,9 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY conf/gunicorn.py conf/
-COPY app.py web templates ./
+COPY app.py ./
+COPY web ./web
+COPY templates ./templates
 
 CMD ["gunicorn", "-c", "/app/conf/gunicorn.py", "app:app"]
 

@@ -32,6 +32,9 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
+    # TODO: review limiter settings
+    # TODO: review redis settings
+    # TODO: redis connection pool
     limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'], storage_uri=f'redis://redis:6379')
 
     return app, limiter

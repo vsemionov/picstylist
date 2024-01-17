@@ -5,8 +5,7 @@ from web import settings
 
 
 app = Flask(__name__)
-
-settings.configure(app)
+app = settings.configure(app)
 
 
 @app.before_request

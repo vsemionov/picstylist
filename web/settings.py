@@ -40,5 +40,10 @@ def configure(app):
     return app, limiter
 
 
-sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.environ['APP_ENV'],
-    integrations=[FlaskIntegration()])
+app_env = os.environ['APP_ENV']
+sentry_dsn = os.environ['SENTRY_DSN']
+if not sentry_dsn:
+    if app_env != 'development':
+        raise ValueError('SENTRY_DSN is required on remote environments.')
+    logging.getLogger(__name__).warning('SENTRY_DSN not set, Sentry disabled.')
+sentry_sdk.init(sentry_dsn, release=VERSION, environment=app_env, integrations=[FlaskIntegration()])

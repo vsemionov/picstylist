@@ -15,7 +15,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 256m
   nginx:
     build:
       context: .
@@ -34,4 +34,4 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 128m

@@ -12,6 +12,5 @@ COPY app.py ./
 COPY web ./web
 COPY templates ./templates
 
-STOPSIGNAL SIGTERM
 EXPOSE 8000
 CMD ["gunicorn", "-c", "/app/conf/gunicorn.py", "app:app"]

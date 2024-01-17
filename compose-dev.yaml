@@ -6,3 +6,13 @@ services:
       service: web
     ports:
       - '8000:8000'
+  nginx:
+    extends:
+      file: compose.yaml
+      service: nginx
+  redis:
+    extends:
+      file: compose.yaml
+      service: redis
+volumes:
+  redis_data:

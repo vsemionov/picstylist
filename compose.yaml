@@ -1,4 +1,5 @@
 services:
+
   web:
     build:
       context: .
@@ -9,6 +10,8 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
     logging:
       driver: local
+    depends_on:
+      - redis
     restart: always
     healthcheck:
       test: curl -f -sS -m 10 http://localhost:8000/ >/dev/null || exit 1
@@ -16,6 +19,7 @@ services:
       resources:
         limits:
           memory: 256m
+
   nginx:
     build:
       context: .
@@ -35,3 +39,24 @@ services:
       resources:
         limits:
           memory: 128m
+
+  redis:
+    build:
+      context: .
+      dockerfile: docker/redis/Dockerfile
+    volumes:
+      - redis_data:/data
+    ports:
+      - 6379:6379
+    logging:
+      driver: local
+    restart: always
+    healthcheck:
+      test: redis-cli ping >/dev/null
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+volumes:
+  redis_data:

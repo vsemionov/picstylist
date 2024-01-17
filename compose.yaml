@@ -30,7 +30,7 @@ services:
       - web
     restart: always
     healthcheck:
-      test: curl -f -sS -m 10 --cert /etc/nginx/ssl/internal.pem --key /etc/nginx/ssl/internal.key --cacert /etc/nginx/ssl/server.pem --connect-to www.picstylist.com:443:localhost https://www.picstylist.com/static/favicon.png >/dev/null || exit 1
+      test: curl -f -sS -m 10 https://localhost/static/favicon.png >/dev/null || exit 1
     deploy:
       resources:
         limits:

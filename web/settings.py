@@ -4,10 +4,15 @@ import logging
 from flask import g
 from flask.logging import default_handler
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from . import VERSION
+
+
+REDIS_HOST = 'redis'
 
 
 class RequestIDLogFilter(logging.Filter):
@@ -30,7 +35,10 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
-    return app
+    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'],
+        storage_uri=f'redis://{REDIS_HOST}:6379')
+
+    return app, limiter
 
 
 sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.environ['APP_ENV'],

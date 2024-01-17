@@ -5,7 +5,7 @@ from web import settings
 
 
 app = Flask(__name__)
-settings.configure(app)
+app, limiter = settings.configure(app)
 
 
 @app.before_request
@@ -14,6 +14,7 @@ def before_request():
 
 
 @app.route('/', methods=['GET', 'POST'])
+@limiter.limit('10 / minute')
 def index():
     if request.method == 'POST':
         content_file = request.files['content']

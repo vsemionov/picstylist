@@ -1,5 +1,7 @@
 FROM redis:7.2.4
 
-COPY conf/redis.conf /usr/local/etc/redis/redis.conf
+WORKDIR /app
 
-CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]
+COPY conf/redis.conf /etc/redis/redis.conf
+
+CMD ["redis-server", "/etc/redis/redis.conf"]

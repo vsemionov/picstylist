@@ -1,18 +1,8 @@
-import os
-
 from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory
 from werkzeug.utils import secure_filename
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 
 from web import settings
 
-
-VERSION = '0.1.0'
-
-
-sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.environ['APP_ENV'],
-    integrations=[FlaskIntegration()])
 
 app = Flask(__name__)
 
@@ -26,6 +16,7 @@ def before_request():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    app.logger.info('Test ') ###
     if request.method == 'POST':
         content_file = request.files['content']
         style_file = request.files['style']

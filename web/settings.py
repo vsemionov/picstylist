@@ -1,7 +1,12 @@
+import os
 import logging
 
 from flask import g
 from flask.logging import default_handler
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+from . import VERSION
 
 
 class RequestIDLogFilter(logging.Filter):
@@ -21,3 +26,7 @@ def configure(app):
     # TODO: review potohub settings
     # TODO: check if this is per file or total
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+
+sentry_sdk.init(os.environ['SENTRY_DSN'], release=VERSION, environment=os.environ['APP_ENV'],
+    integrations=[FlaskIntegration()])

@@ -5,4 +5,4 @@ workers = os.cpu_count()
 worker_class = 'gthread'
 threads = 10
 
-access_log_format = '%(p)s [%({X-Request-ID}i)s] %(h)s - "%(r)s" %(L)s %(s)s %(b)s "%(f)s" "%(a)s"'
+access_log_format = '[%({X-Request-ID}i)s] %(h)s - "%(r)s" %(L)s %(s)s %(b)s "%(f)s" "%(a)s"'

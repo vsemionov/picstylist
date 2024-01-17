@@ -19,8 +19,7 @@ class RequestIDLogFilter(logging.Filter):
 def configure(app):
     app.logger.setLevel(logging.INFO)
     default_handler.addFilter(RequestIDLogFilter())
-    default_handler.setFormatter(logging.Formatter(
-        '[%(process)d:%(threadName)s] [%(request_id)s] [%(name)s] %(levelname)s: %(message)s'))
+    default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
 
     # TODO: review settings reference
     # TODO: review potohub settings

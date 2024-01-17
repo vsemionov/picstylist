@@ -12,9 +12,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from . import VERSION
 
 
-REDIS_HOST = 'redis'
-
-
 class RequestIDLogFilter(logging.Filter):
     def filter(self, record):
         record.request_id = g.request_id or 'none'
@@ -35,8 +32,7 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
-    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'],
-        storage_uri=f'redis://{REDIS_HOST}:6379')
+    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'], storage_uri=f'redis://redis:6379')
 
     return app, limiter
 

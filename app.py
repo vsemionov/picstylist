@@ -15,9 +15,7 @@ def before_request():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    app.logger.info(request.headers) ###
-    import time ###
-    time.sleep(2) ###
+    app.logger.info('Test') ###
     if request.method == 'POST':
         content_file = request.files['content']
         style_file = request.files['style']

@@ -10,7 +10,7 @@ settings.configure(app)
 
 @app.before_request
 def before_request():
-    g.request_id = request.headers.get('X-Request-ID') or 'none'
+    g.request_id = request.headers.get('X-Request-ID')
 
 
 @app.route('/', methods=['GET', 'POST'])

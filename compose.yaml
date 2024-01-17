@@ -5,7 +5,7 @@ services:
       dockerfile: docker/web/Dockerfile
     environment:
       - APP_ENV=${APP_ENV}
-      - HAS_CDN=${HAS_CDN}
+      - PROXY_X_FOR_PROTO=${PROXY_X_FOR_PROTO}
       - SENTRY_DSN=${SENTRY_DSN}
     logging:
       driver: local

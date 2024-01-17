@@ -1,0 +1,7 @@
+services:
+  web:
+    extends:
+      file: compose.yaml
+      service: web
+    ports:
+      - 8000:8000

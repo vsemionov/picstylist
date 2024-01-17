@@ -12,7 +12,7 @@ from . import VERSION
 
 class RequestIDLogFilter(logging.Filter):
     def filter(self, record):
-        record.request_id = g.request_id
+        record.request_id = g.request_id or 'none'
         return True
 
 

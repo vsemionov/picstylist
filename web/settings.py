@@ -27,8 +27,9 @@ def configure(app):
     # TODO: check if this is per file or total
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-    x_for = int(os.environ['HAS_CDN']) + 1
-    app = ProxyFix(app, x_for=x_for, x_proto=1)
+    x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
+    if x_for or x_proto:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
     return app
 

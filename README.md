@@ -58,7 +58,7 @@ Each time, we measure the differences between:
  - the middle (texture) layer's output and the same layer's output when the network was given the style image
  - the last (content) layer's output and the same layer's output for the original image
 Then we adjust the image in the direction that would reduce these differences.
-Rinse and repeat until both differences are small enough, and voilà!
+Rinse and repeat until both differences are small enough, et voilà!
 
 Pretty cool, right? But there's a catch. The process is computationally intensive and slow.
 It can take minutes to style a single high-resolution image,

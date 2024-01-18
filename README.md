@@ -66,7 +66,7 @@ After training, each time we need to style a new image, we feed it to the networ
 and the result is a styled image, hopefully close to what the previous method would have produced.
 But this is much faster because it happens in one go and does not require multiple iterations.
 It also requires less memory. It still needs a few seconds, but that's much better than minutes.
-And with good hardware and/or modest image sizes, it can even work in real time and can be applied to videos.
+With good hardware and/or modest resolutions, it can work in real-time with videos.
 
 If you want to know more, check out the [original paper](https://arxiv.org/abs/1508.06576) by Gatys et al.,
 and the [fast style transfer paper](https://arxiv.org/abs/1705.06830) by Ghiasi et al.

@@ -16,7 +16,7 @@ app, limiter = settings.configure(app)
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit('5/minute;50/hour;200/day', methods=['POST'])
 def index():
-    captcha_limit = limiter.shared_limit('1/hour', scope='captcha', cost=lambda: int(request.method == 'POST'))
+    captcha_limit = limiter.shared_limit('3/hour', scope='captcha', cost=lambda: int(request.method == 'POST'))
     try:
         with captcha_limit:
             use_captcha = False if request.method == 'POST' else limiter.current_limit.remaining <= 0  # TODO: untested

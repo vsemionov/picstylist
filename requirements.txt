@@ -2,7 +2,7 @@ blinker==1.7.0
 certifi==2023.11.17
 click==8.1.7
 Deprecated==1.2.14
-Flask==3.0.0
+Flask==3.0.1
 Flask-Limiter==3.5.0
 gunicorn==21.2.0
 hiredis==2.3.2

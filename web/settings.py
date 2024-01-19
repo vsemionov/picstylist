@@ -36,10 +36,15 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
-    # TODO: review limiter settings
-    # TODO: review redis settings
     redis_pool = redis.BlockingConnectionPool.from_url(f"redis://{os.environ['REDIS_HOST']}:6379",
         max_connections=(gunicorn_conf.threads + 1), timeout=5, socket_timeout=5)
+
+    limiter_logger = logging.getLogger('flask-limiter')
+    limiter_logger.addHandler(default_handler)
+    limiter_logger.setLevel(logging.INFO)
+
+    # TODO: review limiter settings
+    # TODO: review redis settings
     limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window-elastic-expiry', swallow_errors=True)
 

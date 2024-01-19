@@ -9,6 +9,7 @@ services:
       - APP_ENV=${APP_ENV}
       - PROXY_X_FOR_PROTO=${PROXY_X_FOR_PROTO}
       - REDIS_HOST=${REDIS_HOST}
+      - SECRET_KEY=${SECRET_KEY}
       - SENTRY_DSN=${SENTRY_DSN}
     logging:
       driver: local

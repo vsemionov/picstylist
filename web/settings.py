@@ -42,8 +42,6 @@ def configure(app):
     limiter_logger.addHandler(default_handler)
     limiter_logger.setLevel(logging.INFO)
 
-    # TODO: review limiter settings
-    # TODO: review redis settings
     limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window-elastic-expiry', swallow_errors=True)
 

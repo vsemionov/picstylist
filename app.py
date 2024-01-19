@@ -53,10 +53,15 @@ def image(job_id, filename):
 
 @app.errorhandler(404)
 def not_found(e):
-    return render_template('404.html', error=e), 404
+    return render_template('404.html'), 404
 
 
 @app.errorhandler(429)
-def ratelimit_handler(e):
+def too_many_requests(e):
     lockout_time = ' '.join(e.description.split(' ')[-2:])
-    return render_template('429.html', error=e, lockout_time=lockout_time), 429
+    return render_template('429.html', limit=e.description, lockout_time=lockout_time), 429
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500

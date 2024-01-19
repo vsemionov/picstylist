@@ -28,9 +28,8 @@ def configure(app):
 
     # TODO: secret key for sessions
     # TODO: review settings reference
-    # TODO: review potohub settings
-    # TODO: check if this is per file or total
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    # TODO: review photohub settings
+    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
     if x_for or x_proto:

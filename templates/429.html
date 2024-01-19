@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Not Found{% endblock %}
+{% block title %}Too Many Requests{% endblock %}
 
 {% block content %}
 <h1>Please slow down.</h1>
 <p>
   To protect our application from bots and other malicious use, we limit the rate of image submissions.
-  You have exceeded the rate limit ({{ error.description }}) and have been temporarily locked out for {{ lockout_time }}.
+  You have exceeded the rate limit (<strong>{{ limit }}</strong>) and have been temporarily locked out for <strong>{{ lockout_time }}</strong>.
   You're welcome to retry after the lockout expires.
   Please don't retry too early, as that would prolong the lockout.
   Instead, wait for the lockout to expire and then retry.

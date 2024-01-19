@@ -14,7 +14,7 @@ class ImageValidator:
         self.max_resolution = max_resolution
 
     def __call__(self, form, field):
-        fmt, size = images.get_image_dimensions(field.data, self.max_resolution)
+        fmt, size = images.get_image_dimensions(field.data)
         width, height = size
         if any(v is None for v in [fmt, width, height]):
             raise StopValidation('Invalid or corrupt image.')
@@ -22,7 +22,7 @@ class ImageValidator:
             raise StopValidation(f'Unsupported image format. We support JPEG and PNG only.')
         if width * height > self.max_resolution * 1024 * 1024:
             raise StopValidation('Image resolution too high. '
-                f'The maximum allowed resolution is {self.max_resolution} MP.')
+                f'The maximum acceptable resolution is {self.max_resolution} MP.')
 
 
 validators = [
@@ -46,7 +46,7 @@ class UploadForm(FlaskForm):
             upload_size += f.tell()
             f.seek(0)
         if upload_size > settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024:
-            self.form_errors.append(f'Combined file size too large (max {settings.MAX_UPLOAD_SIZE_MB} MB).')
+            self.form_errors.append(f'Total upload size too large. We accept at most {settings.MAX_UPLOAD_SIZE_MB} MB.')
             return False
 
         return True

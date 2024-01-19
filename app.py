@@ -19,7 +19,7 @@ def index():
     captcha_limit = limiter.shared_limit('1/hour', scope='captcha', cost=lambda: int(request.method == 'POST'))
     try:
         with captcha_limit:
-            use_captcha = False
+            use_captcha = False if request.method == 'POST' else limiter.current_limit.remaining <= 0  # TODO: untested
     except RateLimitExceeded:
         use_captcha = True
 

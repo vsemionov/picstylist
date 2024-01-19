@@ -35,6 +35,13 @@
           </ul>
         {% endif %}
       </div>
+      <p>
+        <i>
+          <strong>JPEG</strong> or <strong>PNG</strong> format.
+          At most <strong>{{ limits.max_resolution_mp }} megapixels</strong> per image.
+          Both files must not exceed <strong>{{ limits.max_upload_size_mb }} MB</strong> in total.
+        </i>
+      </p>
       <input type="submit" value="Upload">
     </form>
   </div>

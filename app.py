@@ -32,7 +32,12 @@ def index():
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 
-    return render_template('index.html', form=form)
+    limits = {
+        'max_upload_size_mb': settings.MAX_UPLOAD_SIZE_MB,
+        'allowed_formats': settings.ALLOWED_FORMATS,
+        'max_resolution_mp': settings.MAX_RESOLUTION_MP
+    }
+    return render_template('index.html', form=form, limits=limits)
 
 
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')

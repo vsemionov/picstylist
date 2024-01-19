@@ -56,7 +56,7 @@ def configure(app):
     limiter_logger.setLevel(logging.INFO)
 
     limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
-        storage_options={'connection_pool': redis_pool}, strategy='fixed-window-elastic-expiry', swallow_errors=False)
+        storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
 
     redis_client = redis.Redis.from_pool(redis_pool)
     queue = Queue(connection=redis_client)

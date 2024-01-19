@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Bad Request{% endblock %}</h1>
+  <!-- TODO: test -->
+  <!-- TODO: image -->
+  <p>
+    The request you sent was invalid.
+    If you tried to upload files from a page that was open more than an hour, just go back and try again.
+  </p>
+  <p><a href="{{ url_for('index') }}">Home</a></p>
+{% endblock %}

@@ -8,9 +8,28 @@
   <div id="upload">
     <!-- TODO: show any errors -->
     <form action="{{ url_for('index') }}#upload" method="post" enctype="multipart/form-data">
-        <label for="file">File:</label>
-        <input type="file" name="file" id="file" required>
-        <input type="submit" value="Upload">
+      {{ form.csrf_token }}
+      <div>
+        {{ form.content_image.label }} {{ form.content_image }}
+        {% if form.content_image.errors %}
+          <ul>
+            {% for error in form.content_image.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      <div>
+        {{ form.style_image.label }} {{ form.style_image }}
+        {% if form.style_image.errors %}
+          <ul>
+            {% for error in form.style_image.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      <input type="submit" value="Upload">
     </form>
   </div>
   <p><a href="{{ url_for('html', name='model') }}">How it works</a></p>

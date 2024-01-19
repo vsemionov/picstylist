@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Too Large{% endblock %}</h1>
+  <!-- TODO: test -->
+  <!-- TODO: image -->
+  <p>
+    Sorry, but we cannot accept requests larger than <strong>{{ max_size }} MB</strong>.
+    Please go back and try again.
+  </p>
+  <p><a href="{{ url_for('index') }}">Home</a></p>
+{% endblock %}

@@ -6,16 +6,18 @@ from werkzeug.utils import secure_filename
 from jinja2 import TemplateNotFound
 
 from web import settings
+from web import forms
 
 
 app = Flask(__name__)
-app, limiter = settings.configure(app)
+app, limiter, queue = settings.configure(app)
 
 
 @app.route('/', methods=['GET', 'POST'])
-@limiter.limit('5/minute;50/hour;200/day', methods=['POST'])
+@limiter.limit(settings.RATE_LIMIT, methods=['POST'])
 def index():
-    if request.method == 'POST':
+    form = forms.UploadForm(request.form)
+    if request.method == 'POST' and form.validate():
         # TODO: validate form and secure CSRF
         file = request.files['file']
         filename = secure_filename(file.filename)
@@ -27,7 +29,7 @@ def index():
         redirect_url = url_for('result', session_id=session_id, job_id=123)
         return redirect(redirect_url)
 
-    return render_template('index.html')
+    return render_template('index.html', form=form)
 
 
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
@@ -61,6 +63,11 @@ def html(name):
         abort(404)
 
 
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template('errors/400.html'), 403
+
+
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('errors/403.html'), 403
@@ -69,6 +76,11 @@ def forbidden(e):
 @app.errorhandler(404)
 def not_found(e):
     return render_template('errors/404.html'), 404
+
+
+@app.errorhandler(413)
+def too_large(e):
+    return render_template('errors/413.html', max_size=settings.MAX_UPLOAD_SIZE_MB), 403
 
 
 @app.errorhandler(429)

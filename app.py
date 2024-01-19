@@ -18,7 +18,6 @@ app, limiter, queue = settings.configure(app)
 def index():
     form = forms.UploadForm()
     if form.validate_on_submit():
-        # TODO: validate form and secure CSRF
         content_image = form.content_image.data
         style_image = form.style_image.data
         filename = secure_filename(content_image.filename)

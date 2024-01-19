@@ -27,25 +27,28 @@ def index():
         style_file = request.files['style']
         content_filename = secure_filename(content_file.filename)
         style_filename = secure_filename(style_file.filename)
-        redirect_url = url_for('status', job_id='123')
+        redirect_url = url_for('status', session_id=123, job_id=123)
         return redirect(redirect_url)
     return render_template('index.html')
 
 
-@app.route('/s/<uuid:job_id>/')
-def status(job_id):
+# TODO: add vary header
+@app.route('/s/<uuid:session_id>/<uuid:job_id>/')
+def status(session_id, job_id):
     return {}
 
 
-@app.route('/x/<uuid:job_id>/')
-def result(job_id):
-    if job_id == '123':
+# TODO: add vary header
+@app.route('/x/<uuid:session_id>/<uuid:job_id>/')
+def result(session_id, job_id):
+    if job_id == 123:
         abort(404)
     return make_response()
 
 
-@app.route('/x/<uuid:job_id>/<path:filename>')
-def image(job_id, filename):
+# TODO: add vary header
+@app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
+def image(session_id, job_id, filename):
     dirname = f'results/{job_id}'
     response = send_from_directory(dirname, filename)
     return response

@@ -29,7 +29,7 @@ def configure(app):
     # TODO: secret key for sessions
     # TODO: review settings reference
     # TODO: review photohub settings
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = 15 * 1024 * 1024
 
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
     if x_for or x_proto:

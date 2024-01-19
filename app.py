@@ -1,5 +1,6 @@
 from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory
 from werkzeug.utils import secure_filename
+from flask_limiter import RateLimitExceeded
 
 from web import settings
 
@@ -14,9 +15,14 @@ def before_request():
 
 
 @app.route('/', methods=['GET', 'POST'])
-@limiter.limit('10 / minute')
+@limiter.limit('5/minute;50/hour;200/day', methods=['POST'])
 def index():
     if request.method == 'POST':
+        try:
+            with limiter.limit('3 / hour'):
+                use_captcha = False
+        except RateLimitExceeded:
+            use_captcha = True
         content_file = request.files['content']
         style_file = request.files['style']
         content_filename = secure_filename(content_file.filename)
@@ -46,5 +52,11 @@ def image(job_id, filename):
 
 
 @app.errorhandler(404)
-def not_found(error):
-    return render_template('404.html', error=error), 404
+def not_found(e):
+    return render_template('404.html', error=e), 404
+
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    lockout_time = ' '.join(e.description.split(' ')[-2:])
+    return render_template('429.html', error=e, lockout_time=lockout_time), 429

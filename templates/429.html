@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Not Found{% endblock %}
+
+{% block content %}
+<h1>Please slow down.</h1>
+<p>
+  To protect our application from bots and other malicious use, we limit the rate of image submissions.
+  You have exceeded the rate limit ({{ error.description }}) and have been temporarily locked out for {{ lockout_time }}.
+  You're welcome to retry after the lockout expires.
+  Please don't retry too early, as that would prolong the lockout.
+  Instead, wait for the lockout to expire and then retry.
+  We're sorry for the inconvenience.
+  Provided that this service is free and our resources are limited, we believe this limit is fair and enough for most people.
+  Nevertheless, we may increase it in the future.
+  Thank you for your understanding.
+</p>
+{% endblock %}

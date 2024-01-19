@@ -26,6 +26,7 @@ def configure(app):
     default_handler.addFilter(RequestIDLogFilter())
     default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
 
+    # TODO: secret key for sessions
     # TODO: review settings reference
     # TODO: review potohub settings
     # TODO: check if this is per file or total
@@ -37,10 +38,10 @@ def configure(app):
 
     # TODO: review limiter settings
     # TODO: review redis settings
-    redis_pool = redis.BlockingConnectionPool.from_url(f'redis://redis:6379',
+    redis_pool = redis.BlockingConnectionPool.from_url(f"redis://{os.environ['REDIS_HOST']}:6379",
         max_connections=(gunicorn_conf.threads + 1), timeout=5, socket_timeout=5)
-    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'], storage_uri=f'redis://',
-        storage_options={'connection_pool': redis_pool}, strategy='moving-window')
+    limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
+        storage_options={'connection_pool': redis_pool}, strategy='fixed-window-elastic-expiry', swallow_errors=True)
 
     return app, limiter
 

@@ -1,5 +1,7 @@
-from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory
-from werkzeug.utils import secure_filename
+import uuid
+
+from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory, \
+    session, jsonify
 from flask_limiter import RateLimitExceeded
 
 from web import settings
@@ -24,35 +26,44 @@ def index():
         except RateLimitExceeded:
             use_captcha = True
         # TODO: validate form
-        content_file = request.files['content']
-        style_file = request.files['style']
-        content_filename = secure_filename(content_file.filename)
-        style_filename = secure_filename(style_file.filename)
-        redirect_url = url_for('status', session_id=123, job_id=123)
+        file = request.files['file']
+        session_id = uuid.uuid4()
+        session['id'] = session_id
+        redirect_url = url_for('result', session_id=session_id, job_id=123)
         return redirect(redirect_url)
     return render_template('index.html')
 
 
 # TODO: add vary header
-@app.route('/s/<uuid:session_id>/<uuid:job_id>/')
+# TODO: if session_id is not signed, use its hash in urls
+@app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
 def status(session_id, job_id):
-    return {}
+    if session_id != session.get('id'):
+        return jsonify({}), 403
+    return jsonify({})
 
 
 # TODO: add vary header
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
-    if job_id == 123:
-        abort(404)
+    if session_id != session.get('id'):
+        abort(403)
     return make_response()
 
 
 # TODO: add vary header
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
 def image(session_id, job_id, filename):
+    if session_id != session.get('id'):
+        abort(403)
     dirname = f'results/{job_id}'
     response = send_from_directory(dirname, filename)
     return response
+
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
 
 
 @app.errorhandler(404)

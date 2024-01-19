@@ -39,8 +39,6 @@ def configure(app):
     default_handler.addFilter(RequestIDLogFilter())
     default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
 
-    # TODO: review settings reference
-    # TODO: review photohub settings
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
 

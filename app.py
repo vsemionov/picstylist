@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory, \
+from flask import Flask, request, url_for, abort, redirect, render_template, make_response, send_from_directory, \
     session, jsonify
 from werkzeug.utils import secure_filename
 from jinja2 import TemplateNotFound
@@ -11,11 +11,6 @@ from web import settings
 
 app = Flask(__name__)
 app, limiter = settings.configure(app)
-
-
-@app.before_request
-def before_request():
-    g.request_id = request.headers.get('X-Request-ID')
 
 
 @app.route('/', methods=['GET', 'POST'])

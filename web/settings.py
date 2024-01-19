@@ -1,7 +1,7 @@
 import os
 import logging
 
-from flask import g
+from flask import request, g
 from flask.logging import default_handler
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_limiter import Limiter
@@ -17,11 +17,15 @@ from conf import gunicorn as gunicorn_conf
 
 class RequestIDLogFilter(logging.Filter):
     def filter(self, record):
-        record.request_id = g.request_id or 'none'
+        record.request_id = g.get('request_id', 'n/a') or 'none'
         return True
 
 
 def configure(app):
+    @app.before_request
+    def before_request():
+        g.request_id = request.headers.get('X-Request-ID')
+
     app.logger.setLevel(logging.INFO)
     default_handler.addFilter(RequestIDLogFilter())
     default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))

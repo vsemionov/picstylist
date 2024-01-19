@@ -1,7 +1,6 @@
 import uuid
 
-from flask import Flask, request, url_for, abort, redirect, render_template, make_response, send_from_directory, \
-    session, jsonify
+from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify
 from werkzeug.utils import secure_filename
 from jinja2 import TemplateNotFound
 
@@ -33,7 +32,6 @@ def index():
 
     limits = {
         'max_upload_size_mb': settings.MAX_UPLOAD_SIZE_MB,
-        'allowed_formats': settings.ALLOWED_FORMATS,
         'max_resolution_mp': settings.MAX_RESOLUTION_MP
     }
     return render_template('index.html', form=form, limits=limits)
@@ -50,7 +48,7 @@ def status(session_id, job_id):
 def result(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
-    return make_response()
+    return ''
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')

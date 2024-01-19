@@ -14,8 +14,7 @@ class ImageValidator:
         self.max_resolution = max_resolution
 
     def __call__(self, form, field):
-        fmt, size = images.get_image_dimensions(field.data)
-        width, height = size
+        fmt, (width, height) = images.get_image_dimensions(field.data)
         if any(v is None for v in [fmt, width, height]):
             raise StopValidation('Invalid or corrupt image.')
         if fmt not in settings.ALLOWED_FORMATS:

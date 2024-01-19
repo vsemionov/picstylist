@@ -4,6 +4,7 @@ from flask import Flask, request, url_for, abort, redirect, render_template, mak
     session, jsonify
 from werkzeug.utils import secure_filename
 from jinja2 import TemplateNotFound
+from flask_limiter import RateLimitExceeded
 
 from web import settings
 
@@ -15,6 +16,13 @@ app, limiter = settings.configure(app)
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit('5/minute;50/hour;200/day', methods=['POST'])
 def index():
+    captcha_limit = limiter.shared_limit('1/hour', scope='captcha', cost=lambda: int(request.method == 'POST'))
+    try:
+        with captcha_limit:
+            use_captcha = False
+    except RateLimitExceeded:
+        use_captcha = True
+
     if request.method == 'POST':
         # TODO: validate form and secure CSRF
         file = request.files['file']

@@ -6,10 +6,13 @@ from flask.logging import default_handler
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import redis
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 from . import VERSION
+from conf import gunicorn as gunicorn_conf
 
 
 class RequestIDLogFilter(logging.Filter):
@@ -34,8 +37,10 @@ def configure(app):
 
     # TODO: review limiter settings
     # TODO: review redis settings
-    # TODO: redis connection pool
-    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'], storage_uri=f'redis://redis:6379')
+    redis_pool = redis.BlockingConnectionPool.from_url(f'redis://redis:6379',
+        max_connections=(gunicorn_conf.threads + 1), timeout=5, socket_timeout=5)
+    limiter = Limiter(get_remote_address, app=app, default_limits=['100 / minute'], storage_uri=f'redis://',
+        storage_options={'connection_pool': redis_pool}, strategy='moving-window')
 
     return app, limiter
 
@@ -46,4 +51,5 @@ if not sentry_dsn:
     if app_env != 'development':
         raise ValueError('SENTRY_DSN is required on remote environments.')
     logging.getLogger(__name__).warning('SENTRY_DSN not set, Sentry disabled.')
-sentry_sdk.init(sentry_dsn, release=VERSION, environment=app_env, integrations=[FlaskIntegration()])
+integrations = [FlaskIntegration(), RedisIntegration()]
+sentry_sdk.init(sentry_dsn, release=VERSION, environment=app_env, integrations=integrations)

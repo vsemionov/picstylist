@@ -3,6 +3,7 @@ import zlib
 
 
 # https://github.com/django/django/blob/5.0.1/django/core/files/images.py
+# modified to also return the image format
 def get_image_dimensions(file_or_path, close=False):
     """
     Return the (width, height) of an image, given an open file or a path.  Set
@@ -20,7 +21,7 @@ def get_image_dimensions(file_or_path, close=False):
         try:
             file = open(file_or_path, "rb")
         except OSError:
-            return (None, None)
+            return None, (None, None)
         close = True
     try:
         # Most of the time Pillow only needs a small chunk to parse the image
@@ -50,9 +51,9 @@ def get_image_dimensions(file_or_path, close=False):
                 # WebP files. A different chunk_size may work.
                 pass
             if p.image:
-                return p.image.size
+                return p.image.format, p.image.size
             chunk_size *= 2
-        return (None, None)
+        return None, (None, None)
     finally:
         if close:
             file.close()

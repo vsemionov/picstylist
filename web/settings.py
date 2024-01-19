@@ -19,6 +19,10 @@ from conf import gunicorn as gunicorn_conf
 RATE_LIMIT = '5/minute;50/hour;200/day'
 JOB_KWARGS = dict(job_timeout=30, result_ttl=(2 * 60 * 60), ttl=(30 * 60), failure_ttl=(2 * 60 * 60))
 MAX_UPLOAD_SIZE_MB = 10
+ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
+ALLOWED_FORMATS = ['JPEG', 'PNG']
+MAX_RESOLUTION_MP = 25
+
 
 class RequestIDLogFilter(logging.Filter):
     def filter(self, record):

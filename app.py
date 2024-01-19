@@ -17,16 +17,19 @@ app, limiter, queue = settings.configure(app)
 @limiter.limit(settings.RATE_LIMIT, methods=['POST'])
 def index():
     form = forms.UploadForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         # TODO: validate form and secure CSRF
-        file = request.files['file']
-        filename = secure_filename(file.filename)
+        content_image = form.content_image.data
+        style_image = form.style_image.data
+        filename = secure_filename(content_image.filename)
+
+        job_id = uuid.uuid4()
 
         session_id = session.get('id')
         if session_id is None:
             session_id = uuid.uuid4()
             session['id'] = session_id
-        redirect_url = url_for('result', session_id=session_id, job_id=123)
+        redirect_url = url_for('result', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 
     return render_template('index.html', form=form)

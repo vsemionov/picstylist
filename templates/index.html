@@ -6,10 +6,17 @@
 {% block content %}
   <h1>Hello World!</h1>
   <div id="upload">
-    <!-- TODO: show any errors -->
+    {% if form.form_errors %}
+      <ul>
+        {% for error in form.form_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
     <form action="{{ url_for('index') }}#upload" method="post" enctype="multipart/form-data">
       {{ form.csrf_token }}
       <div>
+        <!-- TODO: test -->
         {{ form.content_image.label }} {{ form.content_image }}
         {% if form.content_image.errors %}
           <ul>
@@ -20,6 +27,7 @@
         {% endif %}
       </div>
       <div>
+        <!-- TODO: test -->
         {{ form.style_image.label }} {{ form.style_image }}
         {% if form.style_image.errors %}
           <ul>

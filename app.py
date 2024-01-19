@@ -36,8 +36,6 @@ def index():
     return render_template('index.html')
 
 
-# TODO: add vary header
-# TODO: if session_id is not signed, use its hash in urls
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
 def status(session_id, job_id):
     if session_id != session.get('id'):
@@ -45,7 +43,6 @@ def status(session_id, job_id):
     return jsonify({})
 
 
-# TODO: add vary header
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
     if session_id != session.get('id'):
@@ -53,7 +50,6 @@ def result(session_id, job_id):
     return make_response()
 
 
-# TODO: add vary header
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
 def image(session_id, job_id, filename):
     if session_id != session.get('id'):

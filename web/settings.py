@@ -26,9 +26,9 @@ def configure(app):
     default_handler.addFilter(RequestIDLogFilter())
     default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
 
-    # TODO: secret key for sessions
     # TODO: review settings reference
     # TODO: review photohub settings
+    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['MAX_CONTENT_LENGTH'] = 15 * 1024 * 1024
 
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]

@@ -64,6 +64,11 @@ def model():
     return render_template('model.html')
 
 
+@app.route('/math/')
+def math():
+    return render_template('math.html')
+
+
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('403.html'), 403

@@ -2,6 +2,8 @@ import uuid
 
 from flask import Flask, request, g, url_for, abort, redirect, render_template, make_response, send_from_directory, \
     session, jsonify
+from werkzeug.utils import secure_filename
+from jinja2 import TemplateNotFound
 from flask_limiter import RateLimitExceeded
 
 from web import settings
@@ -27,6 +29,7 @@ def index():
             use_captcha = True
         # TODO: validate form and secure CSRF
         file = request.files['file']
+        filename = secure_filename(file.filename)
         session_id = session.get('id')
         if session_id is None:
             session_id = uuid.uuid4()
@@ -54,37 +57,35 @@ def result(session_id, job_id):
 def image(session_id, job_id, filename):
     if session_id != session.get('id'):
         abort(403)
-    dirname = f'results/{job_id}'
+    dirname = f'results/{session_id}/{job_id}'
     response = send_from_directory(dirname, filename)
     return response
 
 
-@app.route('/model/')
-def model():
-    return render_template('model.html')
-
-
-@app.route('/math/')
-def math():
-    return render_template('math.html')
+@app.route('/<path:name>.html')
+def html(name):
+    try:
+        return render_template(f'pages/{name}.html')
+    except TemplateNotFound:
+        abort(404)
 
 
 @app.errorhandler(403)
 def forbidden(e):
-    return render_template('403.html'), 403
+    return render_template('errors/403.html'), 403
 
 
 @app.errorhandler(404)
 def not_found(e):
-    return render_template('404.html'), 404
+    return render_template('errors/404.html'), 404
 
 
 @app.errorhandler(429)
 def too_many_requests(e):
     lockout_time = ' '.join(e.description.split(' ')[-2:])
-    return render_template('429.html', limit=e.description, lockout_time=lockout_time), 429
+    return render_template('errors/429.html', limit=e.description, lockout_time=lockout_time), 429
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    return render_template('errors/500.html'), 500

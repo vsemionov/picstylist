@@ -33,8 +33,8 @@ validators = [
 
 
 class UploadForm(FlaskForm):
-    content_image = FileField('Original image', validators=[FileRequired()])
-    style_image = FileField('Style image', validators=[FileRequired()])
+    content_image = FileField('Original image', validators=validators)
+    style_image = FileField('Style image', validators=validators)
 
     def validate(self, extra_validators = None):
         if not super().validate():

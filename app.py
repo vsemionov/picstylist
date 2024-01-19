@@ -16,7 +16,7 @@ app, limiter, queue = settings.configure(app)
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit(settings.RATE_LIMIT, methods=['POST'])
 def index():
-    form = forms.UploadForm(request.form)
+    form = forms.UploadForm()
     if form.validate_on_submit():
         # TODO: validate form and secure CSRF
         content_image = form.content_image.data

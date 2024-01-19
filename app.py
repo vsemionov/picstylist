@@ -25,7 +25,7 @@ def index():
                 use_captcha = False
         except RateLimitExceeded:
             use_captcha = True
-        # TODO: validate form
+        # TODO: validate form and secure CSRF
         file = request.files['file']
         session_id = session.get('id')
         if session_id is None:
@@ -57,6 +57,11 @@ def image(session_id, job_id, filename):
     dirname = f'results/{job_id}'
     response = send_from_directory(dirname, filename)
     return response
+
+
+@app.route('/model/')
+def model():
+    return render_template('model.html')
 
 
 @app.errorhandler(403)

@@ -1,36 +1,8 @@
-"""
-Utility functions for handling images.
-
-Requires Pillow as you might imagine.
-"""
 import struct
 import zlib
 
-from django.core.files import File
 
-
-class ImageFile(File):
-    """
-    A mixin for use alongside django.core.files.base.File, which provides
-    additional features for dealing with images.
-    """
-
-    @property
-    def width(self):
-        return self._get_image_dimensions()[0]
-
-    @property
-    def height(self):
-        return self._get_image_dimensions()[1]
-
-    def _get_image_dimensions(self):
-        if not hasattr(self, "_dimensions_cache"):
-            close = self.closed
-            self.open()
-            self._dimensions_cache = get_image_dimensions(self, close=close)
-        return self._dimensions_cache
-
-
+# https://github.com/django/django/blob/5.0.1/django/core/files/images.py
 def get_image_dimensions(file_or_path, close=False):
     """
     Return the (width, height) of an image, given an open file or a path.  Set

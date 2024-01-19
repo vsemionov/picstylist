@@ -27,8 +27,10 @@ def index():
             use_captcha = True
         # TODO: validate form
         file = request.files['file']
-        session_id = uuid.uuid4()
-        session['id'] = session_id
+        session_id = session.get('id')
+        if session_id is None:
+            session_id = uuid.uuid4()
+            session['id'] = session_id
         redirect_url = url_for('result', session_id=session_id, job_id=123)
         return redirect(redirect_url)
     return render_template('index.html')

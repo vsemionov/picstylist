@@ -16,21 +16,25 @@ app, limiter = settings.configure(app)
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit('5/minute;50/hour;200/day', methods=['POST'])
 def index():
+    captcha_limit = limiter.shared_limit('1/hour', scope='captcha', cost=lambda: int(request.method == 'POST'))
+    try:
+        with captcha_limit:
+            use_captcha = False
+    except RateLimitExceeded:
+        use_captcha = True
+
     if request.method == 'POST':
-        try:
-            with limiter.limit('3 / hour'):
-                use_captcha = False
-        except RateLimitExceeded:
-            use_captcha = True
         # TODO: validate form and secure CSRF
         file = request.files['file']
         filename = secure_filename(file.filename)
+
         session_id = session.get('id')
         if session_id is None:
             session_id = uuid.uuid4()
             session['id'] = session_id
         redirect_url = url_for('result', session_id=session_id, job_id=123)
         return redirect(redirect_url)
+
     return render_template('index.html')
 
 

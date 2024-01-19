@@ -23,6 +23,7 @@ def index():
                 use_captcha = False
         except RateLimitExceeded:
             use_captcha = True
+        # TODO: validate form
         content_file = request.files['content']
         style_file = request.files['style']
         content_filename = secure_filename(content_file.filename)

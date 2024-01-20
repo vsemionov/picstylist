@@ -15,7 +15,12 @@ if __name__ == '__main__':
     config.configure()
 
     # preload libraries
-    import worker.model
+    import numpy
+    import tensorflow
+    import tensorflow_hub
+    from PIL import Image
+    # NOTE: Ideally, we would preload the model too, but it turns out TensorFlow is not fork-safe and deadlocks.
+    # The standard solution seems to be to deploy TensorFlow Serving, but that's a bit overkill for this project.
 
     w = Worker(['default'], connection=Redis(os.environ['REDIS_HOST']))
     w.work()

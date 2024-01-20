@@ -20,14 +20,11 @@ def load_image(image_path):
         scale = MAX_SIZE / long_edge
         width, height = max(int(width * scale), 1), max(int(height * scale), 1)
         image = image.resize((width, height))
-    return tf.constant(image, dtype=tf.float32) / 255
+    return tf.constant(image, dtype=tf.float32)[tf.newaxis, :] / 255
 
 
 def tensor_to_image(tensor):
-    array = np.array(tensor * 255, dtype=np.uint8)
-    if np.ndim(array) > 3:
-        assert array.shape[0] == 1
-        array = array[0]
+    array = np.array(tensor * 255, dtype=np.uint8)[0]
     return Image.fromarray(array)
 
 

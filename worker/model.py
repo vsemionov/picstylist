@@ -7,7 +7,7 @@ from PIL import Image
 
 MAX_SIZE = 1024
 
-os.environ['TFHUB_CACHE_DIR'] = '/Users/victor/tmp'
+assert os.environ['TFHUB_CACHE_DIR']
 hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
 

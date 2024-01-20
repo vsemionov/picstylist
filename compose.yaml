@@ -11,6 +11,8 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - SECRET_KEY=${SECRET_KEY}
       - SENTRY_DSN=${SENTRY_DSN}
+    volumes:
+      - app_data:/app/data
     logging:
       driver: local
     depends_on:
@@ -28,10 +30,11 @@ services:
       context: .
       dockerfile: docker/worker/Dockerfile
     environment:
-      - DATA_DIR=${DATA_DIR}
       - REDIS_HOST=${REDIS_HOST}
       - SENTRY_DSN=${SENTRY_DSN}
       - TFHUB_CACHE_DIR=${TFHUB_CACHE_DIR}
+    volumes:
+      - app_data:/app/data
     logging:
       driver: local
     depends_on:
@@ -81,4 +84,5 @@ services:
           memory: 128m
 
 volumes:
+  app_data:
   redis_data:

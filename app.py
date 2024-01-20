@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 
 from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify
 from werkzeug.utils import secure_filename
@@ -12,6 +13,18 @@ app = Flask(__name__)
 app, limiter, queue = settings.configure(app)
 
 
+def prepare_job(session_id, job_id, content_image, style_image):
+    root = Path(app.root_path) / 'data' / str(session_id) / str(job_id)
+    content_filename = Path(secure_filename(content_image.filename))
+    content_path = root / content_filename
+    style_path = root / secure_filename(style_image.filename)
+    result_stem = root / f'{content_filename.stem} (styled)'
+    root.mkdir(parents=True, exist_ok=True)
+    content_image.save(content_path)
+    style_image.save(style_path)
+    return content_path, style_path, result_stem
+
+
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit(settings.RATE_LIMIT, methods=['POST'])
 def index():
@@ -19,14 +32,17 @@ def index():
     if form.validate_on_submit():
         content_image = form.content_image.data
         style_image = form.style_image.data
-        filename = secure_filename(content_image.filename)
-
-        job_id = uuid.uuid4()
 
         session_id = session.get('id')
         if session_id is None:
             session_id = uuid.uuid4()
             session['id'] = session_id
+        job_id = uuid.uuid4()
+
+        content_path, style_path, result_stem = prepare_job(session_id, job_id, content_image, style_image)
+        queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
+            **settings.JOB_KWARGS)
+
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 

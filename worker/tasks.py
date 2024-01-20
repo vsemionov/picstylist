@@ -3,12 +3,12 @@ import os
 import worker.model
 
 
-def style_image(content_path, style_path, output_name):
+def style_image(content_path, style_path, result_stem):
     try:
-        return worker.model.fast_style_transfer(content_path, style_path, output_name)
+        return worker.model.fast_style_transfer(content_path, style_path, result_stem)
     finally:
-        try:
-            os.remove(content_path)
-            os.remove(style_path)
-        except OSError:
-            pass
+        for path in [content_path, style_path]:
+            try:
+                os.remove(path)
+            except OSError:
+                pass

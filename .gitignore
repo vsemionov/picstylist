@@ -5,8 +5,8 @@
 /.env
 /conf/ssl
 
-/app/data
-/app/model
+/data
+/model
 
 
 # Byte-compiled / optimized / DLL files

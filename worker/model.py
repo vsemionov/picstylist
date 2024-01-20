@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -7,7 +8,7 @@ from PIL import Image
 
 MAX_SIZE = 1024
 
-assert os.environ['TFHUB_CACHE_DIR']
+os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent / '..' / 'model')
 hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
 

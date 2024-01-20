@@ -1,24 +1,21 @@
 #!/usr/bin/env python
 
+import sys
 import os
+from pathlib import Path
 
 from redis import Redis
 from rq import Worker
 
-# preload libraries
-from . import model
 
+if __name__ == '__main__':
+    sys.path.append(str(Path(__file__).parent / '..'))
 
-def style_image(content_path, style_path, output_name):
-    try:
-        return model.fast_style_transfer(content_path, style_path, output_name)
-    finally:
-        try:
-            os.remove(content_path)
-            os.remove(style_path)
-        except OSError:
-            pass
+    from worker import config
+    config.configure()
 
+    # preload libraries
+    import worker.model
 
-worker = Worker(['default'], connection=Redis(os.environ['REDIS_HOST']))
-worker.work()
+    w = Worker(['default'], connection=Redis(os.environ['REDIS_HOST']))
+    w.work()

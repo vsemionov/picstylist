@@ -1,9 +1,10 @@
-import os
+import logging.config
+
+from common.integration import configure_sentry
 
 
-SENTRY_DSN = os.environ['SENTRY_DSN']
-
-DICT_CONFIG = {
+# TODO: test
+logging_config = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
@@ -27,3 +28,10 @@ DICT_CONFIG = {
         },
     }
 }
+
+
+def configure():
+    logging.config.dictConfig(logging_config)
+
+    # TODO: test
+    configure_sentry()

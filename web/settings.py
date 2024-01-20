@@ -8,12 +8,9 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import redis
 from rq import Queue
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
-from sentry_sdk.integrations.redis import RedisIntegration
-
-from . import VERSION
 from conf import gunicorn as gunicorn_conf
+
+from common.integration import configure_sentry
 
 
 RATE_LIMIT = '5/minute;50/hour;200/day'
@@ -46,7 +43,7 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
-    redis_pool = redis.BlockingConnectionPool.from_url(f"redis://{os.environ['REDIS_HOST']}:6379",
+    redis_pool = redis.BlockingConnectionPool.from_url(f"redis://{os.environ['REDIS_HOST']}",
         max_connections=(gunicorn_conf.threads + 1), timeout=5, socket_timeout=5)
 
     limiter_logger = logging.getLogger('flask-limiter')
@@ -62,11 +59,4 @@ def configure(app):
     return app, limiter, queue
 
 
-app_env = os.environ['APP_ENV']
-sentry_dsn = os.environ['SENTRY_DSN']
-if not sentry_dsn:
-    if app_env != 'development':
-        raise ValueError('SENTRY_DSN is required on remote environments.')
-    logging.getLogger(__name__).warning('SENTRY_DSN not set, Sentry disabled.')
-integrations = [FlaskIntegration(), RedisIntegration()]
-sentry_sdk.init(sentry_dsn, release=VERSION, environment=app_env, integrations=integrations)
+configure_sentry(with_flask=True)

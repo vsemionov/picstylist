@@ -7,10 +7,10 @@ COPY requirements-worker.txt ./
 #RUN pip install --no-cache-dir -U pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements-worker.txt
 
-COPY conf/worker.py conf/
-COPY worker ./worker
-
-RUN mkdir model
+COPY worker/model.py worker/
 RUN python worker/model.py
+
+COPY common ./common
+COPY worker ./worker
 
 CMD ["python", "worker/main.py"]

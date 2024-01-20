@@ -30,9 +30,9 @@ services:
       context: .
       dockerfile: docker/worker/Dockerfile
     environment:
+      - APP_ENV=${APP_ENV}
       - REDIS_HOST=${REDIS_HOST}
       - SENTRY_DSN=${SENTRY_DSN}
-      - TFHUB_CACHE_DIR=${TFHUB_CACHE_DIR}
     volumes:
       - app_data:/app/data
     logging:

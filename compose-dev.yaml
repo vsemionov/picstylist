@@ -6,6 +6,10 @@ services:
       service: web
     ports:
       - '8000:8000'
+  worker:
+    extends:
+      file: compose.yaml
+      service: worker
   nginx:
     extends:
       file: compose.yaml

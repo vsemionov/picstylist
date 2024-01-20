@@ -23,6 +23,27 @@ services:
         limits:
           memory: 256m
 
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile
+    environment:
+      - DATA_DIR=${DATA_DIR}
+      - REDIS_HOST=${REDIS_HOST}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - TFHUB_CACHE_DIR=${TFHUB_CACHE_DIR}
+    logging:
+      driver: local
+    depends_on:
+      - redis
+    restart: always
+    # TODO
+    #healthcheck:
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
   nginx:
     build:
       context: .

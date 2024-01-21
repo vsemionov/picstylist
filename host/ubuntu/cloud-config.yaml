@@ -15,13 +15,17 @@ users:
     ssh_import_id:
       - gh:vsemionov
 runcmd:
+  - rm /root/.ssh/authorized_keys
   - dd if=/dev/zero of=/swapfile bs=1M count=2048
   - chmod '600' /swapfile
   - mkswap /swapfile
   - swapon /swapfile
-  - rm /root/.ssh/authorized_keys
+  - snap refresh
 packages:
   - net-tools
   - docker.io
   - docker-buildx
   - docker-compose-v2
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true

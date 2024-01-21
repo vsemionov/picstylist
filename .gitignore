@@ -3,6 +3,8 @@
 .DS_Store
 
 /.env
+/compose.override.yaml
+
 /conf/ssl
 
 /data

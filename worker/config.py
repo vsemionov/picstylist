@@ -3,7 +3,6 @@ import logging.config
 from common.integration import configure_sentry
 
 
-# TODO: test
 logging_config = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -32,6 +31,4 @@ logging_config = {
 
 def configure():
     logging.config.dictConfig(logging_config)
-
-    # TODO: test
     configure_sentry()

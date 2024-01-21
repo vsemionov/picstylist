@@ -32,6 +32,8 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - REDIS_HOST=${REDIS_HOST}
+      - RQ_DASHBOARD_USERNAME=${RQ_DASHBOARD_USERNAME}
+      - RQ_DASHBOARD_PASSWORD=${RQ_DASHBOARD_PASSWORD}
       - SENTRY_DSN=${SENTRY_DSN}
     volumes:
       - app_data:/app/data

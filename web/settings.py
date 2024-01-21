@@ -11,6 +11,7 @@ from flask_limiter.util import get_remote_address
 import redis
 from rq import Queue
 from rq_scheduler import Scheduler
+import rq_dashboard.cli
 
 from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
@@ -48,28 +49,34 @@ def configure(app):
     def before_request():
         g.request_id = request.headers.get('X-Request-ID')
 
+    # Flask
+    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+    app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
+
+    # Logging
     app.logger.setLevel(logging.INFO)
     default_handler.addFilter(RequestIDLogFilter())
     default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
 
-    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-    app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
-
+    # ProxyFix
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
-    redis_pool = redis.BlockingConnectionPool.from_url(f"redis://{os.environ['REDIS_HOST']}",
-        max_connections=(gunicorn_conf.threads + 1), timeout=5, socket_timeout=5)
+    # Redis
+    redis_url = f"redis://{os.environ['REDIS_HOST']}"
+    redis_pool = redis.BlockingConnectionPool.from_url(redis_url, max_connections=(gunicorn_conf.threads + 1),
+        timeout=5, socket_timeout=5)
+    redis_client = redis.Redis.from_pool(redis_pool)
 
+    # Flask-Limiter
     limiter_logger = logging.getLogger('flask-limiter')
     limiter_logger.addHandler(default_handler)
     limiter_logger.setLevel(logging.INFO)
-
     limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
 
-    redis_client = redis.Redis.from_pool(redis_pool)
+    # RQ
     image_queue = Queue(name='images', connection=redis_client)
     system_queue = Queue(name='system', connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
@@ -77,6 +84,17 @@ def configure(app):
         job.delete()
     scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', description='cleanup_data', interval=(15 * 60),
         timeout=30, args=[get_data_dir(app, as_path=False), JOB_KWARGS])
+
+    # RQ Dashboard
+    username = os.environ['RQ_DASHBOARD_USERNAME']
+    password = os.environ['RQ_DASHBOARD_PASSWORD']
+    assert len(username) > 0 and len(password) > 0
+    app.config['RQ_DASHBOARD_REDIS_URL'] = redis_url
+    app.config.from_object(rq_dashboard.default_settings)
+    rq_dashboard.web.setup_rq_connection(app)
+    rq_dashboard.cli.add_basic_auth(rq_dashboard.blueprint, username, password)
+    limiter.limit('3 per 15 minutes', deduct_when=lambda response: response.status_code == 401)(rq_dashboard.blueprint)
+    app.register_blueprint(rq_dashboard.blueprint, url_prefix='/rq')
 
     return app, limiter, image_queue
 

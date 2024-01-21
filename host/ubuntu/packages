@@ -1,4 +1,4 @@
 net-tools
 docker.io
 docker-buildx
-docker-compose
+docker-compose-v2

@@ -21,6 +21,34 @@ users:
       - gh:vsemionov
 
 
+write_files:
+  - path: /root/post-receive
+    permissions: '0755'
+    content: |
+      #!/bin/sh
+      
+      set -e
+      
+      APP_NAME="picstylist"
+      MAIN_BRANCH="main"
+      export GIT_WORK_TREE="/opt/$APP_NAME"
+      
+      while read oldrev newrev refname
+      do
+          branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
+          if [ "$branch" = "$MAIN_BRANCH" ]
+          then
+              git checkout -f "$MAIN_BRANCH"
+              if [ -n "$(git status --porcelain)" ]
+              then
+                  echo "Work tree at $GIT_WORK_TREE is dirty."
+                  exit 1
+              fi
+              sudo "$GIT_WORK_TREE"/bin/deploy
+          fi
+      done
+
+
 runcmd:
   - rm /root/.ssh/authorized_keys
 
@@ -34,33 +62,8 @@ runcmd:
   - sudo -u victor mkdir ~victor/picstylist
   - sudo -u victor git init --bare -b main ~victor/picstylist.git
   - mv ~victor/picstylist ~victor/picstylist.git /opt/
-  - |
-    sudo -u victor sh -c 'cat >/opt/picstylist.git/hooks/post-receive <<EOF
-    #!/bin/sh
-    
-    set -e
-    
-    APP_NAME="picstylist"
-    MAIN_BRANCH="main"
-    export GIT_WORK_TREE="/opt/\$APP_NAME"
-    
-    while read oldrev newrev refname
-    do
-        branch=\$(git rev-parse --symbolic --abbrev-ref "\$refname")
-        if [ "\$branch" = "\$MAIN_BRANCH" ]
-        then
-            git checkout -f "\$MAIN_BRANCH"
-            if [ -n "\$(git status --porcelain)" ]
-            then
-                echo "Work tree at \$GIT_WORK_TREE is dirty."
-                exit 1
-            fi
-            sudo "\$GIT_WORK_TREE"/bin/deploy
-        fi
-    done
-    EOF
-    '
-  - chmod +x /opt/picstylist.git/hooks/post-receive
+  - mv /root/post-receive /opt/picstylist.git/hooks/post-receive
+  - chown victor:victor /root/post-receive
 
 
 packages:

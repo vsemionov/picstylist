@@ -8,8 +8,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import redis
 from rq import Queue
-from conf import gunicorn as gunicorn_conf
 
+from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
 
 

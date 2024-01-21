@@ -42,8 +42,8 @@ services:
     depends_on:
       - redis
     restart: always
-#    healthcheck:
-#      test: for ip in $(awk '/32 host/ { print f } {f=$2}' </proc/net/fib_trie); do rq info -W | fgrep $$ip | egrep '(idle|busy)' >/dev/null && exit; done
+    healthcheck:
+      test: for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie) | uniq; do rq info -W | fgrep $$ip | egrep '(idle|busy)' >/dev/null && exit; done
     deploy:
       resources:
         limits:

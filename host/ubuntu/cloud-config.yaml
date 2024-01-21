@@ -35,9 +35,9 @@ runcmd:
   - sudo -u victor mkdir ~victor/picstylist
   - sudo -u victor git init --bare -b main ~victor/picstylist.git
   - mv ~victor/picstylist ~victor/picstylist.git /opt/
-  - sudo -u victor sh -c |
-    cat > /opt/picstylist.git/hooks/post-receive <<EOF
-    \#!/bin/sh
+  - |
+    sudo -u victor sh -c 'cat > /opt/picstylist.git/hooks/post-receive <<EOF
+    #!/bin/sh
     
     set -e
     
@@ -60,6 +60,7 @@ runcmd:
         fi
     done
     EOF
+    '
 
 
 packages:

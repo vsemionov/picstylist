@@ -10,11 +10,11 @@ from web import forms
 
 
 app = Flask(__name__)
-app, limiter, queue = settings.configure(app)
+app, limiter, image_queue = settings.configure(app)
 
 
 def prepare_job(session_id, job_id, content_image, style_image):
-    root = Path(app.root_path) / 'data' / str(session_id) / str(job_id)
+    root = settings.get_data_dir(app) / str(session_id) / str(job_id)
     content_filename = Path(secure_filename(content_image.filename))
     content_path = root / content_filename
     style_path = root / secure_filename(style_image.filename)
@@ -40,7 +40,7 @@ def index():
         job_id = uuid.uuid4()
 
         content_path, style_path, result_stem = prepare_job(session_id, job_id, content_image, style_image)
-        queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
+        image_queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
             **settings.JOB_KWARGS)
 
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)

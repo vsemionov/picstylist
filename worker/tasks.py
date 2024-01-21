@@ -1,5 +1,7 @@
 import os
+import errno
 import logging
+from datetime import datetime, timedelta
 
 
 logger = logging.getLogger(__name__)
@@ -8,7 +10,6 @@ logger = logging.getLogger(__name__)
 def style_image(content_path, style_path, result_stem):
     try:
         import worker.model
-        logger.info(f'Processing')
         return worker.model.fast_style_transfer(content_path, style_path, result_stem)
     finally:
         for path in [content_path, style_path]:
@@ -16,3 +17,32 @@ def style_image(content_path, style_path, result_stem):
                 os.remove(path)
             except OSError:
                 pass
+
+
+def cleanup_data(data_dir, job_kwargs):
+    ttl = sum(job_kwargs[k] for k in ['job_timeout', 'result_ttl', 'ttl'])
+    max_time = (datetime.now() - timedelta(seconds=ttl)).timestamp()
+    n_files = 0
+    n_dirs = 0
+    for dirpath, dirnames, filenames in os.walk(data_dir, topdown=False):
+        for filename in filenames:
+            path = os.path.join(dirpath, filename)
+            try:
+                if os.path.getmtime(path) < max_time:
+                    os.remove(path)
+                    n_files += 1
+            except FileNotFoundError:
+                continue
+        if dirpath == data_dir:
+            continue
+        try:
+            if not os.listdir(dirpath):
+                os.rmdir(dirpath)
+                n_dirs += 1
+        except FileNotFoundError:
+            continue
+        except OSError as e:
+            if e.errno == errno.ENOTEMPTY:
+                continue
+            raise
+    logger.info('Removed %d files and %d directories', n_files, n_dirs)

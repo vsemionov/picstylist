@@ -11,7 +11,5 @@ COPY app.py ./
 COPY web ./web
 COPY templates ./templates
 
-RUN mkdir -p /app/data
-
 EXPOSE 8000
 CMD ["gunicorn", "-c", "/app/conf/gunicorn.py", "app:app"]

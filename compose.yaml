@@ -53,8 +53,6 @@ services:
       dockerfile: docker/scheduler/Dockerfile
     environment:
       - RQ_REDIS_HOST=${REDIS_HOST}
-    volumes:
-      - app_data:/app/data
     logging:
       driver: local
     depends_on:

@@ -23,6 +23,7 @@ if __name__ == '__main__':
     # The standard solution seems to be to deploy TensorFlow Serving, but that's a bit overkill for this project.
 
     redis_client = Redis(os.environ['REDIS_HOST'])
-    queues = ['default']
+    queues = ['system', 'images']
     w = Worker(queues, connection=redis_client)
+    w.log_result_lifespan = False
     w.work()

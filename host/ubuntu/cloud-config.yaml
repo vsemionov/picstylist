@@ -61,6 +61,7 @@ runcmd:
     done
     EOF
     '
+  - chmod +x /opt/picstylist.git/hooks/post-receive
 
 
 packages:

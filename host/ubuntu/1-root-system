@@ -9,7 +9,6 @@ PermitRootLogin no
 PubkeyAuthentication yes
 PasswordAuthentication no
 KbdInteractiveAuthentication no
-UsePAM no
 X11Forwarding no
 EOF
 chmod 600 /etc/ssh/sshd_config.d/101-custom.conf

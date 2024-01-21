@@ -43,20 +43,20 @@ runcmd:
     
     APP_NAME="picstylist"
     MAIN_BRANCH="main"
-    export GIT_WORK_TREE="/opt/$APP_NAME"
+    export GIT_WORK_TREE="/opt/\$APP_NAME"
     
     while read oldrev newrev refname
     do
         branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
-        if [ "$branch" = "$MAIN_BRANCH" ]
+        if [ "$branch" = "\$MAIN_BRANCH" ]
         then
-            git checkout -f "$MAIN_BRANCH"
+            git checkout -f "\$MAIN_BRANCH"
             if [ -n "$(git status --porcelain)" ]
             then
-                echo "Work tree at $GIT_WORK_TREE is dirty."
+                echo "Work tree at \$GIT_WORK_TREE is dirty."
                 exit 1
             fi
-            sudo "$GIT_WORK_TREE"/bin/deploy
+            sudo "\$GIT_WORK_TREE"/bin/deploy
         fi
     done
     EOF

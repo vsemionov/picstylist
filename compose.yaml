@@ -47,6 +47,26 @@ services:
         limits:
           memory: 512m
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/scheduler/Dockerfile
+    environment:
+      - RQ_REDIS_HOST=${REDIS_HOST}
+    volumes:
+      - app_data:/app/data
+    logging:
+      driver: local
+    depends_on:
+      - redis
+    restart: always
+    # TODO
+    #healthcheck:
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
   nginx:
     build:
       context: .

@@ -1,12 +1,18 @@
 #cloud-config
+
 fs_setup:
   - label: swap
     device: /swapfile
     filesystem: swap
+
 mounts:
   - ['/swapfile', 'none', 'swap', 'sw', '0', '0']
+
+
 bootcmd:
   - sysctl -w vm.swappiness=10 vm.vfs_cache_pressure=50 vm.overcommit_memory=1
+
+
 users:
   - name: victor
     shell: /bin/bash
@@ -14,41 +20,46 @@ users:
     sudo: 'ALL=(ALL) NOPASSWD: /opt/picstylist/bin/deploy'
     ssh_import_id:
       - gh:vsemionov
+
+
 runcmd:
   - rm /root/.ssh/authorized_keys
+
   - dd if=/dev/zero of=/swapfile bs=1M count=2048
   - chmod '600' /swapfile
   - mkswap /swapfile
   - swapon /swapfile
+
   - snap refresh
+
   - sudo -u victor mkdir ~victor/picstylist
   - sudo -u victor git init --bare -b main ~victor/picstylist.git
   - mv ~victor/picstylist ~victor/picstylist.git /opt/
   - sudo -u victor sh -c |
-      cat > /opt/picstylist.git/hooks/post-receive <<EOF
-      #!/bin/sh
-      
-      set -e
-      
-      APP_NAME="picstylist"
-      MAIN_BRANCH="main"
-      export GIT_WORK_TREE="/opt/$APP_NAME"
-      
-      while read oldrev newrev refname
-      do
-          branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
-          if [ "$branch" = "$MAIN_BRANCH" ]
-          then
-              git checkout -f "$MAIN_BRANCH"
-              if [ -n "$(git status --porcelain)" ]
-              then
-                  echo "Work tree at $GIT_WORK_TREE is dirty."
-                  exit 1
-              fi
-              sudo "$GIT_WORK_TREE"/bin/deploy
-          fi
-      done
-      EOF
+    cat > /opt/picstylist.git/hooks/post-receive <<EOF
+    \#!/bin/sh
+    
+    set -e
+    
+    APP_NAME="picstylist"
+    MAIN_BRANCH="main"
+    export GIT_WORK_TREE="/opt/$APP_NAME"
+    
+    while read oldrev newrev refname
+    do
+        branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
+        if [ "$branch" = "$MAIN_BRANCH" ]
+        then
+            git checkout -f "$MAIN_BRANCH"
+            if [ -n "$(git status --porcelain)" ]
+            then
+                echo "Work tree at $GIT_WORK_TREE is dirty."
+                exit 1
+            fi
+            sudo "$GIT_WORK_TREE"/bin/deploy
+        fi
+    done
+    EOF
 
 
 packages:
@@ -56,6 +67,7 @@ packages:
   - docker.io
   - docker-buildx
   - docker-compose-v2
+
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true

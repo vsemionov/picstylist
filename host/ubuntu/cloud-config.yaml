@@ -7,8 +7,6 @@ mounts:
   - ['/swapfile', 'none', 'swap', 'sw', '0', '0']
 bootcmd:
   - sysctl -w vm.swappiness=10 vm.vfs_cache_pressure=50 vm.overcommit_memory=1
-disable_root: true
-disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
 users:
   - name: victor
     shell: /bin/bash
@@ -21,6 +19,7 @@ runcmd:
   - chmod '600' /swapfile
   - mkswap /swapfile
   - swapon /swapfile
+  - rm /root/.ssh/authorized_keys
 packages:
   - net-tools
   - docker.io

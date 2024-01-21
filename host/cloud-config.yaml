@@ -59,11 +59,11 @@ runcmd:
 
   - snap refresh
 
+  - chown victor:victor /root/post-receive
   - sudo -u victor mkdir ~victor/picstylist
   - sudo -u victor git init --bare -b main ~victor/picstylist.git
+  - mv /root/post-receive ~victor/picstylist.git/hooks/
   - mv ~victor/picstylist ~victor/picstylist.git /opt/
-  - mv /root/post-receive /opt/picstylist.git/hooks/post-receive
-  - chown victor:victor /root/post-receive
 
 
 packages:

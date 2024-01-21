@@ -22,5 +22,7 @@ if __name__ == '__main__':
     # NOTE: Ideally, we would preload the model too, but it turns out TensorFlow is not fork-safe and deadlocks.
     # The standard solution seems to be to deploy TensorFlow Serving, but that's a bit overkill for this project.
 
-    w = Worker(['default'], connection=Redis(os.environ['REDIS_HOST']))
+    redis_client = Redis(os.environ['REDIS_HOST'])
+    queues = ['default']
+    w = Worker(queues, connection=redis_client)
     w.work()

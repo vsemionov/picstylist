@@ -17,6 +17,6 @@
  - run `bin/deploy`
 
 ### Production deployment
- - configure a new vm via host/cloud-config.yaml
+ - configure a new vm with host/cloud-config.yaml
  - push main branch of this repo to victor@<vm_addr>:/opt/picstylist.git
  - push main branch of picstylist-config to victor@<vm_addr>:/opt/picstylist-config.git

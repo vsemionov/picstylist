@@ -6,6 +6,8 @@ PORTAINER_VERSION="2.19.4"
 
 cd "$(dirname "$0")"/..
 
+docker container inspect portainer >/dev/null 2>&1 && exit
+
 docker volume create portainer_data
 docker pull portainer/portainer-ce:$PORTAINER_VERSION
 docker run -d -p 8443:9443 --name portainer --restart=always \

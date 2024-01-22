@@ -6,6 +6,8 @@ cd "$(dirname "$0")"/..
 
 (. .env 2>/dev/null; [ "$APP_ENV" = "production" ]) || bin/gencert
 
+bin/portainer
+
 (
     set +e
     docker compose up -d --build

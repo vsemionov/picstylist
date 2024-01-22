@@ -21,19 +21,23 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
   <script>
+    let interval = 5;
+    function setState(status) {
+      if (status === 'finished') {
+        window.location.href = '{{ url_for("result", session_id=session_id, job_id=job_id) }}';
+      } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
+        document.getElementById('wait').hidden = true;
+        document.getElementById('error').hidden = false;
+      } else {
+        interval = Math.min(interval * 1.5, 10);
+        setTimeout(poll, interval * 1000);
+      }
+    }
     function poll() {
       axios.get('{{ url_for("status", session_id=session_id, job_id=job_id) }}', {timeout: 30 * 1000})
         .then(function (response) {
           const status = response.data.status;
-          if (status === 'finished') {
-            window.location.href = '{{ url_for("result", session_id=session_id, job_id=job_id) }}';
-          } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
-            document.getElementById('wait').hidden = true;
-            document.getElementById('error').hidden = false;
-          } else {
-            interval = Math.min(interval * 1.5, 10);
-            setTimeout(poll, interval * 1000);
-          }
+          setState(status);
         })
         .catch(function (error) {
           document.getElementById('wait').hidden = true;
@@ -41,7 +45,6 @@
           console.error(error);
         });
     }
-    let interval = 5;
-    setTimeout(poll, interval * 1000);
+    setState('{{ status }}');
   </script>
 {% endblock %}

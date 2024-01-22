@@ -92,16 +92,18 @@ def waiting(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
     job = get_job_or_404(session_id, job_id)
-    if job.get_status() == 'finished':
+    status = job.get_status(refresh=False)
+    if status == 'finished':
         return redirect(url_for('result', session_id=session_id, job_id=job_id))
     cancel_form = forms.CancelForm()
-    return render_template('waiting.html', session_id=session_id, job_id=job_id, cancel_form=cancel_form)
+    return render_template('waiting.html', session_id=session_id, job_id=job_id, status=status, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
+    job = get_job_or_404(session_id, job_id)
     return ''
 
 

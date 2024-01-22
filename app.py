@@ -42,7 +42,7 @@ def index():
         content_path, style_path, result_stem = prepare_job(session_id, job_id, content_image, style_image)
         image_queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
             **settings.JOB_KWARGS)
-        app.logger.info('Enqueued job %s (%s).', 'style_image', job.id)
+        app.logger.info('Enqueued job %s (%s).', 'style_image', job_id)
 
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)

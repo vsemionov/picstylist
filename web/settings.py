@@ -24,6 +24,7 @@ MAX_UPLOAD_SIZE_MB = 10
 MAX_RESOLUTION_MP = 25
 ALLOWED_FORMATS = ['JPEG', 'PNG']
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
+RESULT_FORMAT = ('jpg', 'image/jpeg')
 JOB_KWARGS = {
     'job_timeout': 30,
     'result_ttl': 30 * 60,

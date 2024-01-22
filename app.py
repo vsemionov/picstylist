@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify
+from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
@@ -18,7 +18,7 @@ def prepare_job(session_id, job_id, content_image, style_image):
     root = settings.get_data_dir(app) / str(session_id) / str(job_id)
     content_filename = Path(secure_filename(content_image.filename))
     style_filename = secure_filename(style_image.filename)
-    result_filename = f'{content_filename.stem} (styled).jpg'
+    result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
     root.mkdir(parents=True, exist_ok=True)
     content_image.save(root / content_filename)
     style_image.save(root / style_filename)
@@ -107,16 +107,22 @@ def waiting(session_id, job_id):
 def result(session_id, job_id):
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
-    return ''
+    if job.get_status(refresh=False) != 'finished':
+        return redirect(url_for('waiting', session_id=session_id, job_id=job_id))
+    filename = job.args[-1]
+    return render_template('result.html', filename=filename)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
 def image(session_id, job_id, filename):
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
-    dirname = f'results/{session_id}/{job_id}'
-    response = send_from_directory(dirname, filename)
-    return response
+    if job.get_status(refresh=False) != 'finished':
+        abort(404)
+    if filename != job.args[-1]:
+        abort(404)
+    path = Path(job.args[0]) / filename
+    return send_file(path, mimetype=settings.RESULT_FORMAT[1])
 
 
 @app.route('/<path:name>.html')

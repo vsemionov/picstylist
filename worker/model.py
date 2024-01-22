@@ -30,6 +30,7 @@ def tensor_to_image(tensor):
 
 def save_image(image, result_path):
     image.save(result_path)
+    return image.size
 
 
 def fast_style_transfer(base_path, content_filename, style_filename, result_filename):
@@ -39,4 +40,4 @@ def fast_style_transfer(base_path, content_filename, style_filename, result_file
     content_image = load_image(content_path)
     style_image = load_image(style_path)
     stylized_image = hub_model(content_image, style_image)[0]
-    save_image(tensor_to_image(stylized_image), result_path)
+    return save_image(tensor_to_image(stylized_image), result_path)

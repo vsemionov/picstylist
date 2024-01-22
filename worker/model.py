@@ -28,14 +28,15 @@ def tensor_to_image(tensor):
     return Image.fromarray(array)
 
 
-def save_image(image, result_stem):
-    path = f'{result_stem}.jpg'
-    image.save(path)
-    return path
+def save_image(image, result_path):
+    image.save(result_path)
 
 
-def fast_style_transfer(content_path, style_path, result_stem):
+def fast_style_transfer(base_path, content_filename, style_filename, result_filename):
+    content_path = os.path.join(base_path, content_filename)
+    style_path = os.path.join(base_path, style_filename)
+    result_path = os.path.join(base_path, result_filename)
     content_image = load_image(content_path)
     style_image = load_image(style_path)
     stylized_image = hub_model(content_image, style_image)[0]
-    return save_image(tensor_to_image(stylized_image), result_stem)
+    save_image(tensor_to_image(stylized_image), result_path)

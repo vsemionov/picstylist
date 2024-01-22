@@ -7,12 +7,12 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 
-def style_image(content_path, style_path, result_stem):
+def style_image(base_path, content_filename, style_filename, result_filename):
     try:
         import worker.model
-        return worker.model.fast_style_transfer(content_path, style_path, result_stem)
+        return worker.model.fast_style_transfer(base_path, content_filename, style_filename, result_filename)
     finally:
-        for path in [content_path, style_path]:
+        for path in [os.path.join(base_path, filename) for filename in [content_filename, style_filename]]:
             try:
                 os.remove(path)
             except OSError:

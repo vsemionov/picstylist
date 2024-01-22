@@ -17,13 +17,12 @@ app, limiter, image_queue = settings.configure(app)
 def prepare_job(session_id, job_id, content_image, style_image):
     root = settings.get_data_dir(app) / str(session_id) / str(job_id)
     content_filename = Path(secure_filename(content_image.filename))
-    content_path = root / content_filename
-    style_path = root / secure_filename(style_image.filename)
-    result_stem = root / f'{content_filename.stem} (styled)'
+    style_filename = secure_filename(style_image.filename)
+    result_filename = f'{content_filename.stem} (styled).jpg'
     root.mkdir(parents=True, exist_ok=True)
-    content_image.save(content_path)
-    style_image.save(style_path)
-    return content_path, style_path, result_stem
+    content_image.save(root / content_filename)
+    style_image.save(root / style_filename)
+    return str(root), str(content_filename), style_filename, result_filename
 
 
 def check_session_id(session_id):
@@ -36,6 +35,7 @@ def get_job_or_404(session_id, job_id):
     if job is None or job.meta['session_id'] != str(session_id):
         abort(404)
     return job
+
 
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit(settings.RATE_LIMIT, methods=['POST'])
@@ -54,10 +54,10 @@ def index():
             session['id'] = session_id
         job_id = uuid.uuid4()
 
-        content_path, style_path, result_stem = prepare_job(session_id, job_id, content_image, style_image)
-        image_queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
-            meta={'session_id': str(session_id)}, **settings.JOB_KWARGS)
-        app.logger.info('Enqueued job %s (%s).', 'style_image', job_id)
+        args = prepare_job(session_id, job_id, content_image, style_image)
+        meta = {'session_id': str(session_id)}
+        image_queue.enqueue('worker.tasks.style_image', job_id=str(job_id), args=args, meta=meta, **settings.JOB_KWARGS)
+        app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)

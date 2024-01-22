@@ -47,7 +47,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256m
+          memory: 512m
 
   scheduler:
     build:
@@ -102,25 +102,6 @@ services:
       resources:
         limits:
           memory: 128m
-
-  tfserving:
-    build:
-      context: .
-      dockerfile: docker/tfserving/Dockerfile
-    environment:
-      - MODEL_NAME=fast_style_transfer
-    volumes:
-      - ./model:/models/fast_style_transfer
-    logging:
-      driver: local
-    restart: always
-    # TODO
-#    healthcheck:
-#      test:
-    deploy:
-      resources:
-        limits:
-          memory: 512m
 
 volumes:
   app_data:

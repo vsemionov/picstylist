@@ -72,7 +72,7 @@ services:
       context: .
       dockerfile: docker/nginx/Dockerfile
     volumes:
-      - conf/ssl:/etc/nginx/ssl:ro
+      - ./conf/ssl:/etc/nginx/ssl:ro
     ports:
       - '443:443'
     logging:

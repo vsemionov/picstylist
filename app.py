@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
 from web import settings
@@ -24,6 +24,11 @@ def prepare_job(session_id, job_id, content_image, style_image):
     content_image.save(content_path)
     style_image.save(style_path)
     return content_path, style_path, result_stem
+
+
+def check_session_id(session_id):
+    if session_id != session.get('id'):
+        abort(403)
 
 
 def get_job_or_404(session_id, job_id):
@@ -66,10 +71,11 @@ def index():
 
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
 def status(session_id, job_id):
-    if session_id != session.get('id'):
-        return jsonify({'error': 'Unauthorized'}), 403
     try:
+        check_session_id(session_id)
         job = get_job_or_404(session_id, job_id)
+    except Forbidden:
+        return jsonify({'error': 'Forbidden'}), 403
     except NotFound:
         return jsonify({'error': 'Not Found'}), 404
     status = job.get_status(refresh=False)
@@ -78,8 +84,7 @@ def status(session_id, job_id):
 
 @app.route('/cancel/<uuid:session_id>/<uuid:job_id>/', methods=['POST'])
 def cancel(session_id, job_id):
-    if session_id != session.get('id'):
-        abort(403)
+    check_session_id(session_id)
     form = forms.CancelForm()
     if form.validate_on_submit():
         job = get_job_or_404(session_id, job_id)
@@ -89,8 +94,7 @@ def cancel(session_id, job_id):
 
 @app.route('/s/<uuid:session_id>/<uuid:job_id>/')
 def waiting(session_id, job_id):
-    if session_id != session.get('id'):
-        abort(403)
+    check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
     status = job.get_status(refresh=False)
     if status == 'finished':
@@ -101,16 +105,15 @@ def waiting(session_id, job_id):
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
-    if session_id != session.get('id'):
-        abort(403)
+    check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
     return ''
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
 def image(session_id, job_id, filename):
-    if session_id != session.get('id'):
-        abort(403)
+    check_session_id(session_id)
+    job = get_job_or_404(session_id, job_id)
     dirname = f'results/{session_id}/{job_id}'
     response = send_from_directory(dirname, filename)
     return response

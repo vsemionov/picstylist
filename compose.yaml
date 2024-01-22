@@ -47,7 +47,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512m
+          memory: 1g
 
   scheduler:
     build:

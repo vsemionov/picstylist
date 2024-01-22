@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from redis import Redis
-from rq import Worker
+from rq import SimpleWorker
 
 
 if __name__ == '__main__':
@@ -15,13 +15,8 @@ if __name__ == '__main__':
     config.configure()
 
     # preload libraries
-    import numpy
-    import tensorflow
-    import tensorflow_hub
-    from PIL import Image
-    # NOTE: Ideally, we would preload the model too, but it turns out TensorFlow is not fork-safe and deadlocks.
-    # The standard solution seems to be to deploy TensorFlow Serving, but that's a bit overkill for this project.
+    import model
 
-    w = Worker(['system', 'images'], connection=Redis(os.environ['REDIS_HOST']))
+    w = SimpleWorker(['system', 'images'], connection=Redis(os.environ['REDIS_HOST']))
     w.log_result_lifespan = False
     w.work()

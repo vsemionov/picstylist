@@ -64,6 +64,20 @@ def status(session_id, job_id):
     return jsonify({})
 
 
+@app.route('/cancel/<uuid:session_id>/<uuid:job_id>/')
+def cancel(session_id, job_id):
+    if session_id != session.get('id'):
+        abort(403)
+    return ''
+
+
+@app.route('/s/<uuid:session_id>/<uuid:job_id>/')
+def waiting(session_id, job_id):
+    if session_id != session.get('id'):
+        abort(403)
+    return ''
+
+
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
     if session_id != session.get('id'):

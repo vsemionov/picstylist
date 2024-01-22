@@ -1,4 +1,5 @@
 #cloud-config
+# ubuntu 22.04 on digitalocean
 
 fs_setup:
   - label: swap

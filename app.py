@@ -30,6 +30,9 @@ def prepare_job(session_id, job_id, content_image, style_image):
 def index():
     form = forms.UploadForm()
     if form.validate_on_submit():
+        if image_queue.count >= settings.get_max_queue_size(image_queue):
+            return render_template('errors/busy.html')
+
         content_image = form.content_image.data
         style_image = form.style_image.data
 

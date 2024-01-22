@@ -9,15 +9,17 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import redis
-from rq import Queue
+from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
+from cachetools import cached, TTLCache
 
 from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
 
 
 RATE_LIMIT = '5/minute;50/hour;200/day'
+MAX_QUEUE_SIZE_PER_WORKER = 200
 MAX_UPLOAD_SIZE_MB = 10
 MAX_RESOLUTION_MP = 25
 ALLOWED_FORMATS = ['JPEG', 'PNG']
@@ -42,6 +44,11 @@ def get_data_dir(app, as_path=True):
     if not as_path:
         path = str(path)
     return path
+
+
+@cached(cache=TTLCache(maxsize=1, ttl=60))
+def get_max_queue_size(queue):
+    return MAX_QUEUE_SIZE_PER_WORKER * max(Worker.count(queue.connection), 1)
 
 
 def configure(app):

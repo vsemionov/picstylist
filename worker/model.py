@@ -37,7 +37,5 @@ def save_image(image, result_stem):
 def fast_style_transfer(content_path, style_path, result_stem):
     content_image = load_image(content_path)
     style_image = load_image(style_path)
-
     stylized_image = hub_model(content_image, style_image)[0]
-
     return save_image(tensor_to_image(stylized_image), result_stem)

@@ -45,7 +45,12 @@ write_files:
                   echo "Work tree at $GIT_WORK_TREE is dirty."
                   exit 1
               fi
-              sudo "$GIT_WORK_TREE"/bin/deploy
+              if [ -f "$GIT_WORK_TREE"/.env ];
+              then
+                  sudo "$GIT_WORK_TREE"/bin/deploy
+              else
+                  echo "Warning: Configuration not found, skipping deploy."
+              fi
           fi
       done
   - path: /root/post-receive-config
@@ -64,7 +69,16 @@ write_files:
           branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
           if [ "$branch" = "$MAIN_BRANCH" ]
           then
+              old_umask=$(umask)
+              umask 0077
               git archive "$MAIN_BRANCH" | tar -x --exclude .gitignore -C "$APP_TREE"
+              umask $old_umask
+          fi
+          if [ -f "APP_TREE"/app.py ];
+          then
+              sudo "APP_TREE"/bin/deploy
+          else
+              echo "Warning: Application not found, skipping deploy."
           fi
       done
 
@@ -87,9 +101,9 @@ runcmd:
 
   - chown victor:victor /root/post-receive-config
   - sudo -u victor git init --bare -b main ~victor/picstylist-config.git
+  - chmod '700' ~victor/picstylist-config.git
   - mv /root/post-receive-config ~victor/picstylist-config.git/hooks/post-receive
   - mv ~victor/picstylist-config.git /opt/
-
 
 packages:
   - net-tools

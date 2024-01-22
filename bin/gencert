@@ -7,8 +7,6 @@ DOMAIN="picstylist.com"
 
 cd "$(dirname "$0")"/..
 
-(. .env 2>/dev/null; [ "$APP_ENV" = "production" ]) && exit
-
 if [ ! -d conf/ssl ]
 then
     mkdir -p conf/ssl

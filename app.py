@@ -44,7 +44,7 @@ def index():
 
         content_path, style_path, result_stem = prepare_job(session_id, job_id, content_image, style_image)
         image_queue.enqueue('worker.tasks.style_image', content_path, style_path, result_stem, job_id=str(job_id),
-            **settings.JOB_KWARGS)
+            meta={'session_id': str(session_id)}, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job %s (%s).', 'style_image', job_id)
 
         redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
@@ -62,8 +62,8 @@ def status(session_id, job_id):
     if session_id != session.get('id'):
         return jsonify({'error': 'Unauthorized'}), 403
     job = image_queue.fetch_job(str(job_id))
-    if job is None:
-        return jsonify({}), 404
+    if job is None or job.meta['session_id'] != str(session_id):
+        return jsonify({'error': 'Not Found'}), 404
     status = job.get_status(refresh=False)
     return jsonify({'status': status}), 200
 

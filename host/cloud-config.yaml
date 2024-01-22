@@ -48,6 +48,25 @@ write_files:
               sudo "$GIT_WORK_TREE"/bin/deploy
           fi
       done
+  - path: /root/post-receive-config
+    permissions: '0755'
+    content: |
+      #!/bin/sh
+      
+      set -e
+      
+      APP_NAME="picstylist"
+      MAIN_BRANCH="main"
+      export APP_TREE="/opt/$APP_NAME"
+      
+      while read oldrev newrev refname
+      do
+          branch=$(git rev-parse --symbolic --abbrev-ref "$refname")
+          if [ "$branch" = "$MAIN_BRANCH" ]
+          then
+              git archive "$MAIN_BRANCH" | tar -x --exclude .gitignore -C "$APP_TREE"
+          fi
+      done
 
 
 runcmd:
@@ -65,6 +84,11 @@ runcmd:
   - sudo -u victor git init --bare -b main ~victor/picstylist.git
   - mv /root/post-receive ~victor/picstylist.git/hooks/
   - mv ~victor/picstylist ~victor/picstylist.git /opt/
+
+  - chown victor:victor /root/post-receive-config
+  - sudo -u victor git init --bare -b main ~victor/picstylist-config.git
+  - mv /root/post-receive-config ~victor/picstylist-config.git/hooks/post-receive
+  - mv ~victor/picstylist-config.git /opt/
 
 
 packages:

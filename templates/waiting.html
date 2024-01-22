@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Processing{% endblock %}
+
+{% block content %}
+  <div id="wait">
+    <h1>Please wait</h1>
+    <div id="loader" class="spinner"></div>
+    <form action="{{ url_for('cancel', session_id=session_id, job_id=job_id) }}" method="post">
+      {{ cancel_form.csrf_token }}
+      <input type="submit" value="Cancel">
+    </form>
+  </div>
+  <div id="error" hidden>
+    <h1>Error</h1>
+    <p>There was a problem processing your image.</p>
+  </div>
+  <div id="query-error" hidden>
+    <h1>Error</h1>
+    <p>Unable to retrieve the status of your image.</p>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
+  <script>
+    function poll() {
+      axios.get('{{ url_for("status", session_id=session_id, job_id=job_id) }}', {timeout: 30 * 1000})
+        .then(function (response) {
+          const status = response.data.status;
+          if (status === 'finished') {
+            window.location.href = '{{ url_for("result", session_id=session_id, job_id=job_id) }}';
+          } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
+            document.getElementById('wait').hidden = true;
+            document.getElementById('error').hidden = false;
+          } else {
+            interval = Math.min(interval * 1.5, 10);
+            setTimeout(poll, interval * 1000);
+          }
+        })
+        .catch(function (error) {
+          document.getElementById('wait').hidden = true;
+          document.getElementById('query-error').hidden = false;
+          console.error(error);
+        });
+    }
+    let interval = 5;
+    setTimeout(poll, interval * 1000);
+  </script>
+{% endblock %}

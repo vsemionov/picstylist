@@ -49,3 +49,7 @@ class UploadForm(FlaskForm):
             return False
 
         return True
+
+
+class CancelForm(FlaskForm):
+    pass

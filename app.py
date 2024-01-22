@@ -47,7 +47,7 @@ def index():
             **settings.JOB_KWARGS)
         app.logger.info('Enqueued job %s (%s).', 'style_image', job_id)
 
-        redirect_url = url_for('result', session_id=session_id, job_id=job_id)
+        redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 
     limits = {
@@ -60,11 +60,15 @@ def index():
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
 def status(session_id, job_id):
     if session_id != session.get('id'):
-        return jsonify({}), 403
-    return jsonify({})
+        return jsonify({'error': 'Unauthorized'}), 403
+    job = image_queue.fetch_job(str(job_id))
+    if job is None:
+        return jsonify({}), 404
+    status = job.get_status(refresh=False)
+    return jsonify({'status': status}), 200
 
 
-@app.route('/cancel/<uuid:session_id>/<uuid:job_id>/')
+@app.route('/cancel/<uuid:session_id>/<uuid:job_id>/', methods=['POST'])
 def cancel(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
@@ -75,7 +79,8 @@ def cancel(session_id, job_id):
 def waiting(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
-    return ''
+    cancel_form = forms.CancelForm()
+    return render_template('waiting.html', session_id=session_id, job_id=job_id, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')

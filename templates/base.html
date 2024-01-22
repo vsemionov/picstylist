@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}{% endblock %}{% block title_suffix %} - PicStylist{% endblock %}</title>
-  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 </head>
 <body>
 {% block content %}

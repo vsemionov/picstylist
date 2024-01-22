@@ -11,6 +11,4 @@ RUN python worker/model.py
 COPY common ./common
 COPY worker ./worker
 
-RUN mkdir -p /app/data
-
 CMD ["python", "worker/main.py"]

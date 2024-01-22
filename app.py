@@ -3,6 +3,7 @@ from pathlib import Path
 
 from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import NotFound
 from jinja2 import TemplateNotFound
 
 from web import settings
@@ -24,6 +25,12 @@ def prepare_job(session_id, job_id, content_image, style_image):
     style_image.save(style_path)
     return content_path, style_path, result_stem
 
+
+def get_job_or_404(session_id, job_id):
+    job = image_queue.fetch_job(str(job_id))
+    if job is None or job.meta['session_id'] != str(session_id):
+        abort(404)
+    return job
 
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit(settings.RATE_LIMIT, methods=['POST'])
@@ -61,8 +68,9 @@ def index():
 def status(session_id, job_id):
     if session_id != session.get('id'):
         return jsonify({'error': 'Unauthorized'}), 403
-    job = image_queue.fetch_job(str(job_id))
-    if job is None or job.meta['session_id'] != str(session_id):
+    try:
+        job = get_job_or_404(session_id, job_id)
+    except NotFound:
         return jsonify({'error': 'Not Found'}), 404
     status = job.get_status(refresh=False)
     return jsonify({'status': status}), 200
@@ -72,13 +80,20 @@ def status(session_id, job_id):
 def cancel(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
-    return ''
+    form = forms.CancelForm()
+    if form.validate_on_submit():
+        job = get_job_or_404(session_id, job_id)
+        job.cancel()
+    return redirect(url_for('index'))
 
 
 @app.route('/s/<uuid:session_id>/<uuid:job_id>/')
 def waiting(session_id, job_id):
     if session_id != session.get('id'):
         abort(403)
+    job = get_job_or_404(session_id, job_id)
+    if job.get_status() == 'finished':
+        return redirect(url_for('result', session_id=session_id, job_id=job_id))
     cancel_form = forms.CancelForm()
     return render_template('waiting.html', session_id=session_id, job_id=job_id, cancel_form=cancel_form)
 

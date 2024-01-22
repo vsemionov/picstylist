@@ -45,4 +45,4 @@ def cleanup_data(data_dir, job_kwargs):
             if e.errno == errno.ENOTEMPTY:
                 continue
             raise
-    logger.info('Removed %d files and %d directories', n_files, n_dirs)
+    logger.info('Removed %d files and %d directories.', n_files, n_dirs)

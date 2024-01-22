@@ -8,3 +8,6 @@ services:
   redis:
     ports:
       - '6379:6379'
+  tfserving:
+    ports:
+      - '8501:8501'

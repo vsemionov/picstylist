@@ -74,9 +74,9 @@ write_files:
               git archive "$MAIN_BRANCH" | tar -x --exclude .gitignore -C "$APP_TREE"
               umask $old_umask
           fi
-          if [ -f "APP_TREE"/app.py ];
+          if [ -f "$APP_TREE"/app.py ];
           then
-              sudo "APP_TREE"/bin/deploy
+              sudo "$APP_TREE"/bin/deploy
           else
               echo "Warning: Application not found, skipping deploy."
           fi

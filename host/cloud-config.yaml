@@ -17,6 +17,7 @@ bootcmd:
 users:
   - name: victor
     shell: /bin/bash
+    groups: sudo
     sudo: 'ALL=(ALL) NOPASSWD: /opt/picstylist/bin/deploy'
     ssh_import_id:
       - gh:vsemionov

@@ -4,8 +4,7 @@ set -e
 
 cd "$(dirname "$0")"/..
 
-(. .env 2>/dev/null; [ "$APP_ENV" = "production" ]) || bin/gencert
-
+bin/gencert
 bin/portainer
 
 (

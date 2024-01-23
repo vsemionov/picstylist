@@ -14,7 +14,7 @@
   </div>
   <div id="result" hidden>
     <h2>Finished</h2>
-    <img id="image" src="" height="480" alt="">
+    <img id="result-image" src="" height="480" alt="">
     <p><a href="{{ url_for('image', session_id=request.view_args['session_id'], job_id=request.view_args['job_id'],
       filename=filename, download=1) }}">Download</a></p>
     <p>Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.</p>
@@ -31,17 +31,24 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
   <script>
+      const processingElement = document.getElementById('processing');
+      const resultElement = document.getElementById('result');
+      const resultImageElement = document.getElementById('result-image');
+      const jobErrorElement = document.getElementById('job-error');
+      const ajaxErrorElement = document.getElementById('ajax-error');
+      const ajaxErrorReasonElement = document.getElementById('ajax-error-reason');
+
       function setState(status) {
           if (status === 'finished') {
-              document.getElementById('processing').hidden = true;
-              document.getElementById('result').hidden = false;
-              document.getElementById('image').src = '{{ url_for('image', session_id=request.view_args['session_id'],
+              processingElement.hidden = true;
+              resultElement.hidden = false;
+              resultImageElement.src = '{{ url_for('image', session_id=request.view_args['session_id'],
                 job_id=request.view_args['job_id'], filename=filename) }}';
           } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
-              document.getElementById('processing').hidden = true;
-              document.getElementById('job-error').hidden = false;
+              processingElement.hidden = true;
+              jobErrorElement.hidden = false;
           } else {
-              document.getElementById('processing').hidden = false;
+              processingElement.hidden = false;
               setTimeout(poll, {{ settings.AJAX_POLL_INTERVAL }} * 1000);
           }
       }
@@ -53,9 +60,9 @@
                   setState(response.data.status);
               })
               .catch(function (error) {
-                  document.getElementById('processing').hidden = true;
-                  document.getElementById('ajax-error').hidden = false;
-                  document.getElementById('ajax-error-reason').innerHTML = error.message;
+                  processingElement.hidden = true;
+                  ajaxErrorElement.hidden = false;
+                  ajaxErrorReasonElement.innerHTML = error.message;
                   console.error(error);
               });
       }

@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, url_for, abort, redirect, render_template, session, jsonify, send_file
+from flask import Flask, session, abort, url_for, redirect, render_template, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
@@ -95,7 +95,7 @@ def waiting(session_id, job_id):
     if status == 'finished':
         return redirect(url_for('result', session_id=session_id, job_id=job_id))
     cancel_form = forms.CancelForm()
-    return render_template('waiting.html', session_id=session_id, job_id=job_id, status=status, cancel_form=cancel_form)
+    return render_template('waiting.html', status=status, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')

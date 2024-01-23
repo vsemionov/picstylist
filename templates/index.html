@@ -38,7 +38,11 @@
       </div>
       <p>
         <i>
-          <strong>JPEG</strong> or <strong>PNG</strong> format.
+          {% for format in settings.ALLOWED_FORMATS %}
+            {%- if not loop.first %}{% if loop.last %} or{% else %},{% endif %}{% endif %}
+            <strong>{{ format }}</strong>
+            {%- if loop.last %}.{% endif %}
+          {%- endfor %}
           At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
           Both files must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong> in total.
         </i>

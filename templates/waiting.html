@@ -6,7 +6,8 @@
   <div id="wait">
     <h1>Please wait</h1>
     <div id="loader" class="spinner"></div>
-    <form action="{{ url_for('cancel', session_id=session_id, job_id=job_id) }}" method="post">
+    <form action="{{ url_for('cancel', session_id=request.view_args['session_id'],
+      job_id=request.view_args['job_id']) }}" method="post">
       {{ cancel_form.csrf_token }}
       <input type="submit" value="Cancel">
     </form>
@@ -21,30 +22,32 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
   <script>
-    let interval = 5;
-    function setState(status) {
-      if (status === 'finished') {
-        window.location.href = '{{ url_for("result", session_id=session_id, job_id=job_id) }}';
-      } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
-        document.getElementById('wait').hidden = true;
-        document.getElementById('error').hidden = false;
-      } else {
-        interval = Math.min(interval * 1.5, 10);
-        setTimeout(poll, interval * 1000);
+      function setState(status) {
+          if (status === 'finished') {
+              window.location.href = '{{ url_for('result', session_id=request.view_args['session_id'],
+                job_id=request.view_args['job_id']) }}';
+          } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
+              document.getElementById('wait').hidden = true;
+              document.getElementById('error').hidden = false;
+          } else {
+              setTimeout(poll, {{ settings.AJAX_POLL_INTERVAL }} * 1000);
+          }
       }
-    }
-    function poll() {
-      axios.get('{{ url_for("status", session_id=session_id, job_id=job_id) }}', {timeout: 30 * 1000})
-        .then(function (response) {
-          const status = response.data.status;
-          setState(status);
-        })
-        .catch(function (error) {
-          document.getElementById('wait').hidden = true;
-          document.getElementById('query-error').hidden = false;
-          console.error(error);
-        });
-    }
-    setState('{{ status }}');
+
+      function poll() {
+          axios.get('{{ url_for('status', session_id=request.view_args['session_id'],
+            job_id=request.view_args['job_id']) }}', {timeout: {{ settings.AJAX_TIMEOUT }} * 1000})
+              .then(function (response) {
+                  const status = response.data.status;
+                  setState(status);
+              })
+              .catch(function (error) {
+                  document.getElementById('wait').hidden = true;
+                  document.getElementById('query-error').hidden = false;
+                  console.error(error);
+              });
+      }
+
+      setState('{{ status }}');
   </script>
 {% endblock %}

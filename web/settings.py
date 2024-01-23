@@ -25,7 +25,7 @@ MAX_UPLOAD_SIZE_MB = 10
 MAX_RESOLUTION_MP = 25
 ALLOWED_FORMATS = ['JPEG', 'PNG']
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
-RESULT_FORMAT = ('jpg', 'image/jpeg')
+RESULT_FORMAT = ('png', 'image/png')
 JOB_KWARGS = {
     'job_timeout': 30,
     'result_ttl': 30 * 60,
@@ -33,6 +33,8 @@ JOB_KWARGS = {
     'failure_ttl': 30 * 60,
     'description': 'style_image'
 }
+AJAX_POLL_INTERVAL = 2
+AJAX_TIMEOUT = 30
 
 
 class RequestIDLogFilter(logging.Filter):

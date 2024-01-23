@@ -9,6 +9,9 @@ from . import settings
 from . import images
 
 
+formatted_formats = ' and '.join([', '.join(settings.ALLOWED_FORMATS[:-1]), settings.ALLOWED_FORMATS[-1]])
+
+
 class ImageValidator:
     def __init__(self, max_resolution):
         self.max_resolution = max_resolution
@@ -18,7 +21,7 @@ class ImageValidator:
         if any(v is None for v in [fmt, width, height]):
             raise StopValidation('Invalid or corrupt image.')
         if fmt not in settings.ALLOWED_FORMATS:
-            raise StopValidation(f'Unsupported image format. We support JPEG and PNG.')
+            raise StopValidation(f'Unsupported image format. We support {formatted_formats}.')
         if width * height > self.max_resolution * 1024 * 1024:
             raise StopValidation('Image resolution too high. '
                 f'The maximum acceptable resolution is {self.max_resolution} MP.')
@@ -26,7 +29,7 @@ class ImageValidator:
 
 validators = [
     FileRequired(),
-    FileAllowed(settings.ALLOWED_EXTENSIONS, message='Unsupported file type. We support JPEG and PNG.'),
+    FileAllowed(settings.ALLOWED_EXTENSIONS, message=f'Unsupported file type. We support {formatted_formats}.'),
     ImageValidator(settings.MAX_RESOLUTION_MP)
 ]
 

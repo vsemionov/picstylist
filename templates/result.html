@@ -1,6 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>{% block title %}Stylized Result{% endblock %}</h1>
-  <div><img src="{{ filename }}" height="480" alt=""></div>
+  <h1>{% block title %}Stylized Image{% endblock %}</h1>
+  <div id="processing" hidden>
+    <h2>Processing</h2>
+    <p>Please wait.</p>
+    <div class="spinner"></div>
+    <form action="{{ url_for('cancel', session_id=request.view_args['session_id'],
+      job_id=request.view_args['job_id']) }}" method="post">
+      {{ cancel_form.csrf_token }}
+      <input type="submit" value="Cancel">
+    </form>
+  </div>
+  <div id="result" hidden>
+    <h2>Finished</h2>
+    <img id="image" src="" height="480" alt="">
+  </div>
+  <div id="error" hidden>
+    <h2>Error</h2>
+    <p>There was a problem processing your image.</p>
+  </div>
+  <div id="ajax-error" hidden>
+    <h2>Error</h2>
+    <p>Unable to retrieve the status of your image.</p>
+    <p>This could be caused by a network problem or server error.</p>
+    <!-- TODO: separate the two cases -->
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js"></script>
+  <script>
+      function setState(status) {
+          if (status === 'finished') {
+              document.getElementById('processing').hidden = true;
+              document.getElementById('result').hidden = false;
+              document.getElementById('image').src = '{{ filename }}';
+          } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
+              document.getElementById('processing').hidden = true;
+              document.getElementById('error').hidden = false;
+          } else {
+              document.getElementById('processing').hidden = false;
+              setTimeout(poll, {{ settings.AJAX_POLL_INTERVAL }} * 1000);
+          }
+      }
+
+      function poll() {
+          axios.get('{{ url_for('status', session_id=request.view_args['session_id'],
+            job_id=request.view_args['job_id']) }}', {timeout: {{ settings.AJAX_TIMEOUT }} * 1000})
+              .then(function (response) {
+                  setState(response.data.status);
+              })
+              .catch(function (error) {
+                  document.getElementById('processing').hidden = true;
+                  document.getElementById('query-error').hidden = false;
+                  console.error(error);
+              });
+      }
+
+      setState('{{ status }}');
+  </script>
 {% endblock %}

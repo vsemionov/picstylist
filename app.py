@@ -58,7 +58,7 @@ def index():
         image_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
-        redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
+        redirect_url = url_for('result', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 
     return render_template('index.html', form=form)
@@ -74,6 +74,7 @@ def status(session_id, job_id):
     except NotFound:
         return jsonify({'error': 'Not Found'}), 404
     status = job.get_status(refresh=False)
+    app.logger.info('Job status: %s', status)
     return jsonify({'status': status}), 200
 
 
@@ -84,28 +85,19 @@ def cancel(session_id, job_id):
     if form.validate_on_submit():
         job = get_job_or_404(session_id, job_id)
         job.cancel()
+        app.logger.info('Canceled job: %s', job_id)
     return redirect(url_for('index'))
-
-
-@app.route('/s/<uuid:session_id>/<uuid:job_id>/')
-def waiting(session_id, job_id):
-    check_session_id(session_id)
-    job = get_job_or_404(session_id, job_id)
-    status = job.get_status(refresh=False)
-    if status == 'finished':
-        return redirect(url_for('result', session_id=session_id, job_id=job_id))
-    cancel_form = forms.CancelForm()
-    return render_template('waiting.html', status=status, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
+    # TODO: save link
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
-    if job.get_status(refresh=False) != 'finished':
-        return redirect(url_for('waiting', session_id=session_id, job_id=job_id))
+    status = job.get_status(refresh=False)
     filename = job.args[-1]
-    return render_template('result.html', filename=filename)
+    cancel_form = forms.CancelForm()
+    return render_template('result.html', status=status, filename=filename, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')

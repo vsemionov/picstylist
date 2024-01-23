@@ -90,7 +90,6 @@ def configure(app):
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
 
     # RQ
-    Queue(name='images', connection=redis_client).delete()
     job_queue = Queue(connection=redis_client)
     system_queue = Queue(name='system', connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)

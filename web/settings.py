@@ -96,6 +96,7 @@ def configure(app):
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         job.delete()
+    # TODO: schedule only once
     scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], description='cleanup_data',
         interval=(15 * 60), timeout=30)
 

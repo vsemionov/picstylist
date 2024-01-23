@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).parent.parent / 'data'
 
 
-def style_image(subdir, content_filename, style_filename, result_filename):
-    import worker.model
+def style_image(subdir, content_filename, style_filename, strength, result_filename):
+    from . import model
     base_path = DATA_DIR / subdir
     try:
         start_time = time.time()
-        result = worker.model.fast_style_transfer(base_path, content_filename, style_filename, result_filename)
+        result = model.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
         logger.info('Finished in %.1f seconds.', time.time() - start_time)
         return result
     finally:

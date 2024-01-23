@@ -36,6 +36,16 @@
           </ul>
         {% endif %}
       </div>
+      <div>
+        {{ form.strength.label }} {{ form.strength }}
+        {% if form.strength.errors %}
+          <ul>
+            {% for error in form.strength.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
       <p>
         <i>
           {% for format in settings.ALLOWED_FORMATS %}

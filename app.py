@@ -36,6 +36,7 @@ def index():
 
         content_image = form.content_image.data
         style_image = form.style_image.data
+        strength = form.strength.data
 
         session_id = session.get('id')
         if session_id is None:
@@ -53,7 +54,7 @@ def index():
         content_image.save(job_dir / content_filename)
         style_image.save(job_dir / style_filename)
 
-        args = str(subdir), str(content_filename), style_filename, result_filename
+        args = str(subdir), str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': str(session_id)}
         job_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)

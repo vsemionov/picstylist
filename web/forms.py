@@ -2,7 +2,8 @@ import os
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms.validators import StopValidation
+from wtforms import IntegerRangeField
+from wtforms.validators import NumberRange, StopValidation
 
 
 from . import settings
@@ -28,14 +29,15 @@ class ImageValidator:
 
 
 class UploadForm(FlaskForm):
-    __validators = [
+    __image_validators = [
         FileRequired(),
         FileAllowed(settings.ALLOWED_EXTENSIONS, message=f'Unsupported file type. We support {formatted_formats}.'),
         ImageValidator(settings.MAX_RESOLUTION_MP)
     ]
 
-    content_image = FileField('Original image', validators=__validators)
-    style_image = FileField('Style image', validators=__validators)
+    content_image = FileField('Original image', validators=__image_validators)
+    style_image = FileField('Style image', validators=__image_validators)
+    strength = IntegerRangeField('Strength', default=100, validators=[NumberRange(1, 100)])
 
     def validate(self, extra_validators = None):
         if not super().validate():

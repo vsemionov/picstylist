@@ -18,7 +18,6 @@
     <p><a href="{{ url_for('image', session_id=request.view_args['session_id'], job_id=request.view_args['job_id'],
       filename=filename, download=1) }}">Download</a></p>
     <p>Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.</p>
-    <!-- TODO: remove flicker when refreshing? -->
   </div>
   <div id="job-error" hidden>
     <h2>Error</h2>

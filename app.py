@@ -74,8 +74,11 @@ def status(session_id, job_id):
     except NotFound:
         return jsonify({'error': 'Not Found'}), 404
     status = job.get_status(refresh=False)
+    fields = {'status': status}
+    if status == 'queued':
+        fields['position'] = image_queue.get_job_position(job)
     app.logger.info('Job status: %s', status)
-    return jsonify({'status': status}), 200
+    return jsonify(fields), 200
 
 
 @app.route('/cancel/<uuid:session_id>/<uuid:job_id>/', methods=['POST'])
@@ -94,9 +97,10 @@ def result(session_id, job_id):
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
     status = job.get_status(refresh=False)
+    position = image_queue.get_job_position(job) if status == 'queued' else None
     filename = job.args[-1]
     cancel_form = forms.CancelForm()
-    return render_template('result.html', status=status, filename=filename, cancel_form=cancel_form)
+    return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)
 
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')

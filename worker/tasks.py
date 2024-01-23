@@ -1,4 +1,5 @@
 import os
+import time
 import errno
 import logging
 from pathlib import Path
@@ -15,7 +16,10 @@ def style_image(subdir, content_filename, style_filename, result_filename):
     import worker.model
     base_path = DATA_DIR / subdir
     try:
-        return worker.model.fast_style_transfer(base_path, content_filename, style_filename, result_filename)
+        start_time = time.time()
+        result = worker.model.fast_style_transfer(base_path, content_filename, style_filename, result_filename)
+        logger.info('Finished in %.1f seconds.', time.time() - start_time)
+        return result
     finally:
         for path in [base_path / filename for filename in [content_filename, style_filename]]:
             try:

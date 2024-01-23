@@ -27,16 +27,15 @@ class ImageValidator:
                 f'The maximum acceptable resolution is {self.max_resolution} MP.')
 
 
-validators = [
-    FileRequired(),
-    FileAllowed(settings.ALLOWED_EXTENSIONS, message=f'Unsupported file type. We support {formatted_formats}.'),
-    ImageValidator(settings.MAX_RESOLUTION_MP)
-]
-
-
 class UploadForm(FlaskForm):
-    content_image = FileField('Original image', validators=validators)
-    style_image = FileField('Style image', validators=validators)
+    __validators = [
+        FileRequired(),
+        FileAllowed(settings.ALLOWED_EXTENSIONS, message=f'Unsupported file type. We support {formatted_formats}.'),
+        ImageValidator(settings.MAX_RESOLUTION_MP)
+    ]
+
+    content_image = FileField('Original image', validators=__validators)
+    style_image = FileField('Style image', validators=__validators)
 
     def validate(self, extra_validators = None):
         if not super().validate():

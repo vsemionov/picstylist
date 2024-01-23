@@ -17,6 +17,6 @@ if __name__ == '__main__':
     # preload libraries
     import model
 
-    w = SimpleWorker(['system', 'images'], connection=Redis(os.environ['REDIS_HOST']))
+    w = SimpleWorker(['system', 'default'], connection=Redis(os.environ['REDIS_HOST']))
     w.log_result_lifespan = False
     w.work()

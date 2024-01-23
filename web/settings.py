@@ -90,7 +90,7 @@ def configure(app):
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
 
     # RQ
-    image_queue = Queue(name='images', connection=redis_client)
+    job_queue = Queue(connection=redis_client)
     system_queue = Queue(name='system', connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
@@ -109,7 +109,7 @@ def configure(app):
     limiter.limit('3 per 15 minutes', deduct_when=lambda response: response.status_code == 401)(rq_dashboard.blueprint)
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/rq')
 
-    return app, limiter, image_queue
+    return app, limiter, job_queue
 
 
 configure_sentry(with_flask=True)

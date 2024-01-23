@@ -11,7 +11,7 @@ from web import forms
 
 
 app = Flask(__name__)
-app, limiter, image_queue = settings.configure(app)
+app, limiter, job_queue = settings.configure(app)
 
 
 def check_session_id(session_id):
@@ -20,7 +20,7 @@ def check_session_id(session_id):
 
 
 def get_job_or_404(session_id, job_id):
-    job = image_queue.fetch_job(str(job_id))
+    job = job_queue.fetch_job(str(job_id))
     if job is None or job.meta['session_id'] != str(session_id):
         abort(404)
     return job
@@ -31,7 +31,7 @@ def get_job_or_404(session_id, job_id):
 def index():
     form = forms.UploadForm()
     if form.validate_on_submit():
-        if image_queue.count >= settings.get_max_queue_size(image_queue):
+        if job_queue.count >= settings.get_max_queue_size(job_queue):
             return render_template('errors/busy.html')
 
         content_image = form.content_image.data
@@ -55,7 +55,7 @@ def index():
 
         args = str(subdir), str(content_filename), style_filename, result_filename
         meta = {'session_id': str(session_id)}
-        image_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
+        job_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)
@@ -76,7 +76,7 @@ def status(session_id, job_id):
     status = job.get_status(refresh=False)
     fields = {'status': status}
     if status == 'queued':
-        fields['position'] = image_queue.get_job_position(job)
+        fields['position'] = job_queue.get_job_position(job)
     app.logger.info('Job status: %s', status)
     return jsonify(fields), 200
 
@@ -97,7 +97,7 @@ def result(session_id, job_id):
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
     status = job.get_status(refresh=False)
-    position = image_queue.get_job_position(job) if status == 'queued' else None
+    position = job_queue.get_job_position(job) if status == 'queued' else None
     filename = job.args[-1]
     cancel_form = forms.CancelForm()
     return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)

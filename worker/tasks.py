@@ -32,7 +32,8 @@ def cleanup_data(job_kwargs):
     ttl = sum(job_kwargs[k] for k in ['job_timeout', 'result_ttl', 'ttl'])
     max_time = (datetime.now() - timedelta(seconds=ttl)).timestamp()
     n_files, n_dirs = 0, 0
-    for dirpath, dirnames, filenames in os.walk(DATA_DIR, topdown=False):
+    data_dir = os.path.normpath(DATA_DIR)
+    for dirpath, dirnames, filenames in os.walk(data_dir, topdown=False):
         for filename in filenames:
             path = os.path.join(dirpath, filename)
             try:
@@ -41,7 +42,7 @@ def cleanup_data(job_kwargs):
                     n_files += 1
             except FileNotFoundError:
                 continue
-        if dirpath == DATA_DIR:
+        if dirpath == data_dir:
             continue
         try:
             if not os.listdir(dirpath):

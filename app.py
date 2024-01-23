@@ -61,11 +61,7 @@ def index():
         redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
         return redirect(redirect_url)
 
-    limits = {
-        'max_upload_size_mb': settings.MAX_UPLOAD_SIZE_MB,
-        'max_resolution_mp': settings.MAX_RESOLUTION_MP
-    }
-    return render_template('index.html', form=form, limits=limits)
+    return render_template('index.html', form=form)
 
 
 @app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
@@ -149,7 +145,7 @@ def not_found(e):
 
 @app.errorhandler(413)
 def too_large(e):
-    return render_template('errors/413.html', max_size=settings.MAX_UPLOAD_SIZE_MB), 403
+    return render_template('errors/413.html'), 403
 
 
 @app.errorhandler(429)

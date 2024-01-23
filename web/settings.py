@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from pathlib import Path
 from datetime import datetime
@@ -53,6 +54,10 @@ def configure(app):
     @app.before_request
     def before_request():
         g.request_id = request.headers.get('X-Request-ID')
+
+    @app.context_processor
+    def settings():
+        return {'settings': sys.modules[__name__]}
 
     # Flask
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']

@@ -3,7 +3,7 @@
 {% block content %}
   <h1>{% block title %}Too Large{% endblock %}</h1>
   <p>
-    Sorry, but we cannot accept requests larger than <strong>{{ max_size }} MB</strong>.
+    Sorry, but we cannot accept requests larger than <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     Please go back and try again.
   </p>
 {% endblock %}

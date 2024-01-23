@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, url_for, abort, redirect, render_template, send_from_directory, session, jsonify, send_file
+from flask import Flask, url_for, abort, redirect, render_template, session, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
@@ -12,17 +12,6 @@ from web import forms
 
 app = Flask(__name__)
 app, limiter, image_queue = settings.configure(app)
-
-
-def prepare_job(session_id, job_id, content_image, style_image):
-    root = settings.get_data_dir(app) / str(session_id) / str(job_id)
-    content_filename = Path(secure_filename(content_image.filename))
-    style_filename = secure_filename(style_image.filename)
-    result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
-    root.mkdir(parents=True, exist_ok=True)
-    content_image.save(root / content_filename)
-    style_image.save(root / style_filename)
-    return str(root), str(content_filename), style_filename, result_filename
 
 
 def check_session_id(session_id):
@@ -54,9 +43,19 @@ def index():
             session['id'] = session_id
         job_id = uuid.uuid4()
 
-        args = prepare_job(session_id, job_id, content_image, style_image)
+        data_dir = settings.get_data_dir(app)
+        subdir = Path(str(session_id)) / str(job_id)
+        job_dir = data_dir / subdir
+        content_filename = Path(secure_filename(content_image.filename))
+        style_filename = secure_filename(style_image.filename)
+        result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
+        job_dir.mkdir(parents=True, exist_ok=True)
+        content_image.save(job_dir / content_filename)
+        style_image.save(job_dir / style_filename)
+
+        args = str(subdir), str(content_filename), style_filename, result_filename
         meta = {'session_id': str(session_id)}
-        image_queue.enqueue('worker.tasks.style_image', job_id=str(job_id), args=args, meta=meta, **settings.JOB_KWARGS)
+        image_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('waiting', session_id=session_id, job_id=job_id)
@@ -121,7 +120,7 @@ def image(session_id, job_id, filename):
         abort(404)
     if filename != job.args[-1]:
         abort(404)
-    path = Path(job.args[0]) / filename
+    path = settings.get_data_dir(app) / job.args[0] / filename
     return send_file(path, mimetype=settings.RESULT_FORMAT[1])
 
 

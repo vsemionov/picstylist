@@ -40,11 +40,8 @@ class RequestIDLogFilter(logging.Filter):
         return True
 
 
-def get_data_dir(app, as_path=True):
-    path = Path(app.root_path) / 'data'
-    if not as_path:
-        path = str(path)
-    return path
+def get_data_dir(app):
+    return Path(app.root_path) / 'data'
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=60))
@@ -90,8 +87,8 @@ def configure(app):
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         job.delete()
-    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', description='cleanup_data', interval=(15 * 60),
-        timeout=30, args=[get_data_dir(app, as_path=False), JOB_KWARGS])
+    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], description='cleanup_data',
+        interval=(15 * 60), timeout=30)
 
     # RQ Dashboard
     username = os.environ['RQ_DASHBOARD_USERNAME']

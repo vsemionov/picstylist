@@ -26,9 +26,10 @@ MAX_RESOLUTION_MP = 25
 ALLOWED_FORMATS = ['JPEG', 'PNG']
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 RESULT_FORMAT = ('png', 'image/png')
+RESULT_TTL_MINUTES = 30
 JOB_KWARGS = {
     'job_timeout': 30,
-    'result_ttl': 30 * 60,
+    'result_ttl': RESULT_TTL_MINUTES * 60,
     'ttl': 30 * 60,
     'failure_ttl': 30 * 60,
     'description': 'style_image'

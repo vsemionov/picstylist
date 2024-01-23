@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, session, abort, url_for, redirect, render_template, jsonify, send_file
+from flask import Flask, request, session, abort, url_for, redirect, render_template, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
@@ -91,7 +91,6 @@ def cancel(session_id, job_id):
 
 @app.route('/x/<uuid:session_id>/<uuid:job_id>/')
 def result(session_id, job_id):
-    # TODO: save link
     check_session_id(session_id)
     job = get_job_or_404(session_id, job_id)
     status = job.get_status(refresh=False)
@@ -109,7 +108,8 @@ def image(session_id, job_id, filename):
     if filename != job.args[-1]:
         abort(404)
     path = settings.get_data_dir(app) / job.args[0] / filename
-    return send_file(path, mimetype=settings.RESULT_FORMAT[1])
+    kwargs = {'as_attachment': True, 'download_name': filename} if 'download' in request.args else {}
+    return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
 
 
 @app.route('/<path:name>.html')

@@ -15,6 +15,10 @@
   <div id="result" hidden>
     <h2>Finished</h2>
     <img id="image" src="" height="480" alt="">
+    <p><a href="{{ url_for('image', session_id=request.view_args['session_id'], job_id=request.view_args['job_id'],
+      filename=filename, download=1) }}">Download</a></p>
+    <p>Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.</p>
+    <!-- TODO: remove flicker when refreshing? -->
   </div>
   <div id="error" hidden>
     <h2>Error</h2>
@@ -32,7 +36,8 @@
           if (status === 'finished') {
               document.getElementById('processing').hidden = true;
               document.getElementById('result').hidden = false;
-              document.getElementById('image').src = '{{ filename }}';
+              document.getElementById('image').src = '{{ url_for('image', session_id=request.view_args['session_id'],
+                job_id=request.view_args['job_id'], filename=filename) }}';
           } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
               document.getElementById('processing').hidden = true;
               document.getElementById('error').hidden = false;

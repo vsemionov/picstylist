@@ -107,7 +107,8 @@ def configure(app):
     app.config.from_object(rq_dashboard.default_settings)
     rq_dashboard.web.setup_rq_connection(app)
     rq_dashboard.cli.add_basic_auth(rq_dashboard.blueprint, username, password)
-    limiter.limit('3 per 15 minutes', deduct_when=lambda response: response.status_code == 401)(rq_dashboard.blueprint)
+    limiter.limit('3 per 15 minutes', deduct_when=lambda response: response.status_code in [401, 403]) \
+        (rq_dashboard.blueprint)
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/rq')
 
     return app, limiter, job_queue

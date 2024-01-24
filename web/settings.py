@@ -15,6 +15,7 @@ from rq_scheduler import Scheduler
 import rq_dashboard.cli
 from cachetools import cached, TTLCache
 
+from common import globals
 from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
 
@@ -90,13 +91,15 @@ def configure(app):
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
 
     # RQ
-    job_queue = Queue(connection=redis_client)
-    system_queue = Queue(name='system', connection=redis_client)
+    job_queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
+    system_queue = Queue(name=globals.SYSTEM_QUEUE, connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         job.delete()
-    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS],
-        id=f'{__name__.split(".")[0]}:cleanup_data', description='cleanup_data', interval=(15 * 60), timeout=30)
+    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
+        description='cleanup_data', interval=(15 * 60), timeout=30)
+    scheduler.schedule(datetime.utcnow(), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
+        description='health_check', interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
 
     # RQ Dashboard
     username = os.environ['RQ_DASHBOARD_USERNAME']

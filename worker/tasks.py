@@ -1,9 +1,21 @@
 import os
+import re
+import io
 import time
+import uuid
 import errno
+import shutil
 import logging
 from pathlib import Path
 from datetime import datetime, timedelta
+
+import requests
+import docker
+import numpy as np
+from PIL import Image
+from rq import get_current_job, Queue
+
+from common import globals, NAME
 
 
 logger = logging.getLogger(__name__)
@@ -55,3 +67,47 @@ def cleanup_data(job_kwargs):
                 continue
             raise
     logger.info('Removed %d files and %d directories.', n_files, n_dirs)
+
+
+def health_check():
+    required_containers = {'web', 'worker', 'scheduler', 'redis', 'nginx'}
+    running_containers = set()
+    docker_client = docker.from_env()
+    containers = docker_client.containers.list()
+    for container in containers:
+        match = re.match(rf'^{NAME}([-_])(.*)\1\d+$', container.name)
+        if not match:
+            continue
+        service = match.group(2)
+        if service not in required_containers:
+            continue
+        if container.health != 'healthy':
+            if container.health != 'starting':
+                logger.warning('Container %s is unhealthy.', container.name)
+            continue
+        running_containers.add(service)
+    not_running_containers = required_containers - running_containers
+    if not_running_containers:
+        logger.error('Not all containers are running: %s', not_running_containers)
+        return False
+
+    response = requests.get('http://localhost/')
+    if response.status_code != 200:
+        logger.error('Web server is down.')
+        return False
+
+    job_id = str(uuid.uuid4())
+    job_dir = f'{job_id}/{job_id}'
+    test_filename = 'test.png'
+    (DATA_DIR / job_dir).mkdir(parents=True, exist_ok=True)
+    with open(DATA_DIR / job_dir / test_filename, 'wb') as f:
+        shutil.copyfileobj(test_image, f)
+    queue = Queue(name=globals.DEFAULT_QUEUE, connection=get_current_job().connection)
+    args = job_dir, test_filename, test_filename, 100, 'result.png'
+    queue.enqueue(style_image, args=args, job_id=job_id, at_front=True, job_timeout=30,
+        result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
+        failure_ttl=globals.HEALTH_CHECK_VALIDITY)
+
+
+test_image = io.BytesIO()
+Image.fromarray(np.zeros((128, 128, 3), dtype=np.uint8)).save(test_image, format='PNG')

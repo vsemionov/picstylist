@@ -7,6 +7,8 @@ from pathlib import Path
 from redis import Redis
 from rq import SimpleWorker
 
+from common import globals
+
 
 if __name__ == '__main__':
     sys.path.append(str(Path(__file__).parent / '..'))
@@ -17,6 +19,6 @@ if __name__ == '__main__':
     # preload libraries
     import model
 
-    w = SimpleWorker(['system', 'default'], connection=Redis(os.environ['REDIS_HOST']))
+    w = SimpleWorker([globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE], connection=Redis(os.environ['REDIS_HOST']))
     w.log_result_lifespan = False
     w.work()

@@ -8,6 +8,7 @@ from jinja2 import TemplateNotFound
 
 from web import settings
 from web import forms
+from web import utils
 
 
 app = Flask(__name__)
@@ -115,6 +116,11 @@ def image(session_id, job_id, filename):
     path = settings.get_data_dir(app) / job.args[0] / filename
     kwargs = {'as_attachment': True, 'download_name': filename} if 'download' in request.args else {}
     return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
+
+
+@app.route('/status/')
+def server_status():
+    return '', 200 if utils.check_health(app, job_queue) else 503
 
 
 @app.route('/<path:name>.html')

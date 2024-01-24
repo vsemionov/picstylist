@@ -107,6 +107,7 @@ def health_check():
     queue.enqueue(style_image, args=args, job_id=job_id, at_front=True, job_timeout=30,
         result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
         failure_ttl=globals.HEALTH_CHECK_VALIDITY)
+    logger.info('Enqueued job: %s', job_id)
 
 
 test_image = io.BytesIO()

@@ -89,12 +89,12 @@ def health_check():
     not_running_containers = required_containers - running_containers
     if not_running_containers:
         logger.error('Not all containers are running: %s', not_running_containers)
-        return False
+        raise RuntimeError('Not all containers are running.')
 
     response = requests.get('http://localhost/')
     if response.status_code != 200:
         logger.error('Web server is down.')
-        return False
+        raise RuntimeError('Web server is down.')
 
     job_id = str(uuid.uuid4())
     job_dir = f'{job_id}/{job_id}'

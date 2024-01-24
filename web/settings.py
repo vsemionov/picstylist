@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import request, g
 from flask.logging import default_handler
@@ -96,9 +96,10 @@ def configure(app):
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         job.delete()
-    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
+    start_time = datetime.utcnow()
+    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
         interval=(15 * 60), timeout=30)
-    scheduler.schedule(datetime.utcnow(), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
+    scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
         interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
 
     # RQ Dashboard

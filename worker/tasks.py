@@ -13,7 +13,8 @@ import requests
 import docker
 import numpy as np
 from PIL import Image
-from rq import get_current_job, Queue
+from redis import Redis
+from rq import Queue
 
 from common import globals, NAME
 
@@ -90,7 +91,7 @@ def health_check():
     if not_running_containers:
         raise RuntimeError('Not all containers are running.')
 
-    response = requests.get('http://localhost/')
+    response = requests.get(f'http://{os.environ["NGINX_HOST"]}/')
     if response.status_code != 200:
         raise RuntimeError('Web server is down.')
 
@@ -101,7 +102,7 @@ def health_check():
     with open(DATA_DIR / job_dir / test_filename, 'wb') as f:
         test_image.seek(0)
         shutil.copyfileobj(test_image, f)
-    queue = Queue(name=globals.DEFAULT_QUEUE, connection=get_current_job().connection)
+    queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
     args = job_dir, test_filename, test_filename, 100, 'result.png'
     job_id = globals.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
     queue.enqueue(style_image, args=args, job_id=job_id, at_front=True, job_timeout=30,
@@ -110,5 +111,6 @@ def health_check():
     logger.info('Enqueued job: %s', job_id)
 
 
+redis_client = Redis(host=os.environ['REDIS_HOST'])
 test_image = io.BytesIO()
 Image.fromarray(np.zeros((128, 128, 3), dtype=np.uint8)).save(test_image, format='PNG')

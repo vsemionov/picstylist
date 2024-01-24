@@ -77,7 +77,7 @@ def configure(app):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
     # Redis
-    redis_url = f"redis://{os.environ['REDIS_HOST']}"
+    redis_url = f'redis://{os.environ["REDIS_HOST"]}'
     redis_pool = redis.BlockingConnectionPool.from_url(redis_url, max_connections=(gunicorn_conf.threads + 1),
         timeout=5, socket_timeout=5)
     redis_client = redis.Redis.from_pool(redis_pool)
@@ -95,9 +95,8 @@ def configure(app):
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         job.delete()
-    # TODO: schedule only once
-    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], description='cleanup_data',
-        interval=(15 * 60), timeout=30)
+    scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS],
+        id=f'{__name__.split(".")[0]}:cleanup_data', description='cleanup_data', interval=(15 * 60), timeout=30)
 
     # RQ Dashboard
     username = os.environ['RQ_DASHBOARD_USERNAME']

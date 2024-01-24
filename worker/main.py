@@ -7,13 +7,13 @@ from pathlib import Path
 from redis import Redis
 from rq import SimpleWorker
 
-from common import globals
-
 
 if __name__ == '__main__':
     sys.path.append(str(Path(__file__).parent / '..'))
 
+    from common import globals
     from worker import config
+
     config.configure()
 
     # preload libraries

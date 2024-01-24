@@ -3,7 +3,9 @@ from functools import wraps
 
 from flask import make_response
 from rq import Worker
-from rq.job import Job, Result
+from rq.job import Job
+from rq.results import Result
+from rq.exceptions import NoSuchJobError
 
 from common import globals
 from . import settings
@@ -30,8 +32,9 @@ def check_health(app, job_queue):
         app.logger.error('Health check failed: no workers are available.')
         return False
     for job_id in [globals.HEALTH_CHECK_JOB_ID, globals.IMAGE_CHECK_JOB_ID]:
-        job = Job.fetch(job_id, job_queue.connection)
-        if job is None:
+        try:
+            job = Job.fetch(job_id, job_queue.connection)
+        except NoSuchJobError:
             app.logger.error('Health check failed: job %s does not exist.', job_id)
             return False
         result = job.latest_result()

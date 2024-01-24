@@ -97,9 +97,9 @@ def configure(app):
     for job in scheduler.get_jobs():
         job.delete()
     scheduler.schedule(datetime.utcnow(), 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
-        description='cleanup_data', interval=(15 * 60), timeout=30)
+        interval=(15 * 60), timeout=30)
     scheduler.schedule(datetime.utcnow(), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
-        description='health_check', interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
+        interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
 
     # RQ Dashboard
     username = os.environ['RQ_DASHBOARD_USERNAME']

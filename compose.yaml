@@ -8,7 +8,7 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - PROXY_X_FOR_PROTO=${PROXY_X_FOR_PROTO}
-      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_HOST=redis
       - RQ_DASHBOARD_USERNAME=${RQ_DASHBOARD_USERNAME}
       - RQ_DASHBOARD_PASSWORD=${RQ_DASHBOARD_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
@@ -33,7 +33,7 @@ services:
       dockerfile: docker/worker/Dockerfile
     environment:
       - APP_ENV=${APP_ENV}
-      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_HOST=redis
       - SENTRY_DSN=${SENTRY_DSN}
       - NGINX_HOST=nginx  # for healthcheck
     volumes:
@@ -56,7 +56,7 @@ services:
       context: .
       dockerfile: docker/scheduler/Dockerfile
     environment:
-      - RQ_REDIS_HOST=${REDIS_HOST}
+      - RQ_REDIS_HOST=redis
     logging:
       driver: local
     depends_on:

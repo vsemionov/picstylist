@@ -105,6 +105,7 @@ def health_check():
         shutil.copyfileobj(test_image, f)
     queue = Queue(name=globals.DEFAULT_QUEUE, connection=get_current_job().connection)
     args = job_dir, test_filename, test_filename, 100, 'result.png'
+    job_id = globals.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
     queue.enqueue(style_image, args=args, job_id=job_id, at_front=True, job_timeout=30,
         result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
         failure_ttl=globals.HEALTH_CHECK_VALIDITY)

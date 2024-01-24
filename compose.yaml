@@ -35,6 +35,7 @@ services:
       - APP_ENV=${APP_ENV}
       - REDIS_HOST=${REDIS_HOST}
       - SENTRY_DSN=${SENTRY_DSN}
+      - NGINX_HOST=nginx  # for healthcheck
     volumes:
       - app_data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock

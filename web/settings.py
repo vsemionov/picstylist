@@ -20,7 +20,7 @@ from common.integration import configure_sentry
 
 
 RATE_LIMIT = '5/minute;50/hour;200/day'
-MAX_QUEUE_SIZE_PER_WORKER = 200
+MAX_QUEUE_SIZE_PER_WORKER = 100
 MAX_UPLOAD_SIZE_MB = 10
 MAX_RESOLUTION_MP = 25
 ALLOWED_FORMATS = ['JPEG', 'PNG']

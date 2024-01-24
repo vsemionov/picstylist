@@ -50,7 +50,7 @@ def get_data_dir(app):
 
 @cached(cache=TTLCache(maxsize=1, ttl=60))
 def get_max_queue_size(queue):
-    return MAX_QUEUE_SIZE_PER_WORKER * max(Worker.count(queue.connection), 1)
+    return MAX_QUEUE_SIZE_PER_WORKER * max(Worker.count(queue), 1)
 
 
 def configure(app):

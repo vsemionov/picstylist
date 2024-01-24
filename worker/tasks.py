@@ -101,6 +101,7 @@ def health_check():
     test_filename = 'test.png'
     (DATA_DIR / job_dir).mkdir(parents=True, exist_ok=True)
     with open(DATA_DIR / job_dir / test_filename, 'wb') as f:
+        test_image.seek(0)
         shutil.copyfileobj(test_image, f)
     queue = Queue(name=globals.DEFAULT_QUEUE, connection=get_current_job().connection)
     args = job_dir, test_filename, test_filename, 100, 'result.png'

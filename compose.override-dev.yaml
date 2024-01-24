@@ -3,8 +3,13 @@ services:
     ports:
       - '80:80'
   web:
+    volumes:
+      - ./data:/app/data
     ports:
       - '8000:8000'
+  worker:
+    volumes:
+      - ./data:/app/data
   redis:
     ports:
       - '6379:6379'

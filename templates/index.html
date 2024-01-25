@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>{% block title %}Stylize Images With AI{% endblock %}</h1>
-  <div id="upload">
+  <h1 class="mb-4">{% block title %}Stylize Images With AI{% endblock %}</h1>
+  <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" id="upload" class="row">
+    {{ form.csrf_token }}
     {% if form.form_errors %}
       <ul>
         {% for error in form.form_errors %}
@@ -10,50 +11,50 @@
         {% endfor %}
       </ul>
     {% endif %}
-    <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data">
-      {{ form.csrf_token }}
-      <div>
-        {{ form.content_image.label }} {{ form.content_image }}
-        {% if form.content_image.errors %}
-          <ul>
-            {% for error in form.content_image.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-      <div>
-        {{ form.style_image.label }} {{ form.style_image }}
-        {% if form.style_image.errors %}
-          <ul>
-            {% for error in form.style_image.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-      <div>
-        {{ form.strength.label }} {{ form.strength }}
-        {% if form.strength.errors %}
-          <ul>
-            {% for error in form.strength.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-      <p>
-        <i>
-          {% for format in settings.ALLOWED_FORMATS %}
-            {%- if not loop.first %}{% if loop.last %} or{% else %},{% endif %}{% endif %}
-            <strong>{{ format }}</strong>
-            {%- if loop.last %}.{% endif %}
-          {%- endfor %}
-          At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
-          Both files must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong> in total.
-        </i>
-      </p>
-      <input type="submit" value="Upload">
-    </form>
-  </div>
+    <div class="col-12 col-sm-6 mb-3">
+      {{ form.content_image.label(class='form-label') }}
+      {{ form.content_image(class='form-control') }}
+      {% if form.content_image.errors %}
+        <ul>
+          {% for error in form.content_image.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="col-12 col-sm-6 mb-3">
+      {{ form.style_image.label(class='form-label') }}
+      {{ form.style_image(class='form-control') }}
+      {% if form.style_image.errors %}
+        <ul>
+          {% for error in form.style_image.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="form-text col-12 mb-3">
+      {% for format in settings.ALLOWED_FORMATS %}
+        {%- if not loop.first %}{% if loop.last %} or{% else %},{% endif %}{% endif %}
+        <strong>{{ format }}</strong>
+        {%- if loop.last %}.{% endif %}
+      {%- endfor %}
+      At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
+      Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
+    </div>
+    <div class="col-12 col-sm-6 mb-3">
+      {{ form.strength.label(class='form-label') }}
+      {{ form.strength(class='form-range') }}
+      {% if form.strength.errors %}
+        <ul>
+          {% for error in form.strength.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary w-auto">Upload</button>
+    </div>
+  </form>
 {% endblock %}

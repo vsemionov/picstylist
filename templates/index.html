@@ -12,7 +12,7 @@
         {% endfor %}
       </div>
     {% endif %}
-    <div class="col-12 col-sm-6 mb-3">
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 mb-3">
       {{ form.content_image(class='form-control ps-upload' + (' is-invalid' if form.content_image.errors else '')) }}
       <label class="form-label w-100 text-center" for="content_image">
         <span>Original image</span>
@@ -24,7 +24,7 @@
         </div>
       {% endfor %}
     </div>
-    <div class="col-12 col-sm-6 mb-3">
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 mb-3">
       {{ form.style_image(class='form-control ps-upload' + (' is-invalid' if form.style_image.errors else '')) }}
       <label class="form-label w-100 text-center" for="style_image">
         <span>Style image</span>

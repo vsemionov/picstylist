@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>{% block title %}How It Works{% endblock %}</h1>
+  <h1>{% block title %}How it works{% endblock %}</h1>
   <p>It does need a few words, so please bear with me.</p>
   <p>
     Neural networks are typically structured in layers.
@@ -76,7 +76,7 @@
   <ul>
     <li>
       For a high-level mathematical explanation how the images are "adjusted",
-      see <a href="{{ url_for('html', name='math') }}">here</a>.</li>
+      see <a href="{{ url_for('page', name='math') }}">here</a>.</li>
     <li>
       If you want to know more, check out the <a href="https://arxiv.org/abs/1508.06576">original paper</a>
       by Gatys et al., and the <a href="https://arxiv.org/abs/1705.06830">fast style transfer paper</a> by Ghiasi et al.

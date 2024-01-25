@@ -124,7 +124,7 @@ def server_status():
 
 
 @app.route('/<path:name>.html')
-def html(name):
+def page(name):
     try:
         return render_template(f'pages/{name}.html')
     except TemplateNotFound:

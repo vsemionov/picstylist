@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}PicStylist{% endblock %}
-{% block title_suffix %}{% endblock %}
-
 {% block content %}
-  <h1>PicStylist</h1>
-  <h2>Stylize Your Images With AI</h2>
+  <h1>{% block title %}Stylize your images with AI{% endblock %}</h1>
   <div id="upload">
     {% if form.form_errors %}
       <ul>
@@ -60,5 +56,4 @@
       <input type="submit" value="Upload">
     </form>
   </div>
-  <p><a href="{{ url_for('html', name='model') }}">How it works</a></p>
 {% endblock %}

@@ -6,11 +6,11 @@
         class="row">
     {{ form.csrf_token }}
     {% if form.form_errors %}
-      <ul>
+      <div class="alert alert-danger mb-3">
         {% for error in form.form_errors %}
-          <li>{{ error }}</li>
+          {{ error }}
         {% endfor %}
-      </ul>
+      </div>
     {% endif %}
     <div class="col-12 col-sm-6 mb-3">
       {{ form.content_image(class='form-control ps-upload' + (' is-invalid' if form.content_image.errors else '')) }}

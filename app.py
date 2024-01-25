@@ -131,11 +131,6 @@ def page(name):
         abort(404)
 
 
-@app.errorhandler(400)
-def bad_request(e):
-    return render_template('errors/400.html'), 403
-
-
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('errors/403.html'), 403

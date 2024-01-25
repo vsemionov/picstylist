@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Busy{% endblock %}
-
 {% block content %}
-  <h1>The System Is Overloaded</h1>
+  <h1>{% block title %}Overloaded{% endblock %}</h1>
+  <p>We can't process your image at the moment.</p>
   <p>Please try again in a minute or two.</p>
 {% endblock %}

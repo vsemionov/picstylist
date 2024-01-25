@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Error{% endblock %}
-
 {% block content %}
-  <h1>Oops</h1>
+  <h1>{% block title %}Server Error{% endblock %}</h1>
   <p>Something broke, but we'll fix it soon.</p>
 {% endblock %}

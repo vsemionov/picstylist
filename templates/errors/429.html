@@ -1,17 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Too Many Requests{% endblock %}
-
 {% block content %}
-  <h1>Please slow down</h1>
+  <h1>{% block title %}Too Many Requests{% endblock %}</h1>
+  <h2>Please slow down</h2>
+  <p>To protect our application from bots and other malicious use, we limit the rate of image submissions.</p>
   <p>
-    To protect our application from bots and other malicious use, we limit the rate of image submissions.
     You have exceeded the rate limit (<strong>{{ limit }}</strong>)
     and have been temporarily locked out for <strong>{{ lockout_time }}</strong>.
-    You're welcome to retry after the lockout expires.
+  </p>
+  <p>
     We're sorry for the inconvenience.
+    You're welcome to retry after the lockout expires.
+    Thank you for your understanding.
+  </p>
+  <p>
     Given that this service is free and our resources are limited, we believe this limit is fair and enough for most people.
     Nevertheless, we may increase it in the future.
-    Thank you for your understanding.
   </p>
 {% endblock %}

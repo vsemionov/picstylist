@@ -67,10 +67,10 @@
       function poll() {
           axios.get('{{ url_for('status', session_id=request.view_args['session_id'],
             job_id=request.view_args['job_id']) }}', {timeout: {{ settings.AJAX_TIMEOUT }} * 1000})
-              .then(function (response) {
+              .then(response => {
                   setState(response.data.status, response.data.position);
               })
-              .catch(function (error) {
+              .catch(error => {
                   processingElement.hidden = true;
                   ajaxErrorElement.hidden = false;
                   ajaxErrorReasonElement.innerHTML = error.message;

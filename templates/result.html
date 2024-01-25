@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>{% block title %}Stylized image{% endblock %}</h1>
   <div id="processing" hidden>
     <h2>Processing</h2>
-    <p>Please wait.</p>
-    <p id="processing-queue-position">&nbsp;</p>
-    <div class="spinner"></div>
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Please wait...</span>
+    </div>
+    <p id="processing-status" class="invisible"></p>
     <form action="{{ url_for('cancel', session_id=request.view_args['session_id'],
       job_id=request.view_args['job_id']) }}" method="post">
       {{ cancel_form.csrf_token }}
@@ -14,7 +14,7 @@
     </form>
   </div>
   <div id="result" hidden>
-    <h2>Finished</h2>
+    <h2>{% block title %}Your stylized image{% endblock %}</h2>
     <img id="result-image" src="" height="480" alt="">
     <p><a href="{{ url_for('image', session_id=request.view_args['session_id'], job_id=request.view_args['job_id'],
       filename=filename, download=1) }}">Download</a></p>
@@ -35,7 +35,7 @@
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6.6/dist/axios.min.js"></script>
   <script>
       const processingElement = document.getElementById('processing');
-      const processingQueuePositionElement = document.getElementById('processing-queue-position');
+      const processingStatusElement = document.getElementById('processing-status');
       const resultElement = document.getElementById('result');
       const resultImageElement = document.getElementById('result-image');
       const jobErrorElement = document.getElementById('job-error');
@@ -54,9 +54,11 @@
           } else {
               processingElement.hidden = false;
               if (position != null) {
-                  processingQueuePositionElement.innerHTML = 'Position in queue: ' + (position + 1);
+                  processingStatusElement.classList.remove('invisible');
+                  processingStatusElement.innerHTML = 'Position in queue: ' + (position + 1);
               } else {
-                  processingQueuePositionElement.innerHTML = '&nbsp;';
+                  processingStatusElement.classList.add('invisible');
+                  processingStatusElement.innerHTML = '&nbsp;';
               }
               setTimeout(poll, {{ settings.AJAX_POLL_INTERVAL }} * 1000);
           }

@@ -13,25 +13,21 @@
     {% endif %}
     <div class="col-12 col-sm-6 mb-3">
       {{ form.content_image.label(class='form-label') }}
-      {{ form.content_image(class='form-control') }}
-      {% if form.content_image.errors %}
-        <ul>
-          {% for error in form.content_image.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+      {{ form.content_image(class='form-control' + (' is-invalid' if form.content_image.errors else '')) }}
+      {% for error in form.content_image.errors %}
+        <div class="invalid-feedback">
+          {{ error }}
+        </div>
+      {% endfor %}
     </div>
     <div class="col-12 col-sm-6 mb-3">
       {{ form.style_image.label(class='form-label') }}
-      {{ form.style_image(class='form-control') }}
-      {% if form.style_image.errors %}
-        <ul>
-          {% for error in form.style_image.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+      {{ form.style_image(class='form-control' + (' is-invalid' if form.style_image.errors else '')) }}
+      {% for error in form.style_image.errors %}
+        <div class="invalid-feedback">
+          {{ error }}
+        </div>
+      {% endfor %}
     </div>
     <div class="form-text col-12 mb-3">
       {% for format in settings.ALLOWED_FORMATS %}
@@ -42,16 +38,14 @@
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
-    <div class="col-12 col-sm-6 mb-3">
+    <div class="col-12 col-sm-6 mb-4">
       {{ form.strength.label(class='form-label') }}
-      {{ form.strength(class='form-range') }}
-      {% if form.strength.errors %}
-        <ul>
-          {% for error in form.strength.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+      {{ form.strength(class='form-range' + (' is-invalid' if form.style_image.errors else '')) }}
+      {% for error in form.strength.errors %}
+        <div class="invalid-feedback">
+          {{ error }}
+        </div>
+      {% endfor %}
     </div>
     <div class="col-12">
       <button type="submit" class="btn btn-primary w-auto">Upload</button>

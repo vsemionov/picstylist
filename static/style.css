@@ -35,6 +35,7 @@ body {
 
 
 body {
+    /* TODO: change image, host locally */
     background:
         linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
         url("https://pixabay.com/get/ga9f806e7566fb38a1cc924edf38aaa931c7473dabee830e5d7ea72f71f164ee2da1c1d69c55e32de1bbb4e4b5813145c1c5d0c562032aa3f5ce49808b39f9fb1ecd08931e7134582d08ac8975e706281_1280.jpg")

@@ -2,7 +2,7 @@
 .btn-light:hover,
 .btn-light:focus {
     color: #333;
-    text-shadow: none; /* Prevent inheritance from `body` */
+    text-shadow: none;
 }
 
 body {
@@ -16,7 +16,7 @@ body {
 
 .nav-masthead .nav-link {
     color: rgba(255, 255, 255, .5);
-    border-bottom: .25rem solid transparent;
+    border-bottom: .125rem solid transparent;
 }
 
 .nav-masthead .nav-link:hover,

@@ -1,20 +1,9 @@
-/*
- * Globals
- */
-
-
-/* Custom default button */
 .btn-light,
 .btn-light:hover,
 .btn-light:focus {
     color: #333;
     text-shadow: none; /* Prevent inheritance from `body` */
 }
-
-
-/*
- * Base structure
- */
 
 body {
     text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
@@ -24,11 +13,6 @@ body {
 .cover-container {
     max-width: 42em;
 }
-
-
-/*
- * Header
- */
 
 .nav-masthead .nav-link {
     color: rgba(255, 255, 255, .5);

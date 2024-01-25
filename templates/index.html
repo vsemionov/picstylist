@@ -45,7 +45,7 @@
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
-    <div class="col-12 col-sm-6 mb-4">
+    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
       {{ form.strength.label(class='form-label') }}
       {{ form.strength(class='form-range' + (' is-invalid' if form.style_image.errors else '')) }}
       {% for error in form.strength.errors %}

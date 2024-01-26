@@ -31,8 +31,8 @@ def to_image(tensor):
 def blend_images(content, output, alpha):
     if alpha == 1:
         return output
-    if output.shape != content.shape[1:]:
-        content = tf.image.resize(content[0], output.shape[:-1], method=tf.image.ResizeMethod.BICUBIC)
+    if output.shape != content.shape:
+        content = tf.image.resize(content, output.shape[:-1], method=tf.image.ResizeMethod.BICUBIC)
     return alpha * output + (1 - alpha) * content
 
 
@@ -45,5 +45,5 @@ def fast_style_transfer(base_path, content_filename, style_filename, strength, r
     content_input = load_image(base_path / content_filename)
     style_input = load_image(base_path / style_filename)
     model_output = hub_model(content_input, style_input)[0][0]
-    output = blend_images(content_input, model_output, strength / 100)
+    output = blend_images(content_input[0], model_output, strength / 100)
     return save_image(to_image(output), base_path / result_filename)

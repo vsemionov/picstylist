@@ -10,6 +10,45 @@
 </head>
 <body>
 <div class="container">
+  <header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">PicStylist</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
+              <li class="nav-item">
+                {% if request.path == path %}
+                  <a class="nav-link active" aria-current="page" href="#">{{ name }}</a>
+                {% else %}
+                  <a class="nav-link" href="{{ path }}">{{ name }}</a>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <header class="mb-auto">
+    <div>
+      <h3 class="float-start mb-0">
+        <a href="{{ url_for('index') }}" class="text-white text-decoration-none">PicStylist</a>
+      </h3>
+      <nav class="nav nav-masthead justify-content-end float-end">
+        {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
+          {% if request.path == path %}
+            <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="#">{{ name }}</a>
+          {% else %}
+            <a class="nav-link fw-bold py-1 px-0" href="{{ path }}">{{ name }}</a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
   <main class="my-5">
     {% block content %}
     {% endblock %}

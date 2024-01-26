@@ -16,7 +16,7 @@
       <div class="navbar-nav">
         {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
           {% if request.path == path %}
-            <a class="nav-link active" aria-current="page" href="#">{{ name }}</a>
+            <a class="nav-link active" aria-current="page" href="{{ path }}">{{ name }}</a>
           {% else %}
             <a class="nav-link" href="{{ path }}">{{ name }}</a>
           {% endif %}

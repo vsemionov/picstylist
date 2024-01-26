@@ -2,8 +2,8 @@
 
 {% block content %}
   <div id="processing" hidden>
-    <h2>Processing</h2>
-    <div class="spinner-border my-3" role="status">
+    <h2 class="mb-4">Processing</h2>
+    <div class="spinner-border mb-3" role="status">
       <span class="visually-hidden">Please wait...</span>
     </div>
     <p id="processing-status" class="invisible"></p>
@@ -14,8 +14,8 @@
     </form>
   </div>
   <div id="result" hidden>
-    <h2>{% block title %}Your stylized image{% endblock %}</h2>
-    <div class="my-3"><img id="result-image" class="img-thumbnail" src="" alt=""></div>
+    <h2 class="mb-3">{% block title %}Your stylized image{% endblock %}</h2>
+    <div class="mb-3"><img id="result-image" class="img-thumbnail" src="" alt=""></div>
     <p>
       <a class="btn btn-primary" href="{{ url_for('image', session_id=request.view_args['session_id'],
         job_id=request.view_args['job_id'], filename=filename, download=1) }}">Download</a>

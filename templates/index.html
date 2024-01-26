@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>{% block title %}Stylize Images With AI{% endblock %}</h1>
-  <div class="row my-5">
+  <h1 class="mb-5">{% block title %}Stylize Images With AI{% endblock %}</h1>
+  <div class="row mb-5">
     <div class="col-4 text-center">
       <div class="mb-2">1) Select an image to style:</div>
       <div>
@@ -25,8 +25,8 @@
       </div>
     </div>
   </div>
-  <h2 id="upload">Upload your images</h2>
-  <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" class="row mt-4">
+  <h2 class="mb-4" id="upload">Upload your images</h2>
+  <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" class="row mb-4">
     {{ form.csrf_token }}
     {% if form.form_errors %}
       <div class="alert alert-danger mb-3">
@@ -68,7 +68,7 @@
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
-    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
       {{ form.strength.label(class='form-label') }}
       {{ form.strength(class='form-range' + (' is-invalid' if form.style_image.errors else '')) }}
       {% for error in form.strength.errors %}
@@ -77,11 +77,11 @@
         </div>
       {% endfor %}
     </div>
-    <div class="col-12 mt-4">
+    <div class="col-12">
       <button type="submit" class="btn btn-primary">Upload</button>
     </div>
   </form>
-  <p class="mt-4">
+  <p>
     <small>
       Tips: Use images with well-defined subjects.
       If the background in the output image is too busy, try reducing the strength.

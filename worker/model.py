@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
 
-MAX_SIZE = 1024
+OUTPUT_SIZE = int(os.environ['MODEL_OUTPUT_SIZE'])
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'model')
 hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
@@ -16,8 +16,8 @@ def load_image(image_path):
     image = Image.open(image_path).convert('RGB')
     width, height = image.size
     long_edge = max(width, height)
-    if long_edge > MAX_SIZE:
-        scale = MAX_SIZE / long_edge
+    if long_edge > OUTPUT_SIZE:
+        scale = OUTPUT_SIZE / long_edge
         width, height = max(int(width * scale), 1), max(int(height * scale), 1)
         image = image.resize((width, height), resample=Image.Resampling.BICUBIC)
     return tf.constant(image, dtype=tf.float32)[tf.newaxis, :] / 255

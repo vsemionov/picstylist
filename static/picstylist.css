@@ -3,6 +3,10 @@
  */
 
 
+div:has(> .ps-upload) {
+    position: relative;
+}
+
 .ps-upload {
     opacity: 0;
     position: absolute;
@@ -10,6 +14,8 @@
     width: 0.1px;
     height: 0.1px;
     overflow: hidden;
+    top: 50%;
+    left: 50%;
 }
 
 .ps-upload + label {

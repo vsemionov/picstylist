@@ -3,6 +3,10 @@
  */
 
 
+.ps-image {
+    max-height: 320px;
+}
+
 div:has(> .ps-upload) {
     position: relative;
 }

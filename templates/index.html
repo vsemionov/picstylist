@@ -2,8 +2,31 @@
 
 {% block content %}
   <h1>{% block title %}Stylize Images With AI{% endblock %}</h1>
-  <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" id="upload"
-        class="row mt-4">
+  <div class="row my-5">
+    <div class="col-4 text-center">
+      <div class="mb-2">1) Select an image to style:</div>
+      <div>
+        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/horse-1201143_640.jpg') }}"
+             alt="">
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="mb-2">2) Select a style image to apply:</div>
+      <div>
+        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/oil-pastel-1749994_640.jpg') }}"
+             alt="">
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="mb-2">3) Transfer the style to the original image:</div>
+      <div>
+        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/horse-1201143_640 (styled).png') }}"
+             alt="">
+      </div>
+    </div>
+  </div>
+  <h2 id="upload">Upload your images</h2>
+  <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" class="row mt-4">
     {{ form.csrf_token }}
     {% if form.form_errors %}
       <div class="alert alert-danger mb-3">

@@ -33,27 +33,11 @@
       </div>
     </nav>
   </header>
-  <header class="mb-auto">
-    <div>
-      <h3 class="float-start mb-0">
-        <a href="{{ url_for('index') }}" class="text-white text-decoration-none">PicStylist</a>
-      </h3>
-      <nav class="nav nav-masthead justify-content-end float-end">
-        {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
-          {% if request.path == path %}
-            <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="#">{{ name }}</a>
-          {% else %}
-            <a class="nav-link fw-bold py-1 px-0" href="{{ path }}">{{ name }}</a>
-          {% endif %}
-        {% endfor %}
-      </nav>
-    </div>
-  </header>
   <main class="my-5">
     {% block content %}
     {% endblock %}
   </main>
-  <footer class="text-body-secondary py-3">
+  <footer class="text-body-secondary py-3 mt-auto">
     <small>
       &copy; 2024
       <a href="https://github.com/vsemionov" class="text-body-emphasis text-decoration-none">Victor Semionov</a>

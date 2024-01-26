@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1 class="mb-4">{% block title %}Stylize Images With AI{% endblock %}</h1>
+  <h1>{% block title %}Stylize Images With AI{% endblock %}</h1>
   <form action="{{ url_for('index', _anchor='upload') }}" method="post" enctype="multipart/form-data" id="upload"
-        class="row">
+        class="row mt-4">
     {{ form.csrf_token }}
     {% if form.form_errors %}
       <div class="alert alert-danger mb-3">
@@ -45,7 +45,7 @@
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
-    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
+    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3">
       {{ form.strength.label(class='form-label') }}
       {{ form.strength(class='form-range' + (' is-invalid' if form.style_image.errors else '')) }}
       {% for error in form.strength.errors %}
@@ -54,7 +54,7 @@
         </div>
       {% endfor %}
     </div>
-    <div class="col-12">
+    <div class="col-12 mt-4">
       <button type="submit" class="btn btn-primary  ">Upload</button>
     </div>
   </form>

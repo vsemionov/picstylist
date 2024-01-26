@@ -33,7 +33,7 @@ services:
       dockerfile: docker/worker/Dockerfile
     environment:
       - APP_ENV=${APP_ENV}
-      - MODEL_OUTPUT_SIZE=1024
+      - MAX_IMAGE_SIZE=1024
       - REDIS_HOST=redis
       - SENTRY_DSN=${SENTRY_DSN}
       - NGINX_HOST=nginx  # for healthcheck

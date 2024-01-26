@@ -14,8 +14,9 @@ div:has(> .ps-upload) {
     width: 1px;
     height: 1px;
     overflow: hidden;
-    top: 50%;
+    top: 100%;
     left: 50%;
+    transform: translate(-50%, -100%);
 }
 
 .ps-upload + label {

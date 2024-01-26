@@ -17,8 +17,7 @@ if __name__ == '__main__':
     config.configure()
 
     # preload libraries
-    from worker import model
-    model.init()
+    import model
 
     w = SimpleWorker([globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE], connection=Redis(os.environ['REDIS_HOST']))
     w.log_result_lifespan = False

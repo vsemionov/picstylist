@@ -30,7 +30,7 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
     base_path = DATA_DIR / subdir
     try:
         start_time = time.time()
-        result = model.style_transfer(base_path, content_filename, style_filename, strength, result_filename)
+        result = model.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
         logger.info('Finished in %.1f seconds.', time.time() - start_time)
         return result
     finally:

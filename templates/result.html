@@ -17,8 +17,9 @@
     <h2 class="mb-3">{% block title %}Your stylized image{% endblock %}</h2>
     <div class="mb-3"><img id="result-image" class="img-thumbnail" src="" alt=""></div>
     <p>
-      <a class="btn btn-primary" href="{{ url_for('image', session_id=request.view_args['session_id'],
+      <a class="btn btn-primary me-2" href="{{ url_for('image', session_id=request.view_args['session_id'],
         job_id=request.view_args['job_id'], filename=filename, download=1) }}">Download</a>
+      <a class="btn btn-secondary" href="{{ url_for('index', _anchor='upload') }}">Upload again</a>
     </p>
     <p class="text-body-tertiary">
       Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.
@@ -27,11 +28,13 @@
   <div id="job-error" hidden>
     <h2>Error</h2>
     <p>There was a problem processing your image.</p>
+    <a class="btn btn-primary" href="{{ url_for('index', _anchor='upload') }}">Try again</a>
   </div>
   <div id="ajax-error" hidden>
     <h2>Error</h2>
     <p>Unable to retrieve the status of your image.</p>
     <p>Reason: <span id="ajax-error-reason"></span></p>
+    <a class="btn btn-primary" href="{{ url_for('index', _anchor='upload') }}">Try again</a>
   </div>
   <script id="state-data" type="application/json">
     {

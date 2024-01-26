@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" class="h-100" data-bs-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,23 +8,19 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='picstylist.css') }}">
   <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
-<body>
-<div class="container">
-  <header>
-    <nav class="navbar navbar-expand">
-      <a class="navbar-brand fs-3" href="{{ url_for('index') }}">PicStylist</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav">
-          {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
-            <li class="nav-item">
-              {% if request.path == path %}
-                <a class="nav-link active" aria-current="page" href="#">{{ name }}</a>
-              {% else %}
-                <a class="nav-link" href="{{ path }}">{{ name }}</a>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
+<body class="h-100">
+<div class="container d-flex flex-column h-100">
+  <header class="mb-auto">
+    <nav class="navbar navbar-expand justify-content-between">
+      <a class="navbar-brand" href="{{ url_for('index') }}">PicStylist</a>
+      <div class="navbar-nav">
+        {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
+          {% if request.path == path %}
+            <a class="nav-link active" aria-current="page" href="#">{{ name }}</a>
+          {% else %}
+            <a class="nav-link" href="{{ path }}">{{ name }}</a>
+          {% endif %}
+        {% endfor %}
       </div>
     </nav>
   </header>
@@ -32,7 +28,7 @@
     {% block content %}
     {% endblock %}
   </main>
-  <footer class="text-body-secondary py-3">
+  <footer class="text-body-secondary py-3 mt-auto">
     <small>
       &copy; 2024
       <a href="https://github.com/vsemionov" class="text-body-emphasis text-decoration-none">Victor Semionov</a>

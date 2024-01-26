@@ -29,55 +29,16 @@
     <p>Unable to retrieve the status of your image.</p>
     <p>Reason: <span id="ajax-error-reason"></span></p>
   </div>
-{% endblock %}
-
-{% block scripts %}
-  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.6/dist/axios.min.js"></script>
-  <script>
-      const processingElement = document.getElementById('processing');
-      const processingStatusElement = document.getElementById('processing-status');
-      const resultElement = document.getElementById('result');
-      const resultImageElement = document.getElementById('result-image');
-      const jobErrorElement = document.getElementById('job-error');
-      const ajaxErrorElement = document.getElementById('ajax-error');
-      const ajaxErrorReasonElement = document.getElementById('ajax-error-reason');
-
-      function setState(status, position) {
-          if (status === 'finished') {
-              processingElement.hidden = true;
-              resultElement.hidden = false;
-              resultImageElement.src = '{{ url_for('image', session_id=request.view_args['session_id'],
-                job_id=request.view_args['job_id'], filename=filename) }}';
-          } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
-              processingElement.hidden = true;
-              jobErrorElement.hidden = false;
-          } else {
-              processingElement.hidden = false;
-              if (position != null) {
-                  processingStatusElement.classList.remove('invisible');
-                  processingStatusElement.innerHTML = 'Position in the queue: ' + (position + 1);
-              } else {
-                  processingStatusElement.classList.add('invisible');
-                  processingStatusElement.innerHTML = '&nbsp;';
-              }
-              setTimeout(poll, {{ settings.AJAX_POLL_INTERVAL }} * 1000);
-          }
-      }
-
-      function poll() {
-          axios.get('{{ url_for('status', session_id=request.view_args['session_id'],
-            job_id=request.view_args['job_id']) }}', {timeout: {{ settings.AJAX_TIMEOUT }} * 1000})
-              .then(response => {
-                  setState(response.data.status, response.data.position);
-              })
-              .catch(error => {
-                  processingElement.hidden = true;
-                  ajaxErrorElement.hidden = false;
-                  ajaxErrorReasonElement.innerHTML = error.message;
-                  console.error(error);
-              });
-      }
-
-      setState('{{ status }}', {{ position if position is not none else 'null' }});
+  <script id="state-data" type="application/json">
+    {
+      "initialStatus": "{{ status }}",
+      "initialQueuePosition": {{ position if position is not none else 'null' }},
+      "statusUrl": "{{ url_for('status', session_id=request.view_args['session_id'],
+        job_id=request.view_args['job_id']) }}",
+      "pollInterval": {{ settings.AJAX_POLL_INTERVAL }},
+      "requestTimeout": {{ settings.AJAX_TIMEOUT }},
+      "resultUrl": "{{ url_for('image', session_id=request.view_args['session_id'],
+        job_id=request.view_args['job_id'], filename=filename) }}"
+    }
   </script>
 {% endblock %}

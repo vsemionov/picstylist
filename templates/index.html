@@ -59,24 +59,3 @@
     </div>
   </form>
 {% endblock %}
-
-{% block scripts %}
-  <script>
-      const initialImgSrc = document.querySelector('.ps-upload + label > img').src;
-      document.querySelectorAll('.ps-upload').forEach(input => {
-          input.onchange = evt => {
-              const label = input.labels[0];
-              const img = label.querySelector('img');
-              const span = label.querySelector('span');
-              const [file] = input.files;
-              if (file) {
-                  span.hidden = true;
-                  img.src = URL.createObjectURL(file);
-              } else {
-                  span.hidden = false;
-                  img.src = initialImgSrc;
-              }
-          };
-      });
-  </script>
-{% endblock %}

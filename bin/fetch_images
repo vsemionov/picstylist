@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+cd "$(dirname "$0")"/..
+
+if [ ! -d static/images ]; then
+    mkdir static/images
+fi
+
+while read -r filename url; do
+    if [ ! -f static/images/"$filename" ]; then
+        curl -f -o static/images/"$filename" "$url"
+    fi
+done <conf/images.txt

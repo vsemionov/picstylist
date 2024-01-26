@@ -5,6 +5,7 @@ set -e
 cd "$(dirname "$0")"/..
 
 bin/gencert
+bin/fetch_images
 bin/portainer
 
 (

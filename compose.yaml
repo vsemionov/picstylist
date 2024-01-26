@@ -84,7 +84,7 @@ services:
       - web
     restart: always
     healthcheck:
-      test: curl -f -sS -m 10 http://localhost/static/style.css >/dev/null || exit 1
+      test: curl -f -sS -m 10 http://localhost/static/picstylist.css >/dev/null || exit 1
     deploy:
       resources:
         limits:

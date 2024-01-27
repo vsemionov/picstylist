@@ -3,7 +3,6 @@ import sys
 import logging
 from pathlib import Path
 from datetime import datetime, timedelta
-import sqlite3
 
 from flask import current_app, request, g
 from flask.logging import default_handler
@@ -18,7 +17,7 @@ from rq_scheduler import Scheduler
 import rq_dashboard.cli
 from cachetools import cached, TTLCache
 
-from common import globals
+from common import globals, database
 from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
 
@@ -53,6 +52,10 @@ def get_data_dir(app):
     return Path(app.root_path) / 'data'
 
 
+def get_jobs_dir(app):
+    return get_data_dir(app) / globals.JOBS_DIR
+
+
 @cached(cache=TTLCache(maxsize=1, ttl=60))
 def get_max_queue_size(queue):
     return MAX_QUEUE_SIZE_PER_WORKER * max(Worker.count(queue=queue), 1)
@@ -61,8 +64,7 @@ def get_max_queue_size(queue):
 def get_db():
     db = getattr(g, 'db', None)
     if db is None:
-        db = sqlite3.connect(current_app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES)
-        db.row_factory = sqlite3.Row
+        db = database.connect(current_app.config['DATABASE'])
         g.db = db
     return db
 

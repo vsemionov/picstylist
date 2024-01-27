@@ -1,8 +1,6 @@
-DROP TABLE IF EXISTS jobs;
-
-CREATE TABLE jobs
+CREATE TABLE IF NOT EXISTS jobs
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    completed TIMESTAMP DEFAULT NULL,
-    succeeded BOOLEAN NOT NULL
+    completed TIMESTAMP,
+    succeeded BOOLEAN
 );

@@ -16,41 +16,33 @@ from PIL import Image
 from redis import Redis
 from rq import Queue
 
-from common import globals, NAME
-from common.stats import start_job, end_job, StatsError
+from common import NAME, globals, database
+from common.stats import start_job, end_job
 
 
 logger = logging.getLogger(__name__)
 
 
-JOBS_DIR = Path(__file__).parent.parent / 'data' / globals.JOBS_DIR
+DATA_DIR = Path(__file__).parent.parent / 'data'
+JOBS_DIR = DATA_DIR / globals.JOBS_DIR
 
 
 def style_image(subdir, content_filename, style_filename, strength, result_filename, stats=True):
-    stat_id = None
-    try:
-        stat_id = start_job()
-    except StatsError as e:
-        logger.error('Failed to start stats job: %s', e)
-
-    from . import model
-
+    stat_id = start_job(db_conn) if stats else None
     base_path = JOBS_DIR / subdir
     succeeded = False
 
     try:
+        from . import model
         start_time = time.time()
         result = model.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
-        succeeded = True
         logger.info('Finished in %.1f seconds.', time.time() - start_time)
+        succeeded = True
         return result
 
     finally:
-        if stats and stat_id is not None:
-            try:
-                end_job(stat_id, succeeded)
-            except StatsError as e:
-                logger.error('Failed to end stats job: %s', e)
+        if stat_id is not None:
+            end_job(db_conn, stat_id, succeeded)
         for path in [base_path / filename for filename in [content_filename, style_filename]]:
             try:
                 path.unlink(missing_ok=True)
@@ -137,6 +129,7 @@ def health_check():
     logger.info('Enqueued job: %s', job_id)
 
 
+db_conn = database.connect(DATA_DIR / globals.DATABASE)
 redis_client = Redis(host=os.environ['REDIS_HOST'])
 test_image = io.BytesIO()
 Image.fromarray(np.zeros((128, 128, 3), dtype=np.uint8)).save(test_image, format='PNG')

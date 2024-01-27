@@ -6,7 +6,6 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
-from common import globals
 from common import stats
 from web import settings
 from web import forms
@@ -15,10 +14,6 @@ from web import utils
 
 app = Flask(__name__)
 app, auth, limiter, auth_limit, job_queue = settings.configure(app)
-
-
-def get_jobs_dir():
-    return settings.get_data_dir(app) / globals.JOBS_DIR
 
 
 def check_session_id(session_id):
@@ -52,7 +47,7 @@ def index():
         job_id = uuid.uuid4()
 
         subdir = Path(str(session_id)) / str(job_id)
-        job_dir = get_jobs_dir() / subdir
+        job_dir = settings.get_jobs_dir(app) / subdir
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
         result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
@@ -118,7 +113,7 @@ def image(session_id, job_id, filename):
         abort(404)
     if filename != job.args[-1]:
         abort(404)
-    path = get_jobs_dir() / job.args[0] / filename
+    path = settings.get_jobs_dir(app) / job.args[0] / filename
     kwargs = {'as_attachment': True, 'download_name': filename} if 'download' in request.args else {}
     return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
 

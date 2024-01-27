@@ -10,7 +10,13 @@ bin/portainer
 
 (
     set +e
-    docker compose up -d --build
+
+    (
+        set -e
+        docker compose build
+        docker compose run --rm web flask init-db
+        docker compose up -d
+    )
     ret=$?
 
     docker image prune -f >/dev/null

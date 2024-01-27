@@ -13,6 +13,7 @@ services:
       - RQ_DASHBOARD_PASSWORD=${RQ_DASHBOARD_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}
       - SENTRY_DSN=${SENTRY_DSN}
+      - SERVICE_NAME=web
     volumes:
       - app_data:/app/data
     logging:
@@ -33,9 +34,10 @@ services:
       dockerfile: docker/worker/Dockerfile
     environment:
       - APP_ENV=${APP_ENV}
+      - NGINX_HOST=nginx  # for healthcheck
       - REDIS_HOST=redis
       - SENTRY_DSN=${SENTRY_DSN}
-      - NGINX_HOST=nginx  # for healthcheck
+      - SERVICE_NAME=worker
     volumes:
       - app_data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock

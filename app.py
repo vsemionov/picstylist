@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
-from common import stats
+from common import history
 from web import settings
 from web import forms
 from web import utils
@@ -134,8 +134,8 @@ def page(name):
 @app.route('/admin/stats/')
 @auth_limit
 @auth.login_required
-def statistics():
-    job_stats = stats.get_job_stats(settings.get_db())
+def stats():
+    job_stats = history.get_job_stats(settings.get_db())
     return render_template('admin/stats.html', job_stats=job_stats)
 
 

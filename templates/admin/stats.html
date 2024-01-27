@@ -2,7 +2,7 @@
 
 {% block content %}
   <h1>{% block title %}Statistics{% endblock %}</h1>
-  <h2>Jobs</h2>
+  <h2>Job history</h2>
   <ul>
     {% for period, (finished, failed, unfinished) in job_stats.items() %}
       <li>

@@ -16,8 +16,7 @@ from PIL import Image
 from redis import Redis
 from rq import Queue
 
-from common import NAME, globals, database
-from common.stats import start_job, end_job
+from common import NAME, globals, database, history
 
 
 logger = logging.getLogger(__name__)
@@ -27,12 +26,19 @@ DATA_DIR = Path(__file__).parent.parent / 'data'
 JOBS_DIR = DATA_DIR / globals.JOBS_DIR
 
 
-def style_image(subdir, content_filename, style_filename, strength, result_filename, stats=True):
-    stat_id = start_job(db_conn) if stats else None
-    base_path = JOBS_DIR / subdir
+def style_image(subdir, content_filename, style_filename, strength, result_filename, with_history=True):
     succeeded = False
+    base_path = JOBS_DIR / subdir
+
+    db = None
+    hist_id = None
+    if with_history:
+        db = database.connect(DATA_DIR / globals.DATABASE)
 
     try:
+        if with_history:
+            hist_id = history.start_job(db)
+
         from . import model
         start_time = time.time()
         result = model.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
@@ -41,8 +47,12 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
         return result
 
     finally:
-        if stat_id is not None:
-            end_job(db_conn, stat_id, succeeded)
+        if db is not None:
+            try:
+                if hist_id is not None:
+                    history.end_job(db, hist_id, succeeded)
+            finally:
+                db.close()
         for path in [base_path / filename for filename in [content_filename, style_filename]]:
             try:
                 path.unlink(missing_ok=True)
@@ -86,6 +96,10 @@ def cleanup_data(job_kwargs):
     logger.info('Removed %d files and %d directories.', n_files, n_dirs)
 
 
+def maintenance():
+    history.cleanup()
+
+
 def health_check():
     required_containers = {'web', 'worker', 'scheduler', 'redis', 'nginx'}
     running_containers = set()
@@ -121,7 +135,7 @@ def health_check():
         shutil.copyfileobj(test_image, f)
     queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
     args = subdir, test_filename, test_filename, 100, 'result.png'
-    kwargs = {'stats': False}
+    kwargs = {'with_history': False}
     job_id = globals.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
     queue.enqueue(style_image, args=args, kwargs=kwargs, job_id=job_id, at_front=True, job_timeout=30,
         result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
@@ -129,7 +143,6 @@ def health_check():
     logger.info('Enqueued job: %s', job_id)
 
 
-db_conn = database.connect(DATA_DIR / globals.DATABASE)
 redis_client = Redis(host=os.environ['REDIS_HOST'])
 test_image = io.BytesIO()
 Image.fromarray(np.zeros((128, 128, 3), dtype=np.uint8)).save(test_image, format='PNG')

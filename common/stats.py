@@ -2,13 +2,13 @@ class StatsError(Exception):
     pass
 
 
-def start_job():
+def start_job(db):
     pass
 
 
-def end_job(id, succeeded):
+def end_job(db, id, succeeded):
     pass
 
 
-def get_job_stats():
+def get_job_stats(db):
     return {'week': (100, 10, 2)}

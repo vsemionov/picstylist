@@ -39,7 +39,7 @@ class UploadForm(FlaskForm):
     style_image = FileField('Style image', validators=__image_validators)
     strength = IntegerRangeField('Strength', default=settings.DEFAULT_STRENGTH, validators=[NumberRange(1, 100)])
 
-    def validate(self, extra_validators = None):
+    def validate(self, extra_validators=None):
         if not super().validate():
             return False
 

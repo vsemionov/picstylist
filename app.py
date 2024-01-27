@@ -140,7 +140,8 @@ def page(name):
 @auth_limit
 @auth.login_required
 def statistics():
-    return render_template('admin/stats.html', job_stats=stats.get_job_stats())
+    job_stats = stats.get_job_stats(settings.get_db())
+    return render_template('admin/stats.html', job_stats=job_stats)
 
 
 @app.errorhandler(400)

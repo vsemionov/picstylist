@@ -17,7 +17,7 @@ from redis import Redis
 from rq import Queue
 
 from common import globals, NAME
-from common.stats import start_job, end_job
+from common.stats import start_job, end_job, StatsError
 
 
 logger = logging.getLogger(__name__)
@@ -30,10 +30,8 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
     stat_id = None
     try:
         stat_id = start_job()
-    except:
-        # TODO: narrower exception
-        # TODO: log
-        pass
+    except StatsError as e:
+        logger.error('Failed to start stats job: %s', e)
 
     from . import model
 
@@ -51,13 +49,13 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
         if stats and stat_id is not None:
             try:
                 end_job(stat_id, succeeded)
-            except:
-                # TODO: log
-                pass
+            except StatsError as e:
+                logger.error('Failed to end stats job: %s', e)
         for path in [base_path / filename for filename in [content_filename, style_filename]]:
             try:
-                path.unlink()
-            except OSError:
+                path.unlink(missing_ok=True)
+            except OSError as e:
+                logger.error('Failed to remove %s: %s', path, e)
                 continue
 
 
@@ -110,7 +108,7 @@ def health_check():
             continue
         if container.health != 'healthy':
             if container.health != 'starting':
-                logger.warning('Container %s is unhealthy.', container.name)
+                logger.error('Container %s is unhealthy.', container.name)
             continue
         running_containers.add(service)
     not_running_containers = required_containers - running_containers

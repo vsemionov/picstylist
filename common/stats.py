@@ -1,3 +1,7 @@
+class StatsError(Exception):
+    pass
+
+
 def start_job():
     pass
 

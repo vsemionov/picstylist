@@ -133,7 +133,7 @@ def page(name):
 
 @app.errorhandler(400)
 def bad_request(e):
-    return render_template('errors/400.html'), 403
+    return render_template('errors/400.html'), 400
 
 
 @app.errorhandler(403)
@@ -148,7 +148,7 @@ def not_found(e):
 
 @app.errorhandler(413)
 def too_large(e):
-    return render_template('errors/413.html'), 403
+    return render_template('errors/413.html'), 413
 
 
 @app.errorhandler(429)

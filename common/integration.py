@@ -10,12 +10,13 @@ from common import VERSION
 def configure_sentry(with_flask=False):
     app_env = os.environ['APP_ENV']
     sentry_dsn = os.environ['SENTRY_DSN']
-    service_name = os.environ['SERVICE_NAME']
     if not sentry_dsn:
         if app_env != 'development':
             raise ValueError('SENTRY_DSN is required on remote environments.')
         logging.getLogger(__name__).warning('SENTRY_DSN not set, Sentry disabled.')
+        return
 
+    service_name = os.environ['SERVICE_NAME']
     integrations = [RedisIntegration(), RqIntegration()]
     if with_flask:
         from sentry_sdk.integrations.flask import FlaskIntegration

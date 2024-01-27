@@ -6,6 +6,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
+from common import globals
+from common import stats
 from web import settings
 from web import forms
 from web import utils
@@ -13,6 +15,10 @@ from web import utils
 
 app = Flask(__name__)
 app, auth, limiter, auth_limit, job_queue = settings.configure(app)
+
+
+def get_jobs_dir():
+    return settings.get_data_dir(app) / globals.JOBS_DIR
 
 
 def check_session_id(session_id):
@@ -45,9 +51,8 @@ def index():
             session['id'] = session_id
         job_id = uuid.uuid4()
 
-        data_dir = settings.get_data_dir(app)
         subdir = Path(str(session_id)) / str(job_id)
-        job_dir = data_dir / subdir
+        job_dir = get_jobs_dir() / subdir
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
         result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
@@ -113,7 +118,7 @@ def image(session_id, job_id, filename):
         abort(404)
     if filename != job.args[-1]:
         abort(404)
-    path = settings.get_data_dir(app) / job.args[0] / filename
+    path = get_jobs_dir() / job.args[0] / filename
     kwargs = {'as_attachment': True, 'download_name': filename} if 'download' in request.args else {}
     return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
 
@@ -131,11 +136,11 @@ def page(name):
         abort(404)
 
 
-@app.route('/stats/')
+@app.route('/admin/stats/')
 @auth_limit
 @auth.login_required
-def stats():
-    return ''
+def statistics():
+    return render_template('admin/stats.html', job_stats=stats.get_job_stats())
 
 
 @app.errorhandler(400)

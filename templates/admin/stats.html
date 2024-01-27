@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Statistics{% endblock %}</h1>
+  <h2>Jobs</h2>
+  <ul>
+    {% for period, (finished, failed, unfinished) in job_stats.items() %}
+      <li>
+        Last <strong>{{ period }}</strong>:
+        <span class="text-success"><strong>{{ finished }}</strong> finished</span>
+        {%- if failed %}, <span class="text-danger"><strong>{{ failed }}</strong> failed</span>{% endif %}
+        {%- if unfinished %}<span class="text-warning">, <strong>{{ unfinished }}</strong> unfinished</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -9,7 +9,7 @@ from common import VERSION
 
 def configure_sentry(with_flask=False):
     app_env = os.environ['APP_ENV']
-    sentry_dsn = os.environ['SENTRY_DSN']
+    sentry_dsn = os.environ.get('SENTRY_DSN')
     if not sentry_dsn:
         if app_env != 'development':
             raise ValueError('SENTRY_DSN is required on remote environments.')

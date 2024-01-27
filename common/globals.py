@@ -1,3 +1,6 @@
+JOBS_DIR = 'jobs'
+DATABASE = 'db.sqlite3'
+
 DEFAULT_QUEUE = 'default'
 SYSTEM_QUEUE = 'system'
 

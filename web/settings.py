@@ -3,18 +3,20 @@ import sys
 import logging
 from pathlib import Path
 from datetime import datetime, timedelta
+import sqlite3
 
-from flask import request, g
+from flask import current_app, request, g
 from flask.logging import default_handler
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_httpauth import HTTPBasicAuth
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import click
 import redis
 from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
 from cachetools import cached, TTLCache
-from flask_httpauth import HTTPBasicAuth
 
 from common import globals
 from conf import gunicorn as gunicorn_conf
@@ -56,7 +58,29 @@ def get_max_queue_size(queue):
     return MAX_QUEUE_SIZE_PER_WORKER * max(Worker.count(queue=queue), 1)
 
 
+def get_db():
+    db = getattr(g, 'db', None)
+    if db is None:
+        db = sqlite3.connect(current_app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES)
+        db.row_factory = sqlite3.Row
+        g.db = db
+    return db
+
+
 def configure(app):
+    @app.cli.command('init-db')
+    def init_db_command():
+        db = get_db()
+        with current_app.open_resource('schema.sql') as f:
+            db.executescript(f.read().decode('utf-8'))
+        click.echo('Initialized the database.')
+
+    @app.teardown_appcontext
+    def close_db(e=None):
+        db = g.pop('db', None)
+        if db is not None:
+            db.close()
+
     @app.before_request
     def before_request():
         g.request_id = request.headers.get('X-Request-ID')
@@ -65,7 +89,11 @@ def configure(app):
     def settings():
         return {'settings': sys.modules[__name__]}
 
+    def verify_password(username, password):
+        return username == admin_username and password == admin_password
+
     # Flask
+    app.config['DATABASE'] = str(get_data_dir(app) / globals.DATABASE)
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
 
@@ -84,12 +112,9 @@ def configure(app):
     admin_password = os.environ['ADMIN_PASSWORD']
     assert len(admin_username) > 0 and len(admin_password) > 0
 
-    # HTTP Basic Auth
+    # Flask-HTTPAuth
     auth = HTTPBasicAuth(realm='Restricted Access')
-
-    @auth.verify_password
-    def verify_password(username, password):
-        return username == admin_username and password == admin_password
+    auth.verify_password(verify_password)
 
     # Redis
     redis_url = f'redis://{os.environ["REDIS_HOST"]}'
@@ -125,7 +150,7 @@ def configure(app):
     rq_dashboard.web.setup_rq_connection(app)
     rq_dashboard.cli.add_basic_auth(rq_dashboard.blueprint, admin_username, admin_password, realm=auth.realm)
     auth_limit(rq_dashboard.blueprint)
-    app.register_blueprint(rq_dashboard.blueprint, url_prefix='/rq')
+    app.register_blueprint(rq_dashboard.blueprint, url_prefix='/admin/rq')
 
     return app, auth, limiter, auth_limit, job_queue
 

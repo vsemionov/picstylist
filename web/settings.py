@@ -113,6 +113,7 @@ def configure(app):
     for job in scheduler.get_jobs():
         job.delete()
     start_time = datetime.utcnow()
+    scheduler.schedule(start_time, 'worker.tasks.log_stats', id='log_stats', interval=60, timeout=30)
     scheduler.schedule(start_time, 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
         interval=(15 * 60), timeout=30)
     scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,

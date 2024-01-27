@@ -41,6 +41,12 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
                 continue
 
 
+def log_stats():
+    default_queue_len = len(Queue(name=globals.DEFAULT_QUEUE, connection=redis_client))
+    system_queue_len = len(Queue(name=globals.SYSTEM_QUEUE, connection=redis_client))
+    logger.info('Queues: %d default, %d system.', default_queue_len, system_queue_len)
+
+
 def cleanup_data(job_kwargs):
     ttl = sum(job_kwargs[k] for k in ['job_timeout', 'result_ttl', 'ttl'])
     max_time = (datetime.now() - timedelta(seconds=ttl)).timestamp()

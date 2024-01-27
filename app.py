@@ -12,7 +12,7 @@ from web import utils
 
 
 app = Flask(__name__)
-app, limiter, job_queue = settings.configure(app)
+app, auth, limiter, auth_limit, job_queue = settings.configure(app)
 
 
 def check_session_id(session_id):
@@ -129,6 +129,13 @@ def page(name):
         return render_template(f'pages/{name}.html')
     except TemplateNotFound:
         abort(404)
+
+
+@app.route('/stats/')
+@auth_limit
+@auth.login_required
+def stats():
+    return ''
 
 
 @app.errorhandler(400)

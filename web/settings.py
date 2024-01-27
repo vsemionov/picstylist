@@ -14,6 +14,7 @@ from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
 from cachetools import cached, TTLCache
+from flask_httpauth import HTTPBasicAuth
 
 from common import globals
 from conf import gunicorn as gunicorn_conf
@@ -78,6 +79,18 @@ def configure(app):
     if x_for or x_proto:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=x_for, x_proto=x_proto)
 
+    # Admin
+    admin_username = os.environ['ADMIN_USERNAME']
+    admin_password = os.environ['ADMIN_PASSWORD']
+    assert len(admin_username) > 0 and len(admin_password) > 0
+
+    # HTTP Basic Auth
+    auth = HTTPBasicAuth(realm='Restricted Access')
+
+    @auth.verify_password
+    def verify_password(username, password):
+        return username == admin_username and password == admin_password
+
     # Redis
     redis_url = f'redis://{os.environ["REDIS_HOST"]}'
     redis_pool = redis.BlockingConnectionPool.from_url(redis_url, max_connections=(gunicorn_conf.threads + 1),
@@ -90,6 +103,8 @@ def configure(app):
     limiter_logger.setLevel(logging.INFO)
     limiter = Limiter(get_remote_address, app=app, application_limits=['100/minute'], storage_uri=f'redis://',
         storage_options={'connection_pool': redis_pool}, strategy='fixed-window', swallow_errors=False)
+    auth_limit = limiter.shared_limit('3 per 15 minutes', scope='auth',
+        deduct_when=lambda response: response.status_code == 401)
 
     # RQ
     job_queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
@@ -104,18 +119,14 @@ def configure(app):
         interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
 
     # RQ Dashboard
-    username = os.environ['RQ_DASHBOARD_USERNAME']
-    password = os.environ['RQ_DASHBOARD_PASSWORD']
-    assert len(username) > 0 and len(password) > 0
     app.config['RQ_DASHBOARD_REDIS_URL'] = redis_url
     app.config.from_object(rq_dashboard.default_settings)
     rq_dashboard.web.setup_rq_connection(app)
-    rq_dashboard.cli.add_basic_auth(rq_dashboard.blueprint, username, password)
-    limiter.limit('3 per 15 minutes', deduct_when=lambda response: response.status_code in [401, 403]) \
-        (rq_dashboard.blueprint)
+    rq_dashboard.cli.add_basic_auth(rq_dashboard.blueprint, admin_username, admin_password, realm=auth.realm)
+    auth_limit(rq_dashboard.blueprint)
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/rq')
 
-    return app, limiter, job_queue
+    return app, auth, limiter, auth_limit, job_queue
 
 
 configure_sentry(with_flask=True)

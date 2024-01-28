@@ -110,7 +110,7 @@ def health_check():
             continue
         if container.health != 'healthy':
             if container.health != 'starting':
-                logger.error('Container %s is unhealthy.', container.name)
+                logger.warning('Container %s is unhealthy.', container.name)
             continue
         running_containers.add(service)
     not_running_containers = required_containers - running_containers

@@ -128,11 +128,7 @@ def page(name):
 
 @app.route('/status/')
 def server_status():
-    healthy = utils.check_health(app, job_queue)
-    status = 200 if healthy else 503
-    response = make_response('', status)
-    response.mimetype = 'text/plain'
-    return response
+    return '', 200 if utils.check_health(app, job_queue) else 503
 
 
 @app.route('/admin/')

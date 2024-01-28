@@ -72,17 +72,6 @@ def get_db():
 
 
 def configure(app):
-    @app.cli.command('add-jobs')
-    def add_jobs():
-        from common import history
-        db = get_db()
-        dt = datetime.utcnow() - timedelta(days=365)
-        n = 0
-        while (dt := dt + timedelta(minutes=60)) < datetime.utcnow():
-            n += 1
-            history.start_job(db, dt)
-        print(n)
-
     @app.cli.command('init-db')
     def init_db_command():
         db = get_db()

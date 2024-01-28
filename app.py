@@ -1,4 +1,3 @@
-import time
 import uuid
 from pathlib import Path
 
@@ -148,9 +147,7 @@ def admin():
 @auth_limit
 @auth.login_required
 def stats():
-    t0 = time.time()
     job_stats = history.get_job_stats(settings.get_db())
-    print(time.time() - t0) ###
     return render_template('admin/stats.html', job_stats=job_stats)
 
 

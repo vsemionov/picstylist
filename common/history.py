@@ -4,6 +4,15 @@ def start_job(db):
         return cur.lastrowid
 
 
+#######################
+def start_job(db, dt):
+    import random
+    with db:
+        cur = db.execute('INSERT INTO job_history (started, succeeded) VALUES (?, ?)',
+                         (dt, random.choice([True, False, None])))
+        return cur.lastrowid
+
+
 def end_job(db, id, succeeded):
     with db:
         cur = db.execute('UPDATE job_history SET succeeded = ?, ended = CURRENT_TIMESTAMP WHERE id = ?',

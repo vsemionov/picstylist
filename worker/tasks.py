@@ -96,10 +96,6 @@ def cleanup_data(job_kwargs):
     logger.info('Removed %d files and %d directories.', n_files, n_dirs)
 
 
-def maintenance():
-    history.cleanup()
-
-
 def health_check():
     required_containers = {'web', 'worker', 'scheduler', 'redis', 'nginx'}
     running_containers = set()
@@ -141,6 +137,15 @@ def health_check():
         result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
         failure_ttl=globals.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)
+
+
+def maintenance():
+    db = database.connect(DATA_DIR / globals.DATABASE)
+    try:
+        n_deleted = history.cleanup(db)
+        logger.info('Deleted %d old job history entries.', n_deleted)
+    finally:
+        db.close()
 
 
 redis_client = Redis(host=os.environ['REDIS_HOST'])

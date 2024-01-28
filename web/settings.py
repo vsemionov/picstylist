@@ -18,8 +18,9 @@ import rq_dashboard.cli
 from cachetools import cached, TTLCache
 
 from common import globals, database
-from conf import gunicorn as gunicorn_conf
 from common.integration import configure_sentry
+from conf import gunicorn as gunicorn_conf
+from web import utils
 
 
 RATE_LIMIT = '5/minute;50/hour;200/day'
@@ -94,6 +95,9 @@ def configure(app):
 
     def verify_password(username, password):
         return username == admin_username and password == admin_password
+
+    # Python
+    utils.filter_warnings(os.environ['WARNING_FILTERS'])
 
     # Flask
     app.config['DATABASE'] = str(get_data_dir(app) / globals.DATABASE)

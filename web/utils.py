@@ -1,5 +1,7 @@
 import time
 from functools import wraps
+import builtins
+import warnings
 
 from flask import make_response
 from rq import Worker
@@ -21,6 +23,15 @@ def no_cache(view):
         return response
 
     return wrapped_view
+
+
+def filter_warnings(filters):
+    for filter in filters.split(','):
+        fields = [s.strip() for s in filter.split(':')]
+        action, message, category, module, lineno = fields + [''] * (5 - len(fields))
+        category = getattr(builtins, category) if category else Warning
+        lineno = int(lineno) if lineno else 0
+        warnings.filterwarnings(action, message, category, module, lineno)
 
 
 def check_health(app, job_queue):

@@ -18,6 +18,5 @@ def get_job_stats(db):
 
 def cleanup(db):
     with db:
-        cur = db.execute("DELETE FROM job_history "
-            "WHERE timediff(CURRENT_TIMESTAMP, started) > '+0001-00-00 00:00:00.000'")
+        cur = db.execute("DELETE FROM job_history WHERE started < datetime('now', '-1 year')")
         return cur.rowcount

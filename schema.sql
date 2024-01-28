@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS job_history
     ended TIMESTAMP,
     succeeded BOOLEAN
 );
+
+-- not needed for now
+-- CREATE INDEX IF NOT EXISTS job_history_started_idx ON job_history(started);

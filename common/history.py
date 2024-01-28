@@ -13,7 +13,19 @@ def end_job(db, id, succeeded):
 
 
 def get_job_stats(db):
-    return {'week': (100, 10, 2)}
+    periods = ['hour', '_4_hours', 'day', 'week', 'month', '_3_months', 'year']
+    modifiers = ['-1 hour', '-4 hours', '-1 day', '-7 days', '-1 month', '-3 months', '-1 year']
+    rows = []
+    for succeeded in [True, False, None]:
+        cols = []
+        params = []
+        for period, modifier in zip(periods, modifiers):
+            cols.append(f"COUNT(*) FILTER (WHERE started > datetime('now', ?)) as {period}")
+            params.append(modifier)
+        cur = db.execute(f"SELECT {', '.join(cols)} FROM job_history WHERE succeeded IS ?", params + [succeeded])
+        row = cur.fetchone()
+        rows.append(row)
+    return {period.replace('_', ' ').strip(): [row[period] for row in rows] for period in periods}
 
 
 def cleanup(db):

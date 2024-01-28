@@ -7,9 +7,9 @@
     {% for period, (finished, failed, unfinished) in job_stats.items() %}
       <li>
         Last <strong>{{ period }}</strong>:
-        <span class="text-success"><strong>{{ finished }}</strong> finished</span>
-        {%- if failed %}, <span class="text-danger"><strong>{{ failed }}</strong> failed</span>{% endif %}
-        {%- if unfinished %}<span class="text-warning">, <strong>{{ unfinished }}</strong> unfinished</span>{% endif %}
+        <strong class="text-success">{{ finished }}</strong> finished
+        {%- if failed %}, <strong class="text-danger">{{ failed }}</strong> failed{% endif %}
+        {%- if unfinished %}, <strong class="text-warning">{{ unfinished }}</strong> unfinished{% endif %}
       </li>
     {% endfor %}
   </ul>

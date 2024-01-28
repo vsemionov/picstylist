@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{% block title %}Admin{% endblock %}</h1>
+  <p>
+    Server status:
+    {% if status %}
+      <strong class="text-success">UP</strong>
+    {% else %}
+      <strong class="text-danger">DOWN</strong>
+    {% endif %}
+  </p>
+  <p><a href="{{ url_for('rq_dashboard.queues_overview') }}">RQ Dashboard</a></p>
+  <p><a href="{{ url_for('stats') }}">Statistics</a></p>
+  <p><a href="https://{{ request.host.split(':')[0] }}:{{ settings.PORTAINER_PORT }}/">Portainer</a></p>
+{% endblock %}

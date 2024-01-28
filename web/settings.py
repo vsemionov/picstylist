@@ -40,6 +40,7 @@ JOB_KWARGS = {
 }
 AJAX_POLL_INTERVAL = 2
 AJAX_TIMEOUT = 30
+PORTAINER_PORT = int(os.environ['PORTAINER_PORT'])
 
 
 class RequestIDLogFilter(logging.Filter):
@@ -112,7 +113,8 @@ def configure(app):
     # Admin
     admin_username = os.environ['ADMIN_USERNAME']
     admin_password = os.environ['ADMIN_PASSWORD']
-    assert len(admin_username) > 0 and len(admin_password) > 0
+    if not (admin_username and admin_password):
+        raise ValueError('ADMIN_USERNAME and ADMIN_PASSWORD must be set.')
 
     # Flask-HTTPAuth
     auth = HTTPBasicAuth(realm='Restricted Access')
@@ -138,6 +140,7 @@ def configure(app):
     system_queue = Queue(name=globals.SYSTEM_QUEUE, connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
+        scheduler.cancel(job)
         job.delete()
     start_time = datetime.utcnow()
     scheduler.schedule(start_time, 'worker.tasks.log_stats', id='log_stats', interval=60, timeout=30)
@@ -145,6 +148,7 @@ def configure(app):
         interval=(15 * 60), timeout=30)
     scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
         interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
+    scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', id='maintenance', timeout=30)
 
     # RQ Dashboard
     app.config['RQ_DASHBOARD_REDIS_URL'] = redis_url

@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, request, session, abort, url_for, redirect, render_template, jsonify, send_file
+from flask import Flask, request, session, abort, url_for, make_response, redirect, render_template, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
@@ -118,17 +118,29 @@ def image(session_id, job_id, filename):
     return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
 
 
-@app.route('/status/')
-def server_status():
-    return '', 200 if utils.check_health(app, job_queue) else 503
-
-
 @app.route('/<path:name>.html')
 def page(name):
     try:
         return render_template(f'pages/{name}.html')
     except TemplateNotFound:
         abort(404)
+
+
+@app.route('/status/')
+def server_status():
+    healthy = utils.check_health(app, job_queue)
+    status = 200 if healthy else 503
+    response = make_response('', status)
+    response.mimetype = 'text/plain'
+    return response
+
+
+@app.route('/admin/')
+@auth_limit
+@auth.login_required
+def admin():
+    status = utils.check_health(app, job_queue)
+    return render_template('admin/admin.html', status=status)
 
 
 @app.route('/admin/stats/')

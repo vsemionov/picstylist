@@ -19,7 +19,6 @@ from cachetools import cached, TTLCache
 
 from common import globals, database
 from common.integration import configure_sentry
-from conf import gunicorn as gunicorn_conf
 from web import utils
 
 
@@ -126,8 +125,7 @@ def configure(app):
 
     # Redis
     redis_url = f'redis://{os.environ["REDIS_HOST"]}'
-    redis_pool = redis.BlockingConnectionPool.from_url(redis_url, max_connections=(gunicorn_conf.threads + 1),
-        timeout=5, socket_timeout=5)
+    redis_pool = redis.BlockingConnectionPool.from_url(redis_url, max_connections=100, timeout=5, socket_timeout=5)
     redis_client = redis.Redis.from_pool(redis_pool)
 
     # Flask-Limiter

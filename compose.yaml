@@ -36,7 +36,7 @@ services:
       dockerfile: docker/worker/Dockerfile
     environment:
       - APP_ENV=${APP_ENV}
-      - NGINX_HOST=nginx  # for healthcheck
+      - NGINX_HOST=nginx  # for the health_check job
       - REDIS_HOST=redis
       - SENTRY_DSN=${SENTRY_DSN}
       - SERVICE_NAME=worker
@@ -49,7 +49,7 @@ services:
       - redis
     restart: always
     healthcheck:
-      test: for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie | sort | uniq); do rq info -W | fgrep $$ip | egrep '(idle|busy)' >/dev/null && exit; done; exit 1
+      test: for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie | sort | uniq); do rq info -W | fgrep $$ip | egrep '(idle|busy)' >/dev/null && break; done || exit 1
     deploy:
       resources:
         limits:
@@ -104,7 +104,7 @@ services:
       driver: local
     restart: always
     healthcheck:
-      test: redis-cli ping >/dev/null
+      test: redis-cli ping >/dev/null || exit 1
     deploy:
       resources:
         limits:

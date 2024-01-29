@@ -21,7 +21,7 @@ def main():
     import model
 
     queues = [globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE]
-    redis_client = Redis(os.environ['REDIS_HOST'])
+    redis_client = Redis(os.environ['REDIS_HOST'], socket_connect_timeout=15)  # socket_timeout is handled by rq
     worker_class = SimpleWorker
     worker = worker_class(queues, connection=redis_client)
     worker.log_result_lifespan = False

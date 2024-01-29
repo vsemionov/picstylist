@@ -17,6 +17,7 @@ def main():
     config.configure()
 
     # preload libraries
+    import tasks
     import model
 
     queues = [globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE]

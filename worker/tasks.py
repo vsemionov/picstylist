@@ -148,6 +148,6 @@ def maintenance():
         db.close()
 
 
-redis_client = Redis(host=os.environ['REDIS_HOST'])
+redis_client = Redis(os.environ['REDIS_HOST'])
 test_image = io.BytesIO()
 Image.fromarray(np.zeros((128, 128, 3), dtype=np.uint8)).save(test_image, format='PNG')

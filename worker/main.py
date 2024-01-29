@@ -8,8 +8,8 @@ from redis import Redis
 from rq import SimpleWorker
 
 
-if __name__ == '__main__':
-    sys.path.append(str(Path(__file__).parent / '..'))
+def main():
+    sys.path.append(str(Path(__file__).parent.parent))
 
     from common import globals
     from worker import config
@@ -19,6 +19,13 @@ if __name__ == '__main__':
     # preload libraries
     import model
 
-    w = SimpleWorker([globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE], connection=Redis(os.environ['REDIS_HOST']))
-    w.log_result_lifespan = False
-    w.work()
+    queues = [globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE]
+    redis_client = Redis(os.environ['REDIS_HOST'])
+    worker_class = SimpleWorker
+    worker = worker_class(queues, connection=redis_client)
+    worker.log_result_lifespan = False
+    worker.work()
+
+
+if __name__ == '__main__':
+    main()

@@ -67,7 +67,7 @@ services:
       - redis
     restart: always
     healthcheck:
-      test: python -c 'import os; import sys; import socket; import redis; ip = socket.gethostbyname(socket.gethostname()); cl = redis.Redis(host=os.environ["RQ_REDIS_HOST"]).client_list(); any([c["addr"].split(":")[0] == ip for c in cl]) or sys.exit(1)' || exit 1
+      test: python -c 'import os; import sys; import socket; import redis; ip = socket.gethostbyname(socket.gethostname()); cl = redis.Redis(os.environ["RQ_REDIS_HOST"]).client_list(); any([c["addr"].split(":")[0] == ip for c in cl]) or sys.exit(1)' || exit 1
     deploy:
       resources:
         limits:

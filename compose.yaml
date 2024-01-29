@@ -60,14 +60,14 @@ services:
       context: .
       dockerfile: docker/scheduler/Dockerfile
     environment:
-      - RQ_REDIS_HOST=redis
+      - RQ_REDIS_URL=redis://redis?socket_timeout=5
     logging:
       driver: local
     depends_on:
       - redis
     restart: always
     healthcheck:
-      test: python -c 'import os; import sys; import socket; import redis; ip = socket.gethostbyname(socket.gethostname()); cl = redis.Redis(os.environ["RQ_REDIS_HOST"], socket_timeout=5).client_list(); any([c["addr"].split(":")[0] == ip for c in cl]) or sys.exit(1)' || exit 1
+      test: python -c 'import os; import sys; import socket; import redis; ip = socket.gethostbyname(socket.gethostname()); cl = redis.Redis.from_url(os.environ["RQ_REDIS_URL"]).client_list(); any([c["addr"].split(":")[0] == ip for c in cl]) or sys.exit(1)' || exit 1
     deploy:
       resources:
         limits:

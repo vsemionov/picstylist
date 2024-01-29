@@ -104,7 +104,7 @@ services:
       driver: local
     restart: always
     healthcheck:
-      test: redis-cli ping >/dev/null || exit 1
+      test: timeout 5 redis-cli ping >/dev/null || exit 1
     deploy:
       resources:
         limits:

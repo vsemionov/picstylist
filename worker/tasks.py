@@ -19,11 +19,11 @@ from rq import Queue
 from common import NAME, globals, database, history
 
 
-logger = logging.getLogger(__name__)
-
-
 DATA_DIR = Path(__file__).parent.parent / 'data'
 JOBS_DIR = DATA_DIR / globals.JOBS_DIR
+
+
+logger = logging.getLogger(__name__)
 
 
 def style_image(subdir, content_filename, style_filename, strength, result_filename, with_history=True):

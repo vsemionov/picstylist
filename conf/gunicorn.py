@@ -14,8 +14,12 @@ access_log_format = '[%({X-Request-ID}i)s] %(h)s - "%(r)s" %(L)s %(s)s %(b)s "%(
 
 
 def post_worker_init(worker):
+    # from gevent.hub import get_hub
+    # get_hub().threadpool.maxsize = 10
+
     import sqlite3
     import gsqlite3
     gsqlite3.too_slow = -1  # disable sync execution
     sys.modules[sqlite3.__name__] = gsqlite3
+
     worker.log.info('Gevent initialized.')

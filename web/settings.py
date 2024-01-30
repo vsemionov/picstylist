@@ -18,7 +18,7 @@ import rq_dashboard.cli
 from cachetools import cached, TTLCache
 import sentry_sdk
 
-from common import VERSION, globals, database
+from common import VERSION, config, database
 from web import utils
 
 
@@ -57,7 +57,7 @@ def get_data_dir(app):
 
 
 def get_jobs_dir(app):
-    return get_data_dir(app) / globals.JOBS_DIR
+    return get_data_dir(app) / config.JOBS_DIR
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=60))
@@ -102,14 +102,14 @@ def configure(app):
     utils.filter_warnings(os.environ['WARNING_FILTERS'])
 
     # Flask
-    app.config['DATABASE'] = str(get_data_dir(app) / globals.DATABASE)
+    app.config['DATABASE'] = str(get_data_dir(app) / config.DATABASE)
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
 
     # Logging
     app.logger.setLevel(logging.INFO)
     default_handler.addFilter(RequestIDLogFilter())
-    default_handler.setFormatter(logging.Formatter(f'[%(request_id)s] {globals.LOG_FORMAT}'))
+    default_handler.setFormatter(logging.Formatter(f'[%(request_id)s] {config.LOG_FORMAT}'))
 
     # ProxyFix
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
@@ -141,8 +141,8 @@ def configure(app):
         deduct_when=lambda response: response.status_code == 401)
 
     # RQ
-    job_queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
-    system_queue = Queue(name=globals.SYSTEM_QUEUE, connection=redis_client)
+    job_queue = Queue(name=config.DEFAULT_QUEUE, connection=redis_client)
+    system_queue = Queue(name=config.SYSTEM_QUEUE, connection=redis_client)
     scheduler = Scheduler(queue=system_queue, connection=system_queue.connection)
     for job in scheduler.get_jobs():
         scheduler.cancel(job)
@@ -151,8 +151,8 @@ def configure(app):
     scheduler.schedule(start_time, 'worker.tasks.log_stats', id='log_stats', interval=60, timeout=30)
     scheduler.schedule(start_time, 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
         interval=(15 * 60), timeout=30)
-    scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=globals.HEALTH_CHECK_JOB_ID,
-        interval=globals.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
+    scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=config.HEALTH_CHECK_JOB_ID,
+        interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
     scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', id='maintenance', timeout=30)
 
     # RQ Dashboard

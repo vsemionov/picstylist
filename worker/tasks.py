@@ -16,11 +16,11 @@ from PIL import Image
 from redis import Redis
 from rq import Queue
 
-from common import NAME, globals, database, history
+from common import NAME, config, database, history
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
-JOBS_DIR = DATA_DIR / globals.JOBS_DIR
+JOBS_DIR = DATA_DIR / config.JOBS_DIR
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
     db = None
     hist_id = None
     if with_history:
-        db = database.connect(DATA_DIR / globals.DATABASE)
+        db = database.connect(DATA_DIR / config.DATABASE)
 
     try:
         if with_history:
@@ -62,8 +62,8 @@ def style_image(subdir, content_filename, style_filename, strength, result_filen
 
 
 def log_stats():
-    default_queue_len = len(Queue(name=globals.DEFAULT_QUEUE, connection=redis_client))
-    system_queue_len = len(Queue(name=globals.SYSTEM_QUEUE, connection=redis_client))
+    default_queue_len = len(Queue(name=config.DEFAULT_QUEUE, connection=redis_client))
+    system_queue_len = len(Queue(name=config.SYSTEM_QUEUE, connection=redis_client))
     logger.info('Queues: %d default, %d system.', default_queue_len, system_queue_len)
 
 
@@ -129,18 +129,18 @@ def health_check():
     with open(job_dir / test_filename, 'wb') as f:
         test_image.seek(0)
         shutil.copyfileobj(test_image, f)
-    queue = Queue(name=globals.DEFAULT_QUEUE, connection=redis_client)
+    queue = Queue(name=config.DEFAULT_QUEUE, connection=redis_client)
     args = subdir, test_filename, test_filename, 100, 'result.png'
     kwargs = {'with_history': False}
-    job_id = globals.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
+    job_id = config.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
     queue.enqueue(style_image, args=args, kwargs=kwargs, job_id=job_id, at_front=True, job_timeout=30,
-        result_ttl=globals.HEALTH_CHECK_VALIDITY, ttl=globals.HEALTH_CHECK_VALIDITY,
-        failure_ttl=globals.HEALTH_CHECK_VALIDITY)
+        result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
+        failure_ttl=config.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)
 
 
 def maintenance():
-    db = database.connect(DATA_DIR / globals.DATABASE)
+    db = database.connect(DATA_DIR / config.DATABASE)
     try:
         n_deleted = history.cleanup(db)
         logger.info('Deleted %d old job history entries.', n_deleted)

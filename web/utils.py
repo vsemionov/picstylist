@@ -9,7 +9,7 @@ from rq.job import Job
 from rq.results import Result
 from rq.exceptions import NoSuchJobError
 
-from common import globals
+from common import config
 from . import settings
 
 
@@ -45,7 +45,7 @@ def check_health(app, job_queue):
     if len([w for w in Worker.all(job_queue.connection) if w.get_state() in ['idle', 'busy']]) < 1:
         app.logger.warning('Health check failed: no workers are available.')
         return False
-    for job_id in [globals.HEALTH_CHECK_JOB_ID, globals.IMAGE_CHECK_JOB_ID]:
+    for job_id in [config.HEALTH_CHECK_JOB_ID, config.IMAGE_CHECK_JOB_ID]:
         try:
             job = Job.fetch(job_id, job_queue.connection)
         except NoSuchJobError:
@@ -59,7 +59,7 @@ def check_health(app, job_queue):
         if result.type != Result.Type.SUCCESSFUL:
             app.logger.warning('Health check failed: job %s failed.', job_id)
             return False
-        if result.created_at.timestamp() < start_time - globals.HEALTH_CHECK_VALIDITY:
+        if result.created_at.timestamp() < start_time - config.HEALTH_CHECK_VALIDITY:
             app.logger.warning('Health check failed: job %s is too old.', job_id)
             return False
     return True

@@ -5,18 +5,18 @@ import functools
 from rq import SimpleWorker
 import sentry_sdk
 
-from common import VERSION, globals
+from common import VERSION, config
 
 
 REDIS_URL = f'redis://{os.environ["REDIS_HOST"]}?socket_connect_timeout=15'  # socket_timeout is handled by rq
-QUEUES = [globals.SYSTEM_QUEUE, globals.DEFAULT_QUEUE]
+QUEUES = [config.SYSTEM_QUEUE, config.DEFAULT_QUEUE]
 SENTRY_DSN = os.environ['SENTRY_DSN']
 DICT_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': globals.LOG_FORMAT
+            'format': config.LOG_FORMAT
         }
     },
     'handlers': {

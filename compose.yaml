@@ -24,7 +24,7 @@ services:
       - redis
     restart: always
     healthcheck:
-      test: curl -f -sS -m 10 http://localhost:8000/ >/dev/null || exit 1
+      test: curl -f -sS -m 5 http://localhost:8000/ >/dev/null || exit 1
     deploy:
       resources:
         limits:
@@ -49,7 +49,7 @@ services:
       - redis
     restart: always
     healthcheck:
-      test: for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie | sort | uniq); do rq info -W -u redis://$$REDIS_HOST?socket_timeout=5 | fgrep $$ip | egrep '(idle|busy)' >/dev/null && break; done || exit 1
+      test: (set -e; info=$(rq info -W -u redis://$$REDIS_HOST?socket_timeout=5 | fgrep -v Error | egrep '(idle|busy)' | fgrep ":" | awk '{print $3}' | awk -F ":" '{print $1}'); for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie | sort | uniq); do echo "$$info" | fgrep $$ip >/dev/null && break; done) || exit 1
     deploy:
       resources:
         limits:
@@ -88,7 +88,7 @@ services:
       - web
     restart: always
     healthcheck:
-      test: curl -f -sS -m 10 http://localhost/static/picstylist.css >/dev/null || exit 1
+      test: curl -f -sS -m 5 http://localhost/static/picstylist.css >/dev/null || exit 1
     deploy:
       resources:
         limits:

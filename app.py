@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from flask import Flask, request, session, abort, url_for, make_response, redirect, render_template, jsonify, send_file
+from flask import Flask, request, session, abort, url_for, redirect, render_template, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound

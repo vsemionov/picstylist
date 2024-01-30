@@ -16,9 +16,9 @@ from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
 from cachetools import cached, TTLCache
+import sentry_sdk
 
-from common import globals, database
-from common.integration import configure_sentry
+from common import VERSION, globals, database
 from web import utils
 
 
@@ -41,6 +41,9 @@ JOB_KWARGS = {
 AJAX_POLL_INTERVAL = 2
 AJAX_TIMEOUT = 30
 PORTAINER_PORT = int(os.environ['PORTAINER_PORT'])
+
+
+logger = logging.getLogger(__name__)
 
 
 class RequestIDLogFilter(logging.Filter):
@@ -106,7 +109,7 @@ def configure(app):
     # Logging
     app.logger.setLevel(logging.INFO)
     default_handler.addFilter(RequestIDLogFilter())
-    default_handler.setFormatter(logging.Formatter('[%(request_id)s] %(levelname)s in %(name)s: %(message)s'))
+    default_handler.setFormatter(logging.Formatter(f'[%(request_id)s] {globals.LOG_FORMAT}'))
 
     # ProxyFix
     x_for, x_proto = [int(s.strip()) for s in os.environ['PROXY_X_FOR_PROTO'].split(':')]
@@ -163,4 +166,12 @@ def configure(app):
     return app, auth, limiter, auth_limit, job_queue
 
 
-configure_sentry(with_flask=True)
+app_env = os.environ['APP_ENV']
+sentry_dsn = os.environ['SENTRY_DSN']
+service_name = os.environ['SERVICE_NAME']
+if sentry_dsn:
+    sentry_sdk.init(sentry_dsn, release=VERSION, environment=app_env, server_name=service_name)
+else:
+    if app_env != 'development':
+        raise ValueError('SENTRY_DSN is required on remote environments.')
+    logger.warning('SENTRY_DSN not set, Sentry disabled.')

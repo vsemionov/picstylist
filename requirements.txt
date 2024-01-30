@@ -12,6 +12,7 @@ Flask-WTF==1.2.1
 freezegun==1.4.0
 gevent==23.9.1
 greenlet==3.0.3
+gsqlite3 @ git+https://github.com/gilesbrown/gsqlite3.git@f20b8964c4041eea57ed8fb9be1a620e51dad572
 gunicorn==21.2.0
 hiredis==2.3.2
 importlib-resources==6.1.1

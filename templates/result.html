@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  {% set upload_url = url_for('index', _anchor='upload') %}
+  {% set session_id = request.view_args['session_id'] %}
+  {% set job_id = request.view_args['job_id'] %}
+  {% set image_url = url_for('image', session_id=session_id, job_id=job_id, filename=filename) %}
   <div id="processing" hidden>
     <h2 class="mb-4">Processing</h2>
     <div class="spinner-border mb-3" role="status">
       <span class="visually-hidden">Please wait...</span>
     </div>
     <p id="processing-status" class="invisible"></p>
-    <form action="{{ url_for('cancel', session_id=request.view_args['session_id'],
-      job_id=request.view_args['job_id']) }}" method="post">
+    <form action="{{ url_for('cancel', session_id=session_id, job_id=job_id) }}" method="post">
       {{ cancel_form.csrf_token }}
       <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
     </form>
@@ -17,9 +20,8 @@
     <h2 class="mb-3">{% block title %}Your stylized image{% endblock %}</h2>
     <div class="mb-3"><img id="result-image" class="img-thumbnail" src="" alt=""></div>
     <p>
-      <a class="btn btn-primary me-2" href="{{ url_for('image', session_id=request.view_args['session_id'],
-        job_id=request.view_args['job_id'], filename=filename, download=1) }}">Download</a>
-      <a class="btn btn-secondary" href="{{ url_for('index', _anchor='upload') }}">Upload again</a>
+      <a class="btn btn-primary me-2" href="{{ image_url }}" download>Download</a>
+      <a class="btn btn-secondary" href="{{ upload_url }}">Upload again</a>
     </p>
     <p class="text-body-tertiary">
       Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.
@@ -28,24 +30,22 @@
   <div id="job-error" hidden>
     <h2>Error</h2>
     <p>There was a problem processing your image.</p>
-    <a class="btn btn-primary" href="{{ url_for('index', _anchor='upload') }}">Try again</a>
+    <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
   <div id="ajax-error" hidden>
     <h2>Error</h2>
     <p>Unable to retrieve the status of your image.</p>
     <p>Reason: <span id="ajax-error-reason"></span></p>
-    <a class="btn btn-primary" href="{{ url_for('index', _anchor='upload') }}">Try again</a>
+    <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
   <script id="state-data" type="application/json">
-    {
-      "initialStatus": "{{ status }}",
-      "initialQueuePosition": {{ position if position is not none else 'null' }},
-      "statusUrl": "{{ url_for('status', session_id=request.view_args['session_id'],
-        job_id=request.view_args['job_id']) }}",
-      "pollInterval": {{ settings.AJAX_POLL_INTERVAL }},
-      "requestTimeout": {{ settings.AJAX_TIMEOUT }},
-      "resultUrl": "{{ url_for('image', session_id=request.view_args['session_id'],
-        job_id=request.view_args['job_id'], filename=filename) }}"
-    }
+    {{ {
+      'initialStatus': status,
+      'initialQueuePosition': position,
+      'statusUrl': url_for('status', session_id=session_id, job_id=job_id),
+      'pollInterval': settings.AJAX_POLL_INTERVAL,
+      'requestTimeout': settings.AJAX_TIMEOUT,
+      'imageUrl': image_url
+    } | tojson }}
   </script>
 {% endblock %}

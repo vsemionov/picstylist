@@ -114,8 +114,7 @@ def image(session_id, job_id, filename):
     if filename != job.args[-1]:
         abort(404)
     path = settings.get_jobs_dir(app) / job.args[0] / filename
-    kwargs = {'as_attachment': True, 'download_name': filename} if 'download' in request.args else {}
-    return send_file(path, mimetype=settings.RESULT_FORMAT[1], **kwargs)
+    return send_file(path, mimetype=settings.RESULT_FORMAT[1])
 
 
 @app.route('/<path:name>.html')

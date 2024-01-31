@@ -1,27 +1,47 @@
 {% extends 'base.html' %}
 
+{% macro form_field(field, class='form-control', extra_class='', image_label=false, label_extra_class='') %}
+  {% set field_class = class + ' ' + extra_class + (' is-invalid' if field.errors else '') %}
+  {% set label_class = 'form-label ' + label_extra_class %}
+  {% if not image_label %}
+    {{ field.label(class=label_class) }}
+  {% endif %}
+  {{ field(class=field_class) }}
+  {% if image_label %}
+    <label for="{{ field.id }}" class="{{ label_class }}">
+      <span>{{ image_label }}</span>
+      <img class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="">
+    </label>
+  {% endif %}
+  {% for error in field.errors %}
+    <div class="invalid-feedback">
+      {{ error }}
+    </div>
+  {% endfor %}
+{% endmacro %}
+
 {% block content %}
   <h1 class="mb-5">{% block title %}Stylize Images With AI{% endblock %}</h1>
   <div class="row mb-5">
     <div class="col-12 col-md-6 col-lg-4 text-center mb-4 mb-lg-0">
       <div class="mb-2">1) Select an image to style:</div>
       <div>
-        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/horse-1201143_640.jpg') }}"
-             alt="">
+        <img class="img-thumbnail ps-image" src="{{ url_for('static',
+          filename='images/horse-1201143_640.jpg') }}" alt="">
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4 text-center mb-4 mb-lg-0">
       <div class="mb-2">2) Select a style image to apply:</div>
       <div>
-        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/28849625005_e531638923_c.jpg') }}"
-             alt="">
+        <img class="img-thumbnail ps-image" src="{{ url_for('static',
+          filename='images/28849625005_e531638923_c.jpg') }}" alt="">
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4 text-center">
       <div class="mb-2">3) Transfer the style to the original:</div>
       <div>
-        <img class="img-thumbnail ps-image" src="{{ url_for('static', filename='images/horse-1201143_640_styled.png') }}"
-             alt="">
+        <img class="img-thumbnail ps-image" src="{{ url_for('static',
+          filename='images/horse-1201143_640_styled.png') }}" alt="">
       </div>
     </div>
   </div>
@@ -36,28 +56,12 @@
       </div>
     {% endif %}
     <div class="col-12 col-sm-6 col-md-5 col-lg-4 mb-3">
-      {{ form.content_image(class='form-control ps-upload' + (' is-invalid' if form.content_image.errors else '')) }}
-      <label class="form-label w-100 text-center" for="content_image">
-        <span>Choose original image...</span>
-        <img class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="">
-      </label>
-      {% for error in form.content_image.errors %}
-        <div class="invalid-feedback">
-          {{ error }}
-        </div>
-      {% endfor %}
+      {{ form_field(form.content_image, extra_class='ps-upload', image_label='Choose original image...',
+        label_extra_class='w-100 text-center') }}
     </div>
     <div class="col-12 col-sm-6 col-md-5 col-lg-4 mb-3">
-      {{ form.style_image(class='form-control ps-upload' + (' is-invalid' if form.style_image.errors else '')) }}
-      <label class="form-label w-100 text-center" for="style_image">
-        <span>Choose style image...</span>
-        <img class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="">
-      </label>
-      {% for error in form.style_image.errors %}
-        <div class="invalid-feedback">
-          {{ error }}
-        </div>
-      {% endfor %}
+      {{ form_field(form.style_image, extra_class='ps-upload', image_label='Choose style image...',
+        label_extra_class='w-100 text-center') }}
     </div>
     <div class="form-text col-12 mb-3">
       {% for format in settings.ALLOWED_FORMATS %}
@@ -69,13 +73,7 @@
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
     <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
-      {{ form.strength.label(class='form-label') }}
-      {{ form.strength(class='form-range' + (' is-invalid' if form.style_image.errors else '')) }}
-      {% for error in form.strength.errors %}
-        <div class="invalid-feedback">
-          {{ error }}
-        </div>
-      {% endfor %}
+      {{ form_field(form.strength, class='form-range') }}
     </div>
     <div class="col-12">
       <button type="submit" class="btn btn-primary">Upload</button>

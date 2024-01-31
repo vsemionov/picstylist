@@ -13,6 +13,8 @@ services:
     volumes:
       - ./data:/app/data
     restart: no
+  scheduler:
+    restart: no
   redis:
     ports:
       - '6379:6379'

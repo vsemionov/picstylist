@@ -32,7 +32,7 @@
     const ajaxErrorElement = document.getElementById('ajax-error');
     const ajaxErrorReasonElement = document.getElementById('ajax-error-reason');
 
-    const stateDataElement = document.getElementById('state-data')
+    const stateDataElement = document.getElementById('result-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);

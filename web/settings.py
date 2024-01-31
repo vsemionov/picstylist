@@ -40,6 +40,7 @@ JOB_KWARGS = {
 AJAX_POLL_INTERVAL = 2
 AJAX_TIMEOUT = 30
 PORTAINER_PORT = int(os.environ['PORTAINER_PORT'])
+PREVENT_JOB_PROBING = False
 
 
 logger = logging.getLogger(__name__)

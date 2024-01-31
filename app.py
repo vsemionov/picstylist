@@ -16,15 +16,23 @@ app = Flask(__name__)
 app, auth, limiter, auth_limit, job_queue = settings.configure(app)
 
 
-def check_session_id(session_id):
-    if session_id != session.get('id'):
+def get_session_id(create=False):
+    session_id = session.get('id')
+    if session_id is None and create:
+        session_id = uuid.uuid4().hex
+        session['id'] = session_id
+    return session_id
+
+
+def get_job_or_abort(job_id):
+    session_id = get_session_id()
+    if session_id is None:
         abort(403)
-
-
-def get_job_or_404(session_id, job_id):
     job = job_queue.fetch_job(str(job_id))
-    if job is None or job.meta['session_id'] != str(session_id):
+    if job is None:
         abort(404)
+    if job.meta['session_id'] != session_id:
+        abort(404 if settings.PREVENT_JOB_PROBING else 403)
     return job
 
 
@@ -40,13 +48,10 @@ def index():
         style_image = form.style_image.data
         strength = form.strength.data
 
-        session_id = session.get('id')
-        if session_id is None:
-            session_id = uuid.uuid4()
-            session['id'] = session_id
+        session_id = get_session_id(create=True)
         job_id = uuid.uuid4()
 
-        subdir = Path(str(session_id)) / str(job_id)
+        subdir = Path(str(job_id))
         job_dir = settings.get_jobs_dir(app) / subdir
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
@@ -56,22 +61,21 @@ def index():
         style_image.save(job_dir / style_filename)
 
         args = str(subdir), str(content_filename), style_filename, strength, result_filename
-        meta = {'session_id': str(session_id)}
+        meta = {'session_id': session_id}
         job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=str(job_id),
             meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
-        redirect_url = url_for('result', session_id=session_id, job_id=job_id)
+        redirect_url = url_for('result', job_id=job_id)
         return redirect(redirect_url)
 
     return render_template('index.html', form=form)
 
 
-@app.route('/api/status/<uuid:session_id>/<uuid:job_id>/')
-def status(session_id, job_id):
+@app.route('/api/status/<uuid:job_id>/')
+def status(job_id):
     try:
-        check_session_id(session_id)
-        job = get_job_or_404(session_id, job_id)
+        job = get_job_or_abort(job_id)
     except Forbidden:
         return jsonify({'error': 'Forbidden'}), 403
     except NotFound:
@@ -84,21 +88,19 @@ def status(session_id, job_id):
     return jsonify(fields), 200
 
 
-@app.route('/cancel/<uuid:session_id>/<uuid:job_id>/', methods=['POST'])
-def cancel(session_id, job_id):
-    check_session_id(session_id)
+@app.route('/cancel/<uuid:job_id>/', methods=['POST'])
+def cancel(job_id):
     form = forms.CancelForm()
     if form.validate_on_submit():
-        job = get_job_or_404(session_id, job_id)
+        job = get_job_or_abort(job_id)
         job.cancel()
         app.logger.info('Canceled job: %s', job_id)
     return redirect(url_for('index'))
 
 
-@app.route('/x/<uuid:session_id>/<uuid:job_id>/')
-def result(session_id, job_id):
-    check_session_id(session_id)
-    job = get_job_or_404(session_id, job_id)
+@app.route('/x/<uuid:job_id>/')
+def result(job_id):
+    job = get_job_or_abort(job_id)
     status = job.get_status(refresh=False)
     position = job_queue.get_job_position(job) if status == 'queued' else None
     filename = job.args[-1]
@@ -106,10 +108,9 @@ def result(session_id, job_id):
     return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)
 
 
-@app.route('/x/<uuid:session_id>/<uuid:job_id>/<path:filename>')
-def image(session_id, job_id, filename):
-    check_session_id(session_id)
-    job = get_job_or_404(session_id, job_id)
+@app.route('/x/<uuid:job_id>/<path:filename>')
+def image(job_id, filename):
+    job = get_job_or_abort(job_id)
     if job.get_status(refresh=False) != 'finished':
         abort(404)
     if filename != job.args[-1]:

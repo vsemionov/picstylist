@@ -121,19 +121,18 @@ def health_check():
     if response.status_code != 200:
         raise RuntimeError('Web server is down.')
 
-    job_id = str(uuid.uuid4())
-    subdir = f'{job_id}/{job_id}'
-    test_filename = 'test.png'
-    job_dir = JOBS_DIR / subdir
+    filename = 'test.png'
+    job_id = f'test-{uuid.uuid4().hex}'
+    job_dir = JOBS_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=True)
-    with open(job_dir / test_filename, 'wb') as f:
+    with open(job_dir / filename, 'wb') as f:
         test_image.seek(0)
         shutil.copyfileobj(test_image, f)
     queue = Queue(name=config.DEFAULT_QUEUE, connection=redis_client)
-    args = subdir, test_filename, test_filename, 100, 'result.png'
+    args = job_id, filename, filename, 100, 'result.png'
     kwargs = {'with_history': False}
     job_id = config.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
-    queue.enqueue(style_transfer, description='style_transfer', args=args, kwargs=kwargs, job_id=job_id, at_front=True,
+    queue.enqueue(style_transfer, description='test_style_transfer', args=args, kwargs=kwargs, job_id=job_id, at_front=True,
         job_timeout=30, result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
         failure_ttl=config.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)

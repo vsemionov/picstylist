@@ -1,4 +1,6 @@
+import os
 import uuid
+import base64
 from pathlib import Path
 
 from flask import Flask, session, abort, url_for, redirect, render_template, jsonify, send_file
@@ -28,7 +30,7 @@ def get_job_or_abort(job_id):
     session_id = get_session_id()
     if session_id is None:
         abort(403)
-    job = job_queue.fetch_job(str(job_id))
+    job = job_queue.fetch_job(job_id)
     if job is None:
         abort(404)
     if job.meta['session_id'] != session_id:
@@ -49,10 +51,9 @@ def index():
         strength = form.strength.data
 
         session_id = get_session_id(create=True)
-        job_id = uuid.uuid4()
+        job_id = base64.urlsafe_b64encode(os.urandom(8)).decode().rstrip('=')
 
-        subdir = Path(str(job_id))
-        job_dir = settings.get_jobs_dir(app) / subdir
+        job_dir = settings.get_jobs_dir(app) / job_id
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
         result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
@@ -60,9 +61,9 @@ def index():
         content_image.save(job_dir / content_filename)
         style_image.save(job_dir / style_filename)
 
-        args = str(subdir), str(content_filename), style_filename, strength, result_filename
+        args = job_id, str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': session_id}
-        job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=str(job_id),
+        job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=job_id,
             meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
@@ -72,7 +73,7 @@ def index():
     return render_template('index.html', form=form)
 
 
-@app.route('/api/status/<uuid:job_id>/')
+@app.route('/api/status/<job_id>/')
 def status(job_id):
     try:
         job = get_job_or_abort(job_id)
@@ -88,7 +89,7 @@ def status(job_id):
     return jsonify(fields), 200
 
 
-@app.route('/cancel/<uuid:job_id>/', methods=['POST'])
+@app.route('/cancel/<job_id>/', methods=['POST'])
 def cancel(job_id):
     form = forms.CancelForm()
     if form.validate_on_submit():
@@ -98,7 +99,7 @@ def cancel(job_id):
     return redirect(url_for('index'))
 
 
-@app.route('/x/<uuid:job_id>/')
+@app.route('/x/<job_id>/')
 def result(job_id):
     job = get_job_or_abort(job_id)
     status = job.get_status(refresh=False)
@@ -108,7 +109,7 @@ def result(job_id):
     return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)
 
 
-@app.route('/x/<uuid:job_id>/<path:filename>')
+@app.route('/x/<job_id>/<path:filename>')
 def image(job_id, filename):
     job = get_job_or_abort(job_id)
     if job.get_status(refresh=False) != 'finished':

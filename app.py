@@ -57,7 +57,8 @@ def index():
 
         args = str(subdir), str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': str(session_id)}
-        job_queue.enqueue('worker.tasks.style_image', args=args, job_id=str(job_id), meta=meta, **settings.JOB_KWARGS)
+        job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=str(job_id),
+            meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('result', session_id=session_id, job_id=job_id)

@@ -26,7 +26,7 @@ JOBS_DIR = DATA_DIR / config.JOBS_DIR
 logger = logging.getLogger(__name__)
 
 
-def style_image(subdir, content_filename, style_filename, strength, result_filename, with_history=True):
+def style_transfer(subdir, content_filename, style_filename, strength, result_filename, with_history=True):
     succeeded = False
     base_path = JOBS_DIR / subdir
 
@@ -133,8 +133,8 @@ def health_check():
     args = subdir, test_filename, test_filename, 100, 'result.png'
     kwargs = {'with_history': False}
     job_id = config.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
-    queue.enqueue(style_image, args=args, kwargs=kwargs, job_id=job_id, at_front=True, job_timeout=30,
-        result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
+    queue.enqueue(style_transfer, description='style_transfer', args=args, kwargs=kwargs, job_id=job_id, at_front=True,
+        job_timeout=30, result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
         failure_ttl=config.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)
 

@@ -35,8 +35,7 @@ JOB_KWARGS = {
     'job_timeout': 30,
     'result_ttl': RESULT_TTL_MINUTES * 60,
     'ttl': 30 * 60,
-    'failure_ttl': 30 * 60,
-    'description': 'style_image'
+    'failure_ttl': 30 * 60
 }
 AJAX_POLL_INTERVAL = 2
 AJAX_TIMEOUT = 30
@@ -148,12 +147,13 @@ def configure(app):
         scheduler.cancel(job)
         job.delete()
     start_time = datetime.utcnow()
-    scheduler.schedule(start_time, 'worker.tasks.log_stats', id='log_stats', interval=60, timeout=30)
-    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', args=[JOB_KWARGS], id='cleanup_data',
-        interval=(15 * 60), timeout=30)
-    scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', id=config.HEALTH_CHECK_JOB_ID,
-        interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
-    scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', id='maintenance', timeout=30)
+    scheduler.schedule(start_time, 'worker.tasks.log_stats', description='log_stats', id='log_stats', interval=60,
+        timeout=30)
+    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data', args=[JOB_KWARGS],
+        id='cleanup_data', interval=(15 * 60), timeout=30)
+    scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', description='health_check',
+        id=config.HEALTH_CHECK_JOB_ID, interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
+    scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', description='maintenance', id='maintenance', timeout=30)
 
     # RQ Dashboard
     app.config['RQ_DASHBOARD_REDIS_URL'] = redis_url

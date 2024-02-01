@@ -15,7 +15,6 @@ import redis
 from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
-from flask_sock import Sock
 from cachetools import cached, TTLCache
 import sentry_sdk
 
@@ -40,6 +39,7 @@ JOB_KWARGS = {
     'failure_ttl': 30 * 60
 }
 USE_WEBSOCKET = True
+WEBSOCKET_PING_INTERVAL = 25
 LISTEN_ALWAYS_REFRESH = False
 STATUS_UPDATE_TIMEOUT = JOB_KWARGS['ttl']
 STATUS_UPDATE_INTERVAL = 2
@@ -169,11 +169,9 @@ def configure(app):
     auth_limit(rq_dashboard.blueprint)
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/admin/rq')
 
-    # Flask-Sock
+    # simple-websocket
     if USE_WEBSOCKET:
-        app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25, 'max_message_size': 128}
-        sock = Sock(app)
-        wsapi.configure(sock)
+        wsapi.configure(app)
 
     return app, auth, limiter, auth_limit, job_queue
 

@@ -1,12 +1,13 @@
 import time
 import json
 
-from werkzeug.exceptions import Forbidden, NotFound
+from flask import request
+from simple_websocket import Server, ConnectionClosed
 
 from web import settings
 
 
-def listen(ws, job_id):
+def listen(job_id):
     from app import app, job_queue, get_job_or_abort
 
     def update_status(refresh):
@@ -21,24 +22,10 @@ def listen(ws, job_id):
         return status is not None and status not in terminal_status
 
     end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
-
-    error_log_fmt = 'Listen error: %s: %s'
-    try:
-        job = get_job_or_abort(job_id)
-    except Forbidden:
-        error = 'forbidden'
-        app.logger.info(error_log_fmt, error, job_id)
-        ws.close(message=error)
-        return
-    except NotFound:
-        error = 'not found'
-        app.logger.info(error_log_fmt, error, job_id)
-        ws.close(message=error)
-        return
-
+    job = get_job_or_abort(job_id)
     state = [(None, None)]
-    error = None
     app.logger.info('Listen: %s', job_id)
+    ws = Server(request.environ, ping_interval=settings.WEBSOCKET_PING_INTERVAL, max_message_size=128)
     try:
         if update_status(False):
             pubsub = job_queue.connection.pubsub()  # no ignore_subscribe_messages to trigger an initial status fetch
@@ -49,7 +36,7 @@ def listen(ws, job_id):
                     timeout = min(end_time - time.time(), settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
                     if timeout <= 0:
                         error = 'Job failed to finalize in time.'
-                        app.logger.info('Job failed to finalize in time: %s', job_id)
+                        app.logger.info(error)
                         ws.close(message=error)
                         break
                     message = pubsub.get_message(timeout=timeout)
@@ -58,14 +45,16 @@ def listen(ws, job_id):
                     data = ws.receive(timeout=0)
                     if data is not None:
                         break
-
             finally:
                 pubsub.close()
-
+    except ConnectionClosed:
+        pass
     finally:
-        if error is None:
-            app.logger.info('Listen finished.')
+        if ws.connected:
+            ws.close()
+    app.logger.info('Listen finished.')
+    return ''
 
 
-def configure(sock):
-    sock.route('/ws/listen/<job_id>/')(listen)
+def configure(app):
+    app.route('/ws/listen/<job_id>/', websocket=True)(listen)

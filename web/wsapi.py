@@ -67,7 +67,7 @@ def listen(ws, job_id):
                 pubsub.close()
 
     finally:
-        if error is not None:
+        if error is None:
             app.logger.info('Listen finished.')
 
 

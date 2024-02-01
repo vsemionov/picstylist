@@ -29,13 +29,13 @@
     const resultElement = document.getElementById('result');
     const resultImageElement = document.getElementById('result-image');
     const jobErrorElement = document.getElementById('job-error');
-    const ajaxErrorElement = document.getElementById('ajax-error');
-    const ajaxErrorReasonElement = document.getElementById('ajax-error-reason');
-    const pollTimeoutElement = document.getElementById('poll-timeout');
+    const updateErrorElement = document.getElementById('update-error');
+    const updateErrorReasonElement = document.getElementById('update-error-reason');
+    const updateTimeoutElement = document.getElementById('update-timeout');
 
-    const stateDataElement = document.getElementById('result-data')
+    const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
-    const maxPollTime = stateDataElement ? Date.now() + stateData.maxPollTime * 1000 : null;
+    const endTime = stateDataElement ? Date.now() + stateData.updateTimeout * 1000 : null;
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);
     }
@@ -57,24 +57,24 @@
                 processingStatusElement.classList.add('invisible');
                 processingStatusElement.innerHTML = '&nbsp;';
             }
-            if (Date.now() < maxPollTime) {
-                setTimeout(pollState, stateData.pollInterval * 1000);
+            if (Date.now() < endTime) {
+                setTimeout(pollState, stateData.updateInterval * 1000);
             } else {
                 processingElement.hidden = true;
-                pollTimeoutElement.hidden = false;
+                updateTimeoutElement.hidden = false;
             }
         }
     }
 
     function pollState() {
-        axios.get(stateData.statusUrl, {timeout: stateData.requestTimeout * 1000})
+        axios.get(stateData.updateUrl, {timeout: stateData.requestTimeout * 1000})
             .then(response => {
                 setState(response.data.status, response.data.position);
             })
             .catch(error => {
                 processingElement.hidden = true;
-                ajaxErrorElement.hidden = false;
-                ajaxErrorReasonElement.innerHTML = error.message;
+                updateErrorElement.hidden = false;
+                updateErrorReasonElement.innerHTML = error.message;
                 console.error(error);
             });
     }

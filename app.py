@@ -126,6 +126,7 @@ def listen(ws, job_id):
                 message = pubsub.get_message(timeout=timeout)
                 if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):
                     break
+                ws.receive(timeout=0)  # undocumented, but needed to trigger the ping/pong timeout
 
         finally:
             pubsub.close()

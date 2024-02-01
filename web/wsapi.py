@@ -8,7 +8,6 @@ from web import settings
 
 def listen(ws, job_id):
     # check ssl
-    # check timeout and closed connection
 
     from app import app, job_queue, get_job_or_abort
 
@@ -25,7 +24,6 @@ def listen(ws, job_id):
 
     end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
 
-    # TODO: https://github.com/miguelgrinberg/simple-websocket/pull/35
     error_log_fmt = 'Listen error: %s: %s'
     try:
         job = get_job_or_abort(job_id)

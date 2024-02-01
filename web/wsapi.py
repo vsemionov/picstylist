@@ -28,6 +28,9 @@ def listen(ws, job_id):
 
     end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
 
+    # TODO: log message
+    # TODO: fix close reason and message
+    # TODO: https://github.com/miguelgrinberg/simple-websocket/pull/35
     try:
         job = get_job_or_abort(job_id)
     except Forbidden:
@@ -58,7 +61,9 @@ def listen(ws, job_id):
                 message = pubsub.get_message(timeout=timeout)
                 if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):
                     break
-                ws.receive(timeout=0)  # undocumented, but needed to trigger the ping/pong timeout
+                data = ws.receive(timeout=0)  # undocumented, but needed to trigger the ping/pong timeout
+                if data is not None:
+                    break
 
         finally:
             pubsub.close()

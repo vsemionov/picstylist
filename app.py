@@ -1,6 +1,7 @@
 import os
 import time
 import uuid
+import json
 import base64
 from pathlib import Path
 
@@ -90,8 +91,8 @@ def status(job_id):
     return jsonify(fields), 200
 
 
-@app.route('/api/listen/<job_id>/')
-def listen(job_id):
+@sock.route('/api/listen/<job_id>/')
+def listen(ws, job_id):
     # return http errors
     # check socket timeout
     # check websocket closed
@@ -101,10 +102,11 @@ def listen(job_id):
         terminal_status = {'finished', 'failed', 'canceled', 'stopped'}
         status = job.get_status(refresh=refresh)
         position = job_queue.get_job_position(job) if status == 'queued' else None
-        # send status and queue position
+        app.logger.info('Job status: %s', status)
+        ws.send(json.dumps({'status': status, 'position': position}))
         return status is not None and status not in terminal_status
 
-    max_time = time.time() + settings.MAX_LISTEN_TIME
+    end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
     job = get_job_or_abort(job_id)
 
     if update_status(False):
@@ -113,18 +115,17 @@ def listen(job_id):
             db = job_queue.connection.connection_pool.connection_kwargs.get('db', 0)
             pubsub.subscribe(f'__keyspace@{db}__:{job.key.decode()}')
             while True:
-                timeout = min(max_time - time.time(), settings.STATUS_POLL_INTERVAL)  # poll for queue position
+                timeout = min(end_time - time.time(), settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
                 if timeout <= 0:
-                    # send error
+                    app.logger.info('Job failed to finalize in time.')
+                    ws.send(json.dumps({'error': 'timeout'}))
                     break
                 message = pubsub.get_message(timeout=timeout)
-                if not update_status(message is not None):
+                if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):
                     break
 
         finally:
             pubsub.close()
-
-    return ''
 
 
 @app.route('/cancel/<job_id>/', methods=['POST'])

@@ -29,10 +29,14 @@
 
     const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
+    const updateInterval = stateData ? stateData.updateInterval * 1000 : null;
+    const requestTimeout = stateData ? stateData.requestTimeout * 1000 : null;
     const endTime = stateData ? Date.now() + stateData.updateTimeout * 1000 : null;
 
     let terminalStatus = false;
     let listenSocket = null;
+    let listenTimeout = null;
+
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);
     }
@@ -63,7 +67,7 @@
                         listenState();
                     }
                 } else {
-                    setTimeout(pollState, stateData.updateInterval * 1000);
+                    setTimeout(pollState, updateInterval);
                 }
             } else {
                 processingElement.hidden = true;
@@ -73,31 +77,38 @@
     }
 
     function listenState() {
+        const onListenTimeout = () => {
+            console.warn('WebSocket timeout.');
+            stateData.listenUrl = null;
+            listenSocket.close();
+        }
         listenSocket = new WebSocket(stateData.listenUrl);
-        // TODO: timeout
+        listenTimeout = setTimeout(onListenTimeout, requestTimeout);
         listenSocket.onmessage = evt => {
+            clearTimeout(listenTimeout);
             const data = JSON.parse(evt.data);
             setState(data.status, data.position);
             if (terminalStatus) {
                 listenSocket.close();
+            } else {
+                listenTimeout = setTimeout(onListenTimeout, requestTimeout);
             }
         };
         listenSocket.onclose = evt => {
             if (!terminalStatus) {
                 console.warn('WebSocket closed: "' + evt.reason + '". Falling back to polling.');
                 stateData.listenUrl = null;
-                setTimeout(pollState, stateData.updateInterval * 1000);
+                setTimeout(pollState, updateInterval);
             }
         };
     }
 
     function pollState() {
-        axios.get(stateData.pollUrl, {timeout: stateData.requestTimeout * 1000})
+        axios.get(stateData.pollUrl, {timeout: requestTimeout})
             .then(response => {
                 setState(response.data.status, response.data.position);
             })
             .catch(error => {
-                console.error(error);
                 processingElement.hidden = true;
                 document.getElementById('update-error').hidden = false;
                 document.getElementById('update-error-reason').innerHTML = error.message;

@@ -51,7 +51,7 @@
       'pollUrl': url_for('status', job_id=job_id),
       'updateTimeout': settings.STATUS_UPDATE_TIMEOUT,
       'updateInterval': settings.STATUS_UPDATE_INTERVAL,
-      'requestTimeout': settings.AJAX_TIMEOUT,
+      'requestTimeout': settings.UPDATE_REQUEST_TIMEOUT,
       'imageUrl': image_url
     }|tojson }}
   </script>

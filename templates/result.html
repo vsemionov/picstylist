@@ -47,11 +47,12 @@
     {{ {
       'initialStatus': status,
       'initialQueuePosition': position,
-      'updateUrl': url_for('status', job_id=job_id),
+      'listenUrl': url_for('listen', job_id=job_id) if settings.USE_WEBSOCKET else none,
+      'pollUrl': url_for('status', job_id=job_id),
       'updateTimeout': settings.STATUS_UPDATE_TIMEOUT,
       'updateInterval': settings.STATUS_UPDATE_INTERVAL,
       'requestTimeout': settings.AJAX_TIMEOUT,
       'imageUrl': image_url
-    } | tojson }}
+    }|tojson }}
   </script>
 {% endblock %}

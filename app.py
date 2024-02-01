@@ -93,6 +93,9 @@ def status(job_id):
 
 @sock.route('/api/listen/<job_id>/')
 def listen(ws, job_id):
+    # ssl
+    # nginx
+    # log connections
     # return http errors
     # check socket timeout
     # check websocket closed

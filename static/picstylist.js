@@ -36,9 +36,12 @@
     const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
     const endTime = stateDataElement ? Date.now() + stateData.updateTimeout * 1000 : null;
+
+    let listenSocket = null;
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);
     }
+
 
     function setState(status, position) {
         if (status === 'finished') {
@@ -58,7 +61,13 @@
                 processingStatusElement.innerHTML = '&nbsp;';
             }
             if (Date.now() < endTime) {
-                setTimeout(pollState, stateData.updateInterval * 1000);
+                if (stateData.listenUrl) {
+                    if (listenSocket == null) {
+                        listenState();
+                    }
+                } else {
+                    setTimeout(pollState, stateData.updateInterval * 1000);
+                }
             } else {
                 processingElement.hidden = true;
                 updateTimeoutElement.hidden = false;
@@ -66,8 +75,20 @@
         }
     }
 
+    function listenState() {
+        listenSocket = new WebSocket(stateData.listenUrl);
+        listenSocket.onmessage = evt => {
+            const data = JSON.parse(evt.data);
+            setState(data.status, data.position);
+        };
+        listenSocket.onclose = evt => {
+            stateData.listenUrl = null;
+            setTimeout(pollState, stateData.updateInterval * 1000);
+        };
+    }
+
     function pollState() {
-        axios.get(stateData.updateUrl, {timeout: stateData.requestTimeout * 1000})
+        axios.get(stateData.pollUrl, {timeout: stateData.requestTimeout * 1000})
             .then(response => {
                 setState(response.data.status, response.data.position);
             })

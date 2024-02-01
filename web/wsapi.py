@@ -65,4 +65,4 @@ def listen(ws, job_id):
 
 
 def configure(sock):
-    sock.route('/listen/<job_id>/')(listen)
+    sock.route('/ws/listen/<job_id>/')(listen)

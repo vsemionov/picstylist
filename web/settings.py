@@ -20,6 +20,7 @@ from cachetools import cached, TTLCache
 import sentry_sdk
 
 from common import VERSION, config, database
+from web import wsapi
 from web import utils
 
 
@@ -169,10 +170,12 @@ def configure(app):
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/admin/rq')
 
     # Flask-Sock
-    app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25, 'max_message_size': 128}
-    sock = Sock(app)
+    if USE_WEBSOCKET:
+        app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25, 'max_message_size': 128}
+        sock = Sock(app)
+        wsapi.configure(sock)
 
-    return app, auth, limiter, sock, auth_limit, job_queue
+    return app, auth, limiter, auth_limit, job_queue
 
 
 app_env = os.environ['APP_ENV']

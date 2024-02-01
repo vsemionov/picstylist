@@ -12,12 +12,10 @@ from common import history
 from web import settings
 from web import forms
 from web import utils
-from web import wsapi
 
 
 app = Flask(__name__)
-app, auth, limiter, sock, auth_limit, job_queue = settings.configure(app)
-wsapi.configure(sock)
+app, auth, limiter, auth_limit, job_queue = settings.configure(app)
 
 
 def get_session_id(create=False):

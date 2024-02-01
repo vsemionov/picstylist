@@ -8,6 +8,8 @@ from web import settings
 
 
 # https://github.com/miguelgrinberg/flask-sock/blob/v0.7.0/src/flask_sock/__init__.py
+# prevents exceptions in the log after closing the connection
+# one side effect is that requests are not logged in the access log
 class WebSocketResponse(Response):
     def __init__(self, ws, *args, **kwargs):
         super().__init__(*args, **kwargs)

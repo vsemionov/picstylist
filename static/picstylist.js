@@ -6,7 +6,7 @@
 (() => {
     const initialImgSrc = document.querySelector('.ps-upload + label > img')?.src;
     document.querySelectorAll('.ps-upload').forEach(input => {
-        input.onchange = evt => {
+        input.onchange = () => {
             const label = input.labels[0];
             const img = label.querySelector('img');
             const span = label.querySelector('span');
@@ -31,6 +31,7 @@
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
     const endTime = stateData ? Date.now() + stateData.updateTimeout * 1000 : null;
 
+    let terminalStatus = false;
     let listenSocket = null;
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);
@@ -42,9 +43,11 @@
             processingElement.hidden = true;
             document.getElementById('result').hidden = false;
             document.getElementById('result-image').src = stateData.imageUrl;
+            terminalStatus = true;
         } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
             processingElement.hidden = true;
             document.getElementById('job-error').hidden = false;
+            terminalStatus = true;
         } else {
             processingElement.hidden = false;
             if (position != null) {
@@ -75,11 +78,16 @@
         listenSocket.onmessage = evt => {
             const data = JSON.parse(evt.data);
             setState(data.status, data.position);
+            if (terminalStatus) {
+                listenSocket.close();
+            }
         };
         listenSocket.onclose = evt => {
-            console.warn('WebSocket closed: "' + evt.reason + '". Falling back to polling.');
-            stateData.listenUrl = null;
-            setTimeout(pollState, stateData.updateInterval * 1000);
+            if (!terminalStatus) {
+                console.warn('WebSocket closed: "' + evt.reason + '". Falling back to polling.');
+                stateData.listenUrl = null;
+                setTimeout(pollState, stateData.updateInterval * 1000);
+            }
         };
     }
 

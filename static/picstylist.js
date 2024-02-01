@@ -77,11 +77,13 @@
 
     function listenState() {
         listenSocket = new WebSocket(stateData.listenUrl);
+        // TODO: timeout
         listenSocket.onmessage = evt => {
             const data = JSON.parse(evt.data);
             setState(data.status, data.position);
         };
         listenSocket.onclose = evt => {
+            console.warn('WebSocket closed: "' + evt.reason + '". Falling back to polling.');
             stateData.listenUrl = null;
             setTimeout(pollState, stateData.updateInterval * 1000);
         };
@@ -93,10 +95,10 @@
                 setState(response.data.status, response.data.position);
             })
             .catch(error => {
+                console.error(error);
                 processingElement.hidden = true;
                 updateErrorElement.hidden = false;
                 updateErrorReasonElement.innerHTML = error.message;
-                console.error(error);
             });
     }
 })();

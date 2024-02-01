@@ -120,8 +120,9 @@ def listen(ws, job_id):
             while True:
                 timeout = min(end_time - time.time(), settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
                 if timeout <= 0:
-                    app.logger.info('Job failed to finalize in time.')
-                    ws.send(json.dumps({'error': 'timeout'}))
+                    error = 'Job failed to finalize in time.'
+                    app.logger.info(error)
+                    ws.close(error)
                     break
                 message = pubsub.get_message(timeout=timeout)
                 if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):

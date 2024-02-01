@@ -8,10 +8,7 @@ from web import settings
 
 def listen(ws, job_id):
     # check ssl
-    # log connections
-    # test http errors
-    # close reason not working
-    # check timeout (and how does the ping work?)
+    # check timeout and closed connection
 
     from app import app, job_queue, get_job_or_abort
 
@@ -28,45 +25,50 @@ def listen(ws, job_id):
 
     end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
 
-    # TODO: log message
-    # TODO: fix close reason and message
     # TODO: https://github.com/miguelgrinberg/simple-websocket/pull/35
+    error_log_fmt = 'Listen error: %s: %s'
     try:
         job = get_job_or_abort(job_id)
     except Forbidden:
-        error = 'Forbidden'
-        app.logger.info(error)
-        ws.close(reason=error)
+        error = 'forbidden'
+        app.logger.info(error_log_fmt, error, job_id)
+        ws.close(message=error)
         return
     except NotFound:
-        error = 'Not Found'
-        app.logger.info(error)
-        ws.close(reason=error)
+        error = 'not found'
+        app.logger.info(error_log_fmt, error, job_id)
+        ws.close(message=error)
         return
 
     state = [(None, None)]
-    app.logger.info(f'Listening for job status updates: {job_id}')
-    if update_status(False):
-        pubsub = job_queue.connection.pubsub()  # no ignore_subscribe_messages=True to trigger an initial status fetch
-        try:
-            db = job_queue.connection.connection_pool.connection_kwargs.get('db', 0)
-            pubsub.subscribe(f'__keyspace@{db}__:{job.key.decode()}')
-            while True:
-                timeout = min(end_time - time.time(), settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
-                if timeout <= 0:
-                    error = 'Job failed to finalize in time.'
-                    app.logger.info(error)
-                    ws.close(reason=error)
-                    break
-                message = pubsub.get_message(timeout=timeout)
-                if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):
-                    break
-                data = ws.receive(timeout=0)  # undocumented, but needed to trigger the ping/pong timeout
-                if data is not None:
-                    break
+    error = None
+    app.logger.info('Listen: %s', job_id)
+    try:
+        if update_status(False):
+            pubsub = job_queue.connection.pubsub()  # no ignore_subscribe_messages to trigger an initial status fetch
+            try:
+                db = job_queue.connection.connection_pool.connection_kwargs.get('db', 0)
+                pubsub.subscribe(f'__keyspace@{db}__:{job.key.decode()}')
+                while True:
+                    timeout = min(end_time - time.time(), settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
+                    if timeout <= 0:
+                        error = 'Job failed to finalize in time.'
+                        app.logger.info('Job failed to finalize in time: %s', job_id)
+                        ws.close(message=error)
+                        break
+                    message = pubsub.get_message(timeout=timeout)
+                    if not update_status(message is not None or settings.LISTEN_ALWAYS_REFRESH):
+                        break
+                    data = ws.receive(timeout=0)
+                    if data is not None:
+                        break
 
-        finally:
-            pubsub.close()
+            finally:
+                pubsub.close()
+
+    finally:
+        if error is not None:
+            app.logger.info('Listen finished.')
 
 
 def configure(sock):

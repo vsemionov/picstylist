@@ -98,7 +98,6 @@ def listen(ws, job_id):
     # test http errors
     # close reason not working
     # check timeout (and how does the ping work?)
-    # check behavior when navigating back to the page
 
     def update_status(refresh):
         terminal_status = {'finished', 'failed', 'canceled', 'stopped'}

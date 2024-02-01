@@ -19,9 +19,9 @@ def listen(ws, job_id):
         terminal_status = {'finished', 'failed', 'canceled', 'stopped'}
         status = job.get_status(refresh=refresh)
         position = job_queue.get_job_position(job) if status == 'queued' else None
-        app.logger.info('Job status: %s', status)
         cur_state = (status, position)
         if cur_state != state[0]:
+            app.logger.info('Job status: %s', status)
             ws.send(json.dumps({'status': status, 'position': position}))
             state[0] = cur_state
         return status is not None and status not in terminal_status

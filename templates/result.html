@@ -37,12 +37,19 @@
     <p>Reason: <span id="ajax-error-reason"></span></p>
     <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
+  <div id="poll-timeout" hidden>
+    <h2>Timed out</h2>
+    <p>This is taking unusually long. There could be a problem with the server.</p>
+    <button class="btn btn-primary me-2" onclick="location.reload()">Continue</button>
+    <a class="btn btn-secondary" href="{{ upload_url }}">Try again</a>
+  </div>
   <script id="result-data" type="application/json">
     {{ {
       'initialStatus': status,
       'initialQueuePosition': position,
       'statusUrl': url_for('status', job_id=job_id),
       'pollInterval': settings.STATUS_POLL_INTERVAL,
+      'maxPollTime': settings.MAX_POLL_TIME,
       'requestTimeout': settings.AJAX_TIMEOUT,
       'imageUrl': image_url
     } | tojson }}

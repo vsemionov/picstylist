@@ -31,9 +31,11 @@
     const jobErrorElement = document.getElementById('job-error');
     const ajaxErrorElement = document.getElementById('ajax-error');
     const ajaxErrorReasonElement = document.getElementById('ajax-error-reason');
+    const pollTimeoutElement = document.getElementById('poll-timeout');
 
     const stateDataElement = document.getElementById('result-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
+    const maxPollTime = stateDataElement ? Date.now() + stateData.maxPollTime * 1000 : null;
     if (stateData) {
         setState(stateData.initialStatus, stateData.initialQueuePosition);
     }
@@ -55,7 +57,12 @@
                 processingStatusElement.classList.add('invisible');
                 processingStatusElement.innerHTML = '&nbsp;';
             }
-            setTimeout(pollState, stateData.pollInterval * 1000);
+            if (Date.now() < maxPollTime) {
+                setTimeout(pollState, stateData.pollInterval * 1000);
+            } else {
+                processingElement.hidden = true;
+                pollTimeoutElement.hidden = false;
+            }
         }
     }
 

@@ -7,8 +7,6 @@ from web import settings
 
 
 def listen(ws, job_id):
-    # check ssl
-
     from app import app, job_queue, get_job_or_abort
 
     def update_status(refresh):

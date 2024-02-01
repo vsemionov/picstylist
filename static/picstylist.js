@@ -26,16 +26,10 @@
 (() => {
     const processingElement = document.getElementById('processing');
     const processingStatusElement = document.getElementById('processing-status');
-    const resultElement = document.getElementById('result');
-    const resultImageElement = document.getElementById('result-image');
-    const jobErrorElement = document.getElementById('job-error');
-    const updateErrorElement = document.getElementById('update-error');
-    const updateErrorReasonElement = document.getElementById('update-error-reason');
-    const updateTimeoutElement = document.getElementById('update-timeout');
 
     const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
-    const endTime = stateDataElement ? Date.now() + stateData.updateTimeout * 1000 : null;
+    const endTime = stateData ? Date.now() + stateData.updateTimeout * 1000 : null;
 
     let listenSocket = null;
     if (stateData) {
@@ -46,11 +40,11 @@
     function setState(status, position) {
         if (status === 'finished') {
             processingElement.hidden = true;
-            resultElement.hidden = false;
-            resultImageElement.src = stateData.imageUrl;
+            document.getElementById('result').hidden = false;
+            document.getElementById('result-image').src = stateData.imageUrl;
         } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
             processingElement.hidden = true;
-            jobErrorElement.hidden = false;
+            document.getElementById('job-error').hidden = false;
         } else {
             processingElement.hidden = false;
             if (position != null) {
@@ -70,7 +64,7 @@
                 }
             } else {
                 processingElement.hidden = true;
-                updateTimeoutElement.hidden = false;
+                document.getElementById('update-timeout').hidden = false;
             }
         }
     }
@@ -97,8 +91,8 @@
             .catch(error => {
                 console.error(error);
                 processingElement.hidden = true;
-                updateErrorElement.hidden = false;
-                updateErrorReasonElement.innerHTML = error.message;
+                document.getElementById('update-error').hidden = false;
+                document.getElementById('update-error-reason').innerHTML = error.message;
             });
     }
 })();

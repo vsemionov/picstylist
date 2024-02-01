@@ -1,10 +1,25 @@
 import time
 import json
 
-from flask import request
+from flask import request, Response
 from simple_websocket import Server, ConnectionClosed
 
 from web import settings
+
+
+# https://github.com/miguelgrinberg/flask-sock/blob/v0.7.0/src/flask_sock/__init__.py
+class WebSocketResponse(Response):
+    def __init__(self, ws, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__ws = ws
+
+    def __call__(self, *args, **kwargs):
+        if self.__ws.mode == 'gunicorn':
+            raise StopIteration()
+        elif self.__ws.mode == 'werkzeug':
+            return super().__call__(*args, **kwargs)
+        else:
+            return []
 
 
 def listen(job_id):
@@ -53,7 +68,7 @@ def listen(job_id):
         if ws.connected:
             ws.close()
     app.logger.info('Listen finished.')
-    return ''
+    return WebSocketResponse(ws)
 
 
 def configure(app):

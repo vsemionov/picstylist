@@ -91,7 +91,7 @@ def status(job_id):
     return jsonify(fields), 200
 
 
-@sock.route('/api/listen/<job_id>/')
+@sock.route('/ws/listen/<job_id>/')
 def listen(ws, job_id):
     # check ssl
     # log connections

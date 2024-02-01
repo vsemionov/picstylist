@@ -169,7 +169,7 @@ def configure(app):
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/admin/rq')
 
     # Flask-Sock
-    app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 30, 'max_message_size': 16}
+    app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25, 'max_message_size': 16}
     sock = Sock(app)
 
     return app, auth, limiter, sock, auth_limit, job_queue

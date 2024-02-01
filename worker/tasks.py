@@ -53,6 +53,12 @@ def style_transfer(subdir, content_filename, style_filename, strength, result_fi
                     history.end_job(db, hist_id, succeeded)
             finally:
                 db.close()
+        for path in [base_path / filename for filename in [content_filename, style_filename]]:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError as e:
+                logger.error('Failed to remove %s: %s', path, e)
+                continue
 
 
 def log_stats():
@@ -61,8 +67,8 @@ def log_stats():
     logger.info('Queues: %d default, %d system.', default_queue_len, system_queue_len)
 
 
-def cleanup_data(enqueue_kwargs):
-    ttl = sum(enqueue_kwargs[k] for k in ['job_timeout', 'result_ttl', 'ttl'])
+def cleanup_data(job_kwargs):
+    ttl = sum(job_kwargs[k] for k in ['job_timeout', 'result_ttl', 'ttl'])
     max_time = (datetime.now() - timedelta(seconds=ttl)).timestamp()
     n_files, n_dirs = 0, 0
     jobs_dir = os.path.normpath(JOBS_DIR)
@@ -128,7 +134,7 @@ def health_check():
     job_id = config.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
     queue.enqueue(style_transfer, description='test_style_transfer', args=args, kwargs=kwargs, job_id=job_id, at_front=True,
         job_timeout=30, result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
-        failure_ttl=config.HEALTH_CHECK_VALIDITY, **config.JOB_CALLBACKS)
+        failure_ttl=config.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)
 
 

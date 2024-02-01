@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
-from common import config, history
+from common import history
 from web import settings
 from web import forms
 from web import utils
@@ -64,7 +64,7 @@ def index():
         args = job_id, str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': session_id}
         job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=job_id,
-            meta=meta, **config.JOB_CALLBACKS, **settings.ENQUEUE_KWARGS)
+            meta=meta, **settings.JOB_KWARGS)
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('result', job_id=job_id)

@@ -31,7 +31,7 @@ ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 DEFAULT_STRENGTH = 75
 RESULT_FORMAT = ('png', 'image/png')
 RESULT_TTL_MINUTES = 30
-ENQUEUE_KWARGS = {
+JOB_KWARGS = {
     'job_timeout': 30,
     'result_ttl': RESULT_TTL_MINUTES * 60,
     'ttl': 30 * 60,
@@ -150,7 +150,7 @@ def configure(app):
     start_time = datetime.utcnow()
     scheduler.schedule(start_time, 'worker.tasks.log_stats', description='log_stats', id='log_stats', interval=60,
         timeout=30)
-    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data', args=[ENQUEUE_KWARGS],
+    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data', args=[JOB_KWARGS],
         id='cleanup_data', interval=(15 * 60), timeout=30)
     scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', description='health_check',
         id=config.HEALTH_CHECK_JOB_ID, interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)

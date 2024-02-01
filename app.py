@@ -79,9 +79,9 @@ def status(job_id):
     try:
         job = get_job_or_abort(job_id)
     except Forbidden:
-        return jsonify({'error': 'Forbidden'}), 403
+        return jsonify({'error': 'forbidden'}), 403
     except NotFound:
-        return jsonify({'error': 'Not Found'}), 404
+        return jsonify({'error': 'not found'}), 404
     status = job.get_status(refresh=False)
     fields = {'status': status}
     if status == 'queued':

@@ -42,7 +42,7 @@
       'initialStatus': status,
       'initialQueuePosition': position,
       'statusUrl': url_for('status', job_id=job_id),
-      'pollInterval': settings.AJAX_POLL_INTERVAL,
+      'pollInterval': settings.STATUS_POLL_INTERVAL,
       'requestTimeout': settings.AJAX_TIMEOUT,
       'imageUrl': image_url
     } | tojson }}

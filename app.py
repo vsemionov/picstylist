@@ -1,4 +1,5 @@
 import os
+import time
 import uuid
 import base64
 from pathlib import Path
@@ -15,7 +16,7 @@ from web import utils
 
 
 app = Flask(__name__)
-app, auth, limiter, auth_limit, job_queue = settings.configure(app)
+app, auth, limiter, sock, auth_limit, job_queue = settings.configure(app)
 
 
 def get_session_id(create=False):
@@ -87,6 +88,43 @@ def status(job_id):
         fields['position'] = job_queue.get_job_position(job)
     app.logger.info('Job status: %s', status)
     return jsonify(fields), 200
+
+
+@app.route('/api/listen/<job_id>/')
+def listen(job_id):
+    # return http errors
+    # check socket timeout
+    # check websocket closed
+    # check ws timeout (and how does the ping work?)
+
+    def update_status(refresh):
+        terminal_status = {'finished', 'failed', 'canceled', 'stopped'}
+        status = job.get_status(refresh=refresh)
+        position = job_queue.get_job_position(job) if status == 'queued' else None
+        # send status and queue position
+        return status is not None and status not in terminal_status
+
+    max_time = time.time() + settings.MAX_LISTEN_TIME
+    job = get_job_or_abort(job_id)
+
+    if update_status(False):
+        pubsub = job_queue.connection.pubsub()  # no ignore_subscribe_messages=True to trigger an initial status fetch
+        try:
+            db = job_queue.connection.connection_pool.connection_kwargs.get('db', 0)
+            pubsub.subscribe(f'__keyspace@{db}__:{job.key.decode()}')
+            while True:
+                timeout = min(max_time - time.time(), settings.STATUS_POLL_INTERVAL)  # poll for queue position
+                if timeout <= 0:
+                    # send error
+                    break
+                message = pubsub.get_message(timeout=timeout)
+                if not update_status(message is not None):
+                    break
+
+        finally:
+            pubsub.close()
+
+    return ''
 
 
 @app.route('/cancel/<job_id>/', methods=['POST'])

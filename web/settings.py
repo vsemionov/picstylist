@@ -15,6 +15,7 @@ import redis
 from rq import Queue, Worker
 from rq_scheduler import Scheduler
 import rq_dashboard.cli
+from flask_sock import Sock
 from cachetools import cached, TTLCache
 import sentry_sdk
 
@@ -37,7 +38,8 @@ JOB_KWARGS = {
     'ttl': 30 * 60,
     'failure_ttl': 30 * 60
 }
-AJAX_POLL_INTERVAL = 2
+MAX_POLL_TIME = JOB_KWARGS['ttl']
+STATUS_POLL_INTERVAL = 2
 AJAX_TIMEOUT = 30
 PORTAINER_PORT = int(os.environ['PORTAINER_PORT'])
 PREVENT_JOB_PROBING = False
@@ -164,7 +166,11 @@ def configure(app):
     auth_limit(rq_dashboard.blueprint)
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/admin/rq')
 
-    return app, auth, limiter, auth_limit, job_queue
+    # Flask-Sock
+    app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 30, 'max_message_size': 16}
+    sock = Sock(app)
+
+    return app, auth, limiter, sock, auth_limit, job_queue
 
 
 app_env = os.environ['APP_ENV']

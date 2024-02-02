@@ -4,11 +4,24 @@ import socket
 
 from flask import request
 from simple_websocket import Server, ConnectionClosed
+import wrapt
 
 from web import settings
 
 
 class WebSocketServer(Server):
+    class SocketProxy(wrapt.ObjectProxy):
+        def close(self):
+            pass
+
+    @property
+    def sock(self):
+        return self.__sock
+
+    @sock.setter
+    def sock(self, sock):
+        self.__sock = self.SocketProxy(sock)  # prevent closing the underlying socket
+
     def close(self, *args, **kwargs):
         super().close(*args, **kwargs)
         self.sock.shutdown(socket.SHUT_WR)  # prevent sending http headers

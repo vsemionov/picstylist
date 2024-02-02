@@ -29,7 +29,6 @@ packaging==23.2
 pillow==10.2.0
 Pygments==2.17.2
 python-dateutil==2.8.2
-python-dotenv==1.0.1
 redis==5.0.1
 Redis-Sentinel-Url==1.0.1
 rich==13.7.0

@@ -28,21 +28,22 @@ def listen(job_id):
     from app import app, job_queue, get_job_or_abort
 
     def update_status(refresh):
+        nonlocal state, last_send
         terminal_status = {'finished', 'failed', 'canceled', 'stopped'}
         status = job.get_status(refresh=refresh)
         position = job_queue.get_job_position(job) if status == 'queued' else None
         cur_state = (status, position)
-        if cur_state != state[0] or time.time() - last_send[0] >= settings.STATUS_UPDATE_HEARTBEAT:
+        if cur_state != state or time.time() - last_send >= settings.STATUS_UPDATE_HEARTBEAT:
             app.logger.info('Job status: %s', status)
             ws.send(json.dumps({'status': status, 'position': position}))
-            state[0] = cur_state
-            last_send[0] = time.time()
+            state = cur_state
+            last_send = time.time()
         return status is not None and status not in terminal_status
 
     end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
     job = get_job_or_abort(job_id)
-    state = [(None, None)]
-    last_send = [0.0]
+    state = (None, None)
+    last_send = 0.0
     app.logger.info('Listen: %s', job_id)
     ws = Server(request.environ, ping_interval=settings.WEBSOCKET_PING_INTERVAL, max_message_size=128)
     try:
@@ -58,7 +59,7 @@ def listen(job_id):
                         app.logger.info(error)
                         ws.close(message=error)
                         break
-                    next_time = max(min(end_time, last_send[0] + settings.STATUS_UPDATE_HEARTBEAT), cur_time)
+                    next_time = max(min(end_time, last_send + settings.STATUS_UPDATE_HEARTBEAT), cur_time)
                     timeout = min(next_time - cur_time, settings.STATUS_UPDATE_INTERVAL)  # poll for queue position
                     message = pubsub.get_message(timeout=timeout)
                     if not update_status(message is not None):

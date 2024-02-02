@@ -1,27 +1,17 @@
 import time
 import json
+import socket
 
-from flask import request, Response
+from flask import request
 from simple_websocket import Server, ConnectionClosed
 
 from web import settings
 
 
-# https://github.com/miguelgrinberg/flask-sock/blob/v0.7.0/src/flask_sock/__init__.py
-# prevents exceptions in the log after closing the connection
-# one side effect is that requests are not logged in the access log
-class WebSocketResponse(Response):
-    def __init__(self, ws, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__ws = ws
-
-    def __call__(self, *args, **kwargs):
-        if self.__ws.mode == 'gunicorn':
-            raise StopIteration()
-        elif self.__ws.mode == 'werkzeug':
-            return super().__call__(*args, **kwargs)
-        else:
-            return []
+class WebSocketServer(Server):
+    def close(self, *args, **kwargs):
+        super().close(*args, **kwargs)
+        self.sock.shutdown(socket.SHUT_WR)  # prevent sending http headers
 
 
 def listen(job_id):
@@ -45,7 +35,7 @@ def listen(job_id):
     state = (None, None)
     last_send = 0.0
     app.logger.info('Listen: %s', job_id)
-    ws = Server(request.environ, ping_interval=settings.WEBSOCKET_PING_INTERVAL, max_message_size=128)
+    ws = WebSocketServer(request.environ, ping_interval=settings.WEBSOCKET_PING_INTERVAL, max_message_size=128)
     try:
         if update_status(False):
             pubsub = job_queue.connection.pubsub()  # no ignore_subscribe_messages to trigger an initial status fetch
@@ -74,8 +64,7 @@ def listen(job_id):
     finally:
         if ws.connected:
             ws.close()
-    app.logger.info('Listen finished.')
-    return WebSocketResponse(ws)
+    return '', 101
 
 
 def configure(app):

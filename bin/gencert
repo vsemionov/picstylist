@@ -11,8 +11,6 @@ if [ ! -d conf/ssl ]
 then
     mkdir -p conf/ssl
     openssl req -x509 -newkey rsa:2048 -keyout conf/ssl/server.key -out conf/ssl/server.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/OU=Server/CN=$DOMAIN/CN=*.$DOMAIN"
-    openssl req -x509 -newkey rsa:2048 -keyout conf/ssl/internal.key -out conf/ssl/internal.pem -sha256 -days 3652 -nodes -subj "/C=US/ST=NY/L=NY/O=$COMPANY/OU=Internal/CN=localhost"
     curl https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem >conf/ssl/client.pem
     echo >>conf/ssl/client.pem
-    cat conf/ssl/internal.pem >>conf/ssl/client.pem
 fi

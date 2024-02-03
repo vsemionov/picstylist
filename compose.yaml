@@ -81,7 +81,7 @@ services:
       - ./conf/ssl:/etc/nginx/ssl:ro
       - ./static/images:/app/static/images:ro
     ports:
-      - '443:443'
+      - 443:443
     logging:
       driver: local
     depends_on:

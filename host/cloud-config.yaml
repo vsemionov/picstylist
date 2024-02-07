@@ -111,6 +111,7 @@ packages:
   - docker.io
   - docker-buildx
   - docker-compose-v2
+  - screen
 
 package_update: true
 package_upgrade: true

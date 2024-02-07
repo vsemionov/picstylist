@@ -25,4 +25,4 @@ bin/portainer
     exit $ret
 )
 
-echo "Deploy successful."
+echo "Deployment successful."

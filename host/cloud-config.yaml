@@ -48,7 +48,7 @@ write_files:
               fi
               if [ -f "$GIT_WORK_TREE"/.env ];
               then
-                  sudo "$GIT_WORK_TREE"/bin/deploy | tee "$GIT_WORK_TREE"/deploy.log
+                  sudo "$GIT_WORK_TREE"/bin/deploy 2>&1 | tee "$GIT_WORK_TREE"/deploy.log
               else
                   echo "Warning: Configuration not found, skipping deploy."
               fi
@@ -77,7 +77,7 @@ write_files:
           fi
           if [ -f "$APP_TREE"/app.py ];
           then
-              sudo "$APP_TREE"/bin/deploy | tee "$APP_TREE"/deploy.log
+              sudo "$APP_TREE"/bin/deploy 2>&1 | tee "$APP_TREE"/deploy.log
           else
               echo "Warning: Application not found, skipping deploy."
           fi

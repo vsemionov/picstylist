@@ -11,7 +11,9 @@ MAX_SIZE = 512
 
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')
-hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+fast_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+
+vgg = tf.keras.applications.VGG19(include_top=True, weights='imagenet')
 
 
 def load_image(image_path):
@@ -46,6 +48,6 @@ def save_image(image, result_path):
 def fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename):
     content_input = load_image(base_path / content_filename)
     style_input = load_image(base_path / style_filename)
-    model_output = hub_model(content_input, style_input)[0][0]
+    model_output = fast_model(content_input, style_input)[0][0]
     output = blend_images(content_input[0], model_output, strength / 100)
     return save_image(to_image(output), base_path / result_filename)

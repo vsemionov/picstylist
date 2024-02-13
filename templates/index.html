@@ -72,6 +72,15 @@
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
     </div>
+    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-3 mb-sm-4">
+      {{ form.model.label(class='form-label') }}
+      {% for subfield in form.model %}
+        <div class="form-check">
+          {{ subfield(class='form-check-input') }}
+          {{ subfield.label(class='form-check-label') }}
+        </div>
+      {% endfor %}
+    </div>
     <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
       {{ form_field(form.strength, class='form-range') }}
     </div>

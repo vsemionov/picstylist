@@ -51,3 +51,7 @@ def fast_style_transfer(base_path, content_filename, style_filename, strength, r
     model_output = fast_model(content_input, style_input)[0][0]
     output = blend_images(content_input[0], model_output, strength / 100)
     return save_image(to_image(output), base_path / result_filename)
+
+
+def iterative_style_transfer(base_path, content_filename, style_filename, strength, result_filename):
+    return fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)

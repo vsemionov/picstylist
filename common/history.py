@@ -1,6 +1,6 @@
-def start_job(db):
+def start_job(db, meta=None):
     with db:
-        cur = db.execute('INSERT INTO job_history DEFAULT VALUES')
+        cur = db.execute('INSERT INTO job_history (meta) VALUES (?)', (meta,))
         return cur.lastrowid
 
 

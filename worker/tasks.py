@@ -26,7 +26,7 @@ JOBS_DIR = DATA_DIR / config.JOBS_DIR
 logger = logging.getLogger(__name__)
 
 
-def style_transfer(subdir, content_filename, style_filename, strength, result_filename, with_history=True):
+def style_transfer(func, subdir, content_filename, style_filename, strength, result_filename, with_history=True):
     succeeded = False
     base_path = JOBS_DIR / subdir
 
@@ -37,11 +37,10 @@ def style_transfer(subdir, content_filename, style_filename, strength, result_fi
 
     try:
         if with_history:
-            hist_id = history.start_job(db)
+            hist_id = history.start_job(db, meta=func.__name__)
 
-        from . import models
         start_time = time.time()
-        result = models.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
+        result = func(base_path, content_filename, style_filename, strength, result_filename)
         logger.info('Finished in %.1f seconds.', time.time() - start_time)
         succeeded = True
         return result
@@ -59,6 +58,16 @@ def style_transfer(subdir, content_filename, style_filename, strength, result_fi
             except OSError as e:
                 logger.error('Failed to remove %s: %s', path, e)
                 continue
+
+
+def fast_style_transfer(*args, **kwargs):
+    from . import models
+    return style_transfer(models.fast_style_transfer, *args, **kwargs)
+
+
+def iterative_style_transfer(*args, **kwargs):
+    from . import models
+    return style_transfer(models.iterative_style_transfer, *args, **kwargs)
 
 
 def log_stats():
@@ -132,8 +141,8 @@ def health_check():
     args = job_id, filename, filename, 100, 'result.png'
     kwargs = {'with_history': False}
     job_id = config.IMAGE_CHECK_JOB_ID  # if re-enqueuing with the same id causes problems, use the uuid and return it
-    queue.enqueue(style_transfer, description='test_style_transfer', args=args, kwargs=kwargs, job_id=job_id, at_front=True,
-        job_timeout=30, result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
+    queue.enqueue(fast_style_transfer, description='test_style_transfer', args=args, kwargs=kwargs, job_id=job_id,
+        at_front=True, job_timeout=30, result_ttl=config.HEALTH_CHECK_VALIDITY, ttl=config.HEALTH_CHECK_VALIDITY,
         failure_ttl=config.HEALTH_CHECK_VALIDITY)
     logger.info('Enqueued job: %s', job_id)
 

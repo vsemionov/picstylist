@@ -16,7 +16,7 @@
     <nav class="navbar navbar-expand justify-content-between">
       <a class="navbar-brand" href="{{ url_for('index') }}">PicStylist</a>
       <div class="navbar-nav">
-        {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='model'), 'How it works')] %}
+        {% for path, name in [(url_for('index'), 'Home'), (url_for('page', name='models'), 'How it works')] %}
           {% if request.path == path %}
             <a class="nav-link active" aria-current="page" href="{{ path }}">{{ name }}</a>
           {% else %}

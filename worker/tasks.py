@@ -39,9 +39,9 @@ def style_transfer(subdir, content_filename, style_filename, strength, result_fi
         if with_history:
             hist_id = history.start_job(db)
 
-        from . import model
+        from . import models
         start_time = time.time()
-        result = model.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
+        result = models.fast_style_transfer(base_path, content_filename, style_filename, strength, result_filename)
         logger.info('Finished in %.1f seconds.', time.time() - start_time)
         succeeded = True
         return result

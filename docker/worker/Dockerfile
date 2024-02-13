@@ -5,8 +5,8 @@ WORKDIR /app
 COPY requirements-worker.txt ./
 RUN pip install --no-cache-dir -r requirements-worker.txt
 
-COPY worker/model.py worker/
-RUN python worker/model.py
+COPY worker/models.py worker/
+RUN python worker/models.py
 
 COPY conf/worker.py conf/
 COPY common ./common

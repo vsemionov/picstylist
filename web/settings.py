@@ -38,7 +38,7 @@ JOB_KWARGS_BASE = {
     'ttl': 30 * 60,
     'failure_ttl': 30 * 60
 }
-JOB_KWARGS = {'fast': JOB_KWARGS_BASE, 'iterative': {**JOB_KWARGS_BASE, 'job_timeout': 30 * 60}}
+JOB_KWARGS = {'fast': JOB_KWARGS_BASE, 'iterative': {**JOB_KWARGS_BASE, 'job_timeout': 60 * 60}}
 USE_WEBSOCKET = True
 WEBSOCKET_PING_INTERVAL = 25
 STATUS_UPDATE_INTERVAL = 2

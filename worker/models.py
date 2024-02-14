@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
 
-from . import iterative
+from worker import iterative
 
 
 MAX_SIZE = 512

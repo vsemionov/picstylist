@@ -8,7 +8,7 @@ import tensorflow_hub as hub
 from PIL import Image
 
 
-MAX_SIZE = 512
+MAX_SIZE = 128
 
 
 logger = logging.getLogger(__name__)

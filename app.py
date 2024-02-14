@@ -108,7 +108,9 @@ def result(job_id):
     position = job_queue.get_job_position(job) if status == 'queued' else None
     filename = job.args[-1]
     cancel_form = forms.CancelForm()
-    return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)
+    update_timeout = job.ttl + job.timeout
+    return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form,
+        update_timeout=update_timeout)
 
 
 @app.route('/x/<job_id>/<path:filename>')

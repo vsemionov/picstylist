@@ -49,7 +49,7 @@
       'initialQueuePosition': position,
       'listenUrl': url_for('listen', job_id=job_id) if settings.USE_WEBSOCKET else none,
       'pollUrl': url_for('status', job_id=job_id),
-      'updateTimeout': settings.STATUS_UPDATE_TIMEOUT,
+      'updateTimeout': {{ update_timeout }},
       'updateInterval': settings.STATUS_UPDATE_INTERVAL,
       'requestTimeout': settings.UPDATE_REQUEST_TIMEOUT,
       'imageUrl': image_url

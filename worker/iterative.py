@@ -103,7 +103,7 @@ torch.set_default_device(device)
 
 # %%
 # desired size of the output image
-imsize = 512  # if torch.cuda.is_available() else 128  # use small size if no GPU
+imsize = 128  # if torch.cuda.is_available() else 128  # use small size if no GPU
 
 loader = transforms.Compose([
     transforms.Resize(imsize),  # scale imported image

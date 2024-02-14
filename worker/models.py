@@ -9,7 +9,7 @@ from PIL import Image
 from . import iterative
 
 
-MAX_SIZE = 128
+MAX_SIZE = 512
 STEPS = 500
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')
@@ -60,4 +60,4 @@ def iterative_style_transfer(base_path, content_filename, style_filename, streng
     output = iterative.run_style_transfer(iterative.cnn, iterative.cnn_normalization_mean,
         iterative.cnn_normalization_std, content_image, style_image, content_image.clone(), int(STEPS * strength / 100))
 
-    return save_image(iterative.unloader(output), base_path / result_filename)
+    return save_image(iterative.unloader(output[0]), base_path / result_filename)

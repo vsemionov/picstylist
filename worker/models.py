@@ -140,5 +140,4 @@ def iterative_style_transfer(base_path, content_filename, style_filename, streng
 
     tf.keras.backend.clear_session()
 
-    output = blend_images(content_image[0], image[0], strength / 100)
-    return save_image(to_image(output), base_path / result_filename)
+    return save_image(to_image(image[0]), base_path / result_filename)

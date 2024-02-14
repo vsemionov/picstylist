@@ -32,15 +32,16 @@ ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 DEFAULT_STRENGTH = 75
 RESULT_FORMAT = ('png', 'image/png')
 RESULT_TTL_MINUTES = 30
-JOB_KWARGS = {
-    'job_timeout': 30 * 60,  # TODO: per job type
+JOB_KWARGS_BASE = {
+    'job_timeout': 30,
     'result_ttl': RESULT_TTL_MINUTES * 60,
     'ttl': 30 * 60,
     'failure_ttl': 30 * 60
 }
+JOB_KWARGS = {'fast': JOB_KWARGS_BASE, 'iterative': {**JOB_KWARGS_BASE, 'job_timeout': 60 * 60}}
 USE_WEBSOCKET = True
 WEBSOCKET_PING_INTERVAL = 25
-STATUS_UPDATE_TIMEOUT = JOB_KWARGS['ttl']
+STATUS_UPDATE_TIMEOUT = JOB_KWARGS_BASE['ttl']
 STATUS_UPDATE_INTERVAL = 2
 UPDATE_REQUEST_TIMEOUT = 30
 STATUS_UPDATE_HEARTBEAT = UPDATE_REQUEST_TIMEOUT // 2
@@ -155,8 +156,8 @@ def configure(app):
     start_time = datetime.utcnow()
     scheduler.schedule(start_time, 'worker.tasks.log_stats', description='log_stats', id='log_stats', interval=60,
         timeout=30)
-    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data', args=[JOB_KWARGS],
-        id='cleanup_data', interval=(15 * 60), timeout=30)
+    scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data',
+        args=[JOB_KWARGS['iterative']], id='cleanup_data', interval=(15 * 60), timeout=30)
     scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', description='health_check',
         id=config.HEALTH_CHECK_JOB_ID, interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
     scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', description='maintenance', id='maintenance', timeout=30)

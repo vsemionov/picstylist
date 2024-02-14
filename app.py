@@ -61,11 +61,12 @@ def index():
         content_image.save(job_dir / content_filename)
         style_image.save(job_dir / style_filename)
 
-        func = {'fast': 'fast_style_transfer', 'iterative': 'iterative_style_transfer'}[form.model.data]
+        model = form.model.data
+        func = {'fast': 'fast_style_transfer', 'iterative': 'iterative_style_transfer'}[model]
         args = job_id, str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': session_id}
         job_queue.enqueue(f'worker.tasks.{func}', description=func, args=args, job_id=job_id, meta=meta,
-            **settings.JOB_KWARGS)
+            **settings.JOB_KWARGS[model])
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('result', job_id=job_id)

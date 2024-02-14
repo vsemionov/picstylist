@@ -72,6 +72,9 @@
             } else {
                 processingElement.hidden = true;
                 document.getElementById('update-timeout').hidden = false;
+                if (listenSocket != null) {
+                    listenSocket.close();
+                }
             }
         }
     }

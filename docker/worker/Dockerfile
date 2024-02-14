@@ -6,8 +6,8 @@ COPY requirements-worker.txt ./
 RUN pip install --no-cache-dir -r requirements-worker.txt
 
 COPY worker/models.py worker/
-RUN python worker/models.py && ln -s ~/.keras/models/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5 \
-    models/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5
+RUN python worker/models.py && ln -s /Users/victor/.cache/torch/hub/checkpoints/vgg19-dcbb9e9d.pth \
+    models/vgg19-dcbb9e9d.pth
 
 COPY conf/worker.py conf/
 COPY common ./common

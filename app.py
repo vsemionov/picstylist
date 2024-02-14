@@ -56,7 +56,7 @@ def index():
         job_dir = settings.get_jobs_dir(app) / job_id
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
-        result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
+        result_filename = f'{content_filename.stem} (stylized).{settings.RESULT_FORMAT[0]}'
         job_dir.mkdir(parents=True, exist_ok=True)
         content_image.save(job_dir / content_filename)
         style_image.save(job_dir / style_filename)

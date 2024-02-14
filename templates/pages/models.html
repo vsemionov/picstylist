@@ -38,7 +38,7 @@
   <p>
     It also turns out that the middle layers of image classification networks can detect textures, or styles.
     It is shiny metal, or it is wood, or brown fur. It has a pattern of stripes, or dots, or waves.
-    So we can modify an original image and style it like another image.
+    So we can modify an original image and stylize it like another image.
     The final image will have the same subject and high-level structure as the original image,
     but with the textures of the style image.
     Since the style is represented by the output of the network's middle layers, it is just a set of numbers.
@@ -59,15 +59,15 @@
   </p>
   <p>
     Pretty cool, right? But there's a catch. The process is computationally intensive and slow.
-    It can take minutes to style a single high-resolution image,
+    It can take minutes to stylize a single high-resolution image,
     even when we already have a pre-trained image classification network.
     For a desktop application, this may not be a problem, but who would wait minutes for a web page to load?
     So to speed this up, we use another neural network, trained specifically for this task.
-    Before training, we use the above (slow) method to produce a (large) set of styled images.
+    Before training, we use the above (slow) method to produce a (large) set of stylized images.
     Then, during training, we feed the network the original images, and gradually adjust it to produce results
-    close enough to the styled images.
-    After training, each time we need to style a new image, we feed it to the network only once,
-    and the result is a styled image, hopefully close to what the previous method would have produced.
+    close enough to the stylized images.
+    After training, each time we need to stylize a new image, we feed it to the network only once,
+    and the result is a stylized image, hopefully close to what the previous method would have produced.
     This is much faster because it happens in one go and does not require multiple iterations.
     It also requires less memory. It still needs a few seconds, but that's much better than minutes.
     With good hardware and/or modest resolutions, it can work in real-time with videos.

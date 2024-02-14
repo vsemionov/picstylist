@@ -6,11 +6,12 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from PIL import Image
 
-from worker import iterative
+from . import iterative
 
 
 MAX_SIZE = 512
 STEPS = 500
+
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')
 fast_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')

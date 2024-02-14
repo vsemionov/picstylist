@@ -138,6 +138,4 @@ def iterative_style_transfer(base_path, content_filename, style_filename, streng
         if n % 100 == 0 and n > 0 or n == steps:
             logger.info('Step %d/%d', n, steps)
 
-    tf.keras.backend.clear_session()
-
     return save_image(to_image(image[0]), base_path / result_filename)

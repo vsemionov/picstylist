@@ -191,7 +191,9 @@ class ContentLoss(nn.Module):
         self.target = target.detach()
 
     def forward(self, input):
-        self.loss = F.mse_loss(input, self.target)
+        self.loss = 0
+        if input.shape == self.target.shape:
+            self.loss = F.mse_loss(input, self.target)
         return input
 
 # %% [markdown]

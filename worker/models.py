@@ -82,7 +82,7 @@ class StyleContentModel(tf.keras.models.Model):
         return result / num_locations
 
     def call(self, inputs, training=None, mask=None):
-        inputs = inputs * 255.0
+        inputs = inputs * 255
         preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
         outputs = self.vgg(preprocessed_input)
 
@@ -99,17 +99,16 @@ extractor = StyleContentModel()
 
 def style_content_loss(outputs, style_targets, content_targets):
     style_outputs = outputs['style']
-    content_outputs = outputs['content']
     style_loss = tf.add_n([tf.reduce_mean((style_outputs[name] - style_targets[name])**2)
         for name in style_outputs.keys()])
     style_loss *= style_weight / num_style_layers
 
+    content_outputs = outputs['content']
     content_loss = tf.add_n([tf.reduce_mean((content_outputs[name] - content_targets[name])**2)
         for name in content_outputs.keys()])
     content_loss *= content_weight / num_content_layers
 
-    loss = style_loss + content_loss
-    return loss
+    return style_loss + content_loss
 
 
 def iterative_style_transfer(base_path, content_filename, style_filename, strength, result_filename):
@@ -131,14 +130,15 @@ def iterative_style_transfer(base_path, content_filename, style_filename, streng
     content_targets = extractor(content_image)['content']
 
     image = tf.Variable(content_image)
-
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
 
     steps = int(total_steps * strength / 100)
-
     for n in range(1, steps + 1):
         train_step()
         if n % 100 == 0 and n > 0 or n == steps:
             logger.info('Step %d/%d', n, steps)
 
-    return save_image(to_image(image[0]), base_path / result_filename)
+    tf.keras.backend.clear_session()
+
+    output = blend_images(content_image[0], image[0], strength / 100)
+    return save_image(output, base_path / result_filename)

@@ -19,6 +19,16 @@ fast_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylizat
 vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
 vgg.trainable = False
 
+content_layers = ['block5_conv2']
+style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1', 'block5_conv1']
+num_content_layers = len(content_layers)
+num_style_layers = len(style_layers)
+
+style_weight = 1e-2
+content_weight = 1e4
+total_variation_weight = 30
+total_steps = 500
+
 
 def load_image(image_path):
     image = Image.open(image_path).convert('RGB')
@@ -55,17 +65,6 @@ def fast_style_transfer(base_path, content_filename, style_filename, strength, r
     model_output = fast_model(content_input, style_input)[0][0]
     output = blend_images(content_input[0], model_output, strength / 100)
     return save_image(to_image(output), base_path / result_filename)
-
-
-content_layers = ['block5_conv2']
-style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1', 'block5_conv1']
-num_content_layers = len(content_layers)
-num_style_layers = len(style_layers)
-style_weight = 1e-2
-content_weight = 1e4
-total_variation_weight = 30
-learning_rate = 0.02
-total_steps = 1000
 
 
 class StyleContentModel(tf.keras.models.Model):
@@ -133,7 +132,7 @@ def iterative_style_transfer(base_path, content_filename, style_filename, streng
 
     image = tf.Variable(content_image)
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, beta_1=0.99, epsilon=1e-1)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
 
     steps = int(total_steps * strength / 100)
 

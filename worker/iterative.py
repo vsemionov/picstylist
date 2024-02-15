@@ -12,12 +12,12 @@ from PIL import Image
 
 
 MAX_SIZE = 128
-MAX_STEPS = 500
+NUM_STEPS = 320
 
 CONTENT_LAYERS = ['conv_5']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
-STYLE_WEIGHT = 1e4
+MAX_STYLE_WEIGHT = 1e4
 CONTENT_WEIGHT = 1e-2
 
 
@@ -126,12 +126,12 @@ def get_style_model_and_losses(content_image, style_image):
 
     model = model[:(i + 1)]
 
-    return model, style_losses, content_losses
+    return model, content_losses, style_losses
 
 
-def run_style_transfer(content_image, style_image):
-    # TODO: steps reported are more, tune optimmizer
-    model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
+def run_style_transfer(content_image, style_image, content_weight, style_weight):
+    # TODO: tune optimizer
+    model, content_losses, style_losses = get_style_model_and_losses(content_image, style_image)
 
     work_image = content_image.clone()  # TODO: avoid cloning
     work_image.requires_grad_(True)
@@ -139,11 +139,10 @@ def run_style_transfer(content_image, style_image):
     model.eval()
     model.requires_grad_(False)
 
-    optimizer = optim.LBFGS([work_image])
+    optimizer = optim.LBFGS([work_image], max_iter=1)
 
     step = 0
-    while step <= num_steps:
-
+    while step < NUM_STEPS:
         def closure():
             nonlocal step
 
@@ -152,26 +151,26 @@ def run_style_transfer(content_image, style_image):
 
             optimizer.zero_grad()
             model(work_image)
-            style_loss = 0
             content_loss = 0
+            style_loss = 0
 
-            for sl in style_losses:
-                style_loss += sl.loss
             for cl in content_losses:
                 content_loss += cl.loss
+            for sl in style_losses:
+                style_loss += sl.loss
 
-            style_loss *= STYLE_WEIGHT
-            content_loss *= CONTENT_WEIGHT
+            content_loss *= content_weight
+            style_loss *= style_weight
 
-            loss = style_loss + content_loss
+            loss = content_loss + style_loss
             loss.backward()
 
             step += 1
-            if step % 100 == 0 or step >= num_steps:
-                logger.info('Step %d/%d:', step, num_steps)
+            if step % 50 == 0 or step == NUM_STEPS:
+                logger.info('Step %d/%d:', step, NUM_STEPS)
                 logger.info('Style loss : %.2f Content loss: %.2f', style_loss.item(), content_loss.item())
 
-            return style_loss + content_loss
+            return content_loss + style_loss
 
         optimizer.step(closure)
 
@@ -197,6 +196,6 @@ def load_image(image_path):
 def style_transfer(content_path, style_path, strength):
     content_image = load_image(content_path)
     style_image = load_image(style_path)
-    num_steps = int(MAX_STEPS * strength / 100)
-    output = run_style_transfer(content_image, style_image, num_steps)
+    style_weight = MAX_STYLE_WEIGHT * strength / 100
+    output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight)
     return transforms.ToPILImage()(output[0])

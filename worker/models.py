@@ -25,7 +25,7 @@ def load_image(image_path):
     if long_edge > MAX_SIZE:
         scale = MAX_SIZE / long_edge
         size = tf.maximum(tf.cast(tf.round(size * scale), tf.int32), 1)
-        tensor = tf.image.resize(tensor, size, method=tf.image.ResizeMethod.BICUBIC)
+        tensor = tf.image.resize(tensor, size, method=tf.image.ResizeMethod.BICUBIC, antialias=True)
     return tensor[tf.newaxis, :] / 255
 
 
@@ -38,7 +38,7 @@ def blend_images(content, output, alpha):
     if alpha == 1:
         return output
     if output.shape != content.shape:
-        content = tf.image.resize(content, output.shape[:-1], method=tf.image.ResizeMethod.BICUBIC)
+        content = tf.image.resize(content, output.shape[:-1], method=tf.image.ResizeMethod.BICUBIC, antialias=True)
     return alpha * output + (1 - alpha) * content
 
 

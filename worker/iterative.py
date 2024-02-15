@@ -192,7 +192,7 @@ def load_image(image_path):
     if long_edge > MAX_SIZE:
         scale = MAX_SIZE / long_edge
         size = [max(round(s * scale), 1) for s in size]
-        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=False)(tensor)
+        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=True)(tensor)
     return tensor.unsqueeze(0).to(device)
 
 

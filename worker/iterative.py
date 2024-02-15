@@ -135,13 +135,13 @@ def run_style_transfer(content_image, style_image, num_steps):
 
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 
-    input_image = content_image.clone()  # TODO: avoid cloning
-    input_image.requires_grad_(True)
+    work_image = content_image.clone()  # TODO: avoid cloning
+    work_image.requires_grad_(True)
 
     model.eval()
     model.requires_grad_(False)
 
-    optimizer = optim.LBFGS([input_image])
+    optimizer = optim.LBFGS([work_image])
 
     step = 0
     while step <= num_steps:
@@ -150,10 +150,10 @@ def run_style_transfer(content_image, style_image, num_steps):
             nonlocal step
 
             with torch.no_grad():
-                input_image.clamp_(0, 1)
+                work_image.clamp_(0, 1)
 
             optimizer.zero_grad()
-            model(input_image)
+            model(work_image)
             style_loss = 0
             content_loss = 0
 
@@ -178,6 +178,7 @@ def run_style_transfer(content_image, style_image, num_steps):
         optimizer.step(closure)
 
     with torch.no_grad():
-        input_image.clamp_(0, 1)
+        # TODO: call this only once
+        work_image.clamp_(0, 1)
 
-    return transforms.ToPILImage()(input_image[0])
+    return transforms.ToPILImage()(work_image[0])

@@ -163,8 +163,8 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
 
             step += 1
             if step % 50 == 0:
-                logger.info('step %d/%d:', step, NUM_STEPS)
-                logger.info('style loss: %.2f content loss: %.2f', style_loss.item(), content_loss.item())
+                logger.info('Step %d/%d:', step, NUM_STEPS)
+                logger.info('Content loss: %.2f, style loss: %.2f', content_loss.item(), style_loss.item())
 
             return loss
 

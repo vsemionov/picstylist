@@ -17,8 +17,8 @@ MAX_STEPS = 500
 CONTENT_LAYERS = ['conv_5']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
-STYLE_WEIGHT = 1_000_000
-CONTENT_WEIGHT = 1
+STYLE_WEIGHT = 1e4
+CONTENT_WEIGHT = 1e-2
 
 
 logger = logging.getLogger(__name__)
@@ -131,7 +131,6 @@ def get_style_model_and_losses(content_image, style_image):
 
 def run_style_transfer(content_image, style_image, num_steps):
     # TODO: eliminate warning
-    # TODO: results are different on 2nd run
     # TODO: steps reported are more, tune optimmizer
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 

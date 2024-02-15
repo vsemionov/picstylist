@@ -193,7 +193,7 @@ def run_style_transfer(content_image, style_image, num_steps):
         # TODO: call this only once
         work_image.clamp_(0, 1)
 
-    return transforms.ToPILImage()(work_image[0])
+    return work_image
 
 
 def style_transfer(content_path, style_path, strength):
@@ -201,4 +201,5 @@ def style_transfer(content_path, style_path, strength):
     content_image = load_image(content_path)
     style_image = load_image(style_path)
     num_steps = int(MAX_STEPS * strength / 100)
-    return run_style_transfer(content_image, style_image, num_steps)
+    output = run_style_transfer(content_image, style_image, num_steps)
+    return transforms.ToPILImage()(output[0])

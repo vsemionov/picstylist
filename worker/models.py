@@ -40,7 +40,7 @@ def blend_images(content, output, alpha):
     if alpha == 1:
         return output
     if output.shape != content.shape:
-        content = tf.image.resize(content, output.shape[:-1], method=tf.image.ResizeMethod.BICUBIC, antialias=True)
+        content = tf.image.resize(content, output.shape[:-1])
     return alpha * output + (1 - alpha) * content
 
 

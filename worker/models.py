@@ -58,5 +58,5 @@ def fast_style_transfer(base_path, content_filename, style_filename, strength, r
 def iterative_style_transfer(base_path, content_filename, style_filename, strength, result_filename):
     content_path = base_path / content_filename
     style_path = base_path / style_filename
-    output = iterative.run_style_transfer(content_path, style_path, strength)
+    output = iterative.style_transfer(content_path, style_path, strength)
     return save_image(output, base_path / result_filename)

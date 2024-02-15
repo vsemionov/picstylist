@@ -141,17 +141,10 @@ def load_image(image_path):
     return tensor.unsqueeze(0).to(device)
 
 
-def run_style_transfer(content_path, style_path, strength):
-    # TODO: decide on antialiasing
-    # TODO: losses are zero
+def run_style_transfer(content_image, style_image, num_steps):
     # TODO: results are different on 2nd run
-    # TODO: steps reported are +1
+    # TODO: steps reported are more
     # TODO: check why result is different from TF, is it because the optimizer is different?
-    content_image = load_image(content_path)
-    style_image = load_image(style_path)
-
-    num_steps = int(MAX_STEPS * strength / 100)
-
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 
     work_image = content_image.clone()  # TODO: avoid cloning
@@ -201,3 +194,11 @@ def run_style_transfer(content_path, style_path, strength):
         work_image.clamp_(0, 1)
 
     return transforms.ToPILImage()(work_image[0])
+
+
+def style_transfer(content_path, style_path, strength):
+    # TODO: decide on antialiasing
+    content_image = load_image(content_path)
+    style_image = load_image(style_path)
+    num_steps = int(MAX_STEPS * strength / 100)
+    return run_style_transfer(content_image, style_image, num_steps)

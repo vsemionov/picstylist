@@ -37,7 +37,7 @@ class UploadForm(FlaskForm):
 
     content_image = FileField('Original image', validators=__image_validators)
     style_image = FileField('Style image', validators=__image_validators)
-    model = RadioField('Model', choices=[('fast', 'Fast'), ('iterative', 'Iterative (be very patient)')],
+    model = RadioField('Model', choices=[('fast', 'Fast'), ('iterative', 'Iterative (up to 1 hour)')],
         default='iterative')
     strength = IntegerRangeField('Strength', default=settings.DEFAULT_STRENGTH, validators=[NumberRange(1, 100)])
 

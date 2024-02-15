@@ -17,7 +17,6 @@ fast_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylizat
 
 
 def load_image(image_path):
-    # TODO: test
     image = Image.open(image_path).convert('RGB')
     tensor = tf.constant(image, dtype=tf.float32)
     size = tf.cast(tf.shape(tensor)[:-1], tf.float32)

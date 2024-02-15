@@ -125,11 +125,15 @@ def get_style_model_and_losses(content_image, style_image):
 
 
 def run_style_transfer(content_image, style_image, num_steps):
+    # TODO: losses are zero
+    # TODO: results are different on 2nd run
+    # TODO: steps reported are +1
+    # TODO: check why result is different from TF, is it because the optimizer is different?
     to_tensor = transforms.ToTensor()
-    content_image = to_tensor(content_image).to(device).unsqueeze(0)
-    style_image = to_tensor(style_image).to(device).unsqueeze(0)
+    content_image = to_tensor(content_image).unsqueeze(0).to(device)
+    style_image = to_tensor(style_image).unsqueeze(0).to(device)
 
-    model, style_losses, content_losses = get_style_model_and_losses(style_image, content_image)
+    model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 
     input_image = content_image.clone()  # TODO: avoid cloning
     input_image.requires_grad_(True)

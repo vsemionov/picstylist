@@ -131,8 +131,7 @@ def get_style_model_and_losses(content_image, style_image):
 
 def run_style_transfer(content_image, style_image, num_steps):
     # TODO: results are different on 2nd run
-    # TODO: steps reported are more
-    # TODO: check why result is different from TF, is it because the optimizer is different?
+    # TODO: steps reported are more, tune optimmizer
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 
     work_image = content_image.clone()  # TODO: avoid cloning
@@ -197,7 +196,6 @@ def load_image(image_path):
 
 
 def style_transfer(content_path, style_path, strength):
-    # TODO: decide on antialiasing
     # TODO: decide content layer
     content_image = load_image(content_path)
     style_image = load_image(style_path)

@@ -133,7 +133,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     # TODO: tune optimizer
     model, content_losses, style_losses = get_style_model_and_losses(content_image, style_image)
 
-    work_image = content_image.clone()  # TODO: avoid cloning
+    work_image = content_image
     work_image.requires_grad_(True)
 
     model.eval()

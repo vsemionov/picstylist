@@ -12,9 +12,9 @@ from PIL import Image
 
 
 MAX_SIZE = 128
-MAX_STEPS = 100
+MAX_STEPS = 500
 
-CONTENT_LAYERS = ['conv_4']
+CONTENT_LAYERS = ['conv_5']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
 STYLE_WEIGHT = 1_000_000
@@ -130,6 +130,7 @@ def get_style_model_and_losses(content_image, style_image):
 
 
 def run_style_transfer(content_image, style_image, num_steps):
+    # TODO: eliminate warning
     # TODO: results are different on 2nd run
     # TODO: steps reported are more, tune optimmizer
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
@@ -196,7 +197,6 @@ def load_image(image_path):
 
 
 def style_transfer(content_path, style_path, strength):
-    # TODO: decide content layer
     content_image = load_image(content_path)
     style_image = load_image(style_path)
     num_steps = int(MAX_STEPS * strength / 100)

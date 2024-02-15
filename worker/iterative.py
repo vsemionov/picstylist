@@ -170,12 +170,11 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
                 logger.info('Step %d/%d:', step, NUM_STEPS)
                 logger.info('Style loss : %.2f Content loss: %.2f', style_loss.item(), content_loss.item())
 
-            return content_loss + style_loss
+            return loss
 
         optimizer.step(closure)
 
     with torch.no_grad():
-        # TODO: call this only once
         work_image.clamp_(0, 1)
 
     return work_image

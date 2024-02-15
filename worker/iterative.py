@@ -14,7 +14,7 @@ from PIL import Image
 MAX_SIZE = 128
 MAX_STEPS = 100
 
-CONTENT_LAYERS = ['conv_5']
+CONTENT_LAYERS = ['conv_4']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
 STYLE_WEIGHT = 1_000_000
@@ -129,18 +129,6 @@ def get_style_model_and_losses(content_image, style_image):
     return model, style_losses, content_losses
 
 
-def load_image(image_path):
-    image = Image.open(image_path).convert('RGB')
-    tensor = transforms.ToTensor()(image)
-    size = tensor.shape[1:]
-    long_edge = max(size)
-    if long_edge > MAX_SIZE:
-        scale = MAX_SIZE / long_edge
-        size = [max(round(s * scale), 1) for s in size]
-        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=False)(tensor)
-    return tensor.unsqueeze(0).to(device)
-
-
 def run_style_transfer(content_image, style_image, num_steps):
     # TODO: results are different on 2nd run
     # TODO: steps reported are more
@@ -196,8 +184,21 @@ def run_style_transfer(content_image, style_image, num_steps):
     return work_image
 
 
+def load_image(image_path):
+    image = Image.open(image_path).convert('RGB')
+    tensor = transforms.ToTensor()(image)
+    size = tensor.shape[1:]
+    long_edge = max(size)
+    if long_edge > MAX_SIZE:
+        scale = MAX_SIZE / long_edge
+        size = [max(round(s * scale), 1) for s in size]
+        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=False)(tensor)
+    return tensor.unsqueeze(0).to(device)
+
+
 def style_transfer(content_path, style_path, strength):
     # TODO: decide on antialiasing
+    # TODO: decide content layer
     content_image = load_image(content_path)
     style_image = load_image(style_path)
     num_steps = int(MAX_STEPS * strength / 100)

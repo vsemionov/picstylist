@@ -135,7 +135,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     model.eval()
     model.requires_grad_(False)
 
-    optimizer = optim.LBFGS([work_image])
+    optimizer = optim.LBFGS([work_image], history_size=10)
 
     step = 0
     while step <= NUM_STEPS:

@@ -5,9 +5,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-import torchvision.transforms as transforms
+from torchvision import transforms
 from torchvision.models import vgg19, VGG19_Weights
 
+from PIL import Image
+
+
+MAX_SIZE = 128
+MAX_STEPS = 100
 
 CONTENT_LAYERS = ['conv_5']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
@@ -124,14 +129,28 @@ def get_style_model_and_losses(content_image, style_image):
     return model, style_losses, content_losses
 
 
-def run_style_transfer(content_image, style_image, num_steps):
+def load_image(image_path):
+    image = Image.open(image_path).convert('RGB')
+    tensor = transforms.ToTensor()(image)
+    size = tensor.shape[1:]
+    long_edge = max(size)
+    if long_edge > MAX_SIZE:
+        scale = MAX_SIZE / long_edge
+        size = [max(round(s * scale), 1) for s in size]
+        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=False)(tensor)
+    return tensor.unsqueeze(0).to(device)
+
+
+def run_style_transfer(content_path, style_path, strength):
+    # TODO: decide on antialiasing
     # TODO: losses are zero
     # TODO: results are different on 2nd run
     # TODO: steps reported are +1
     # TODO: check why result is different from TF, is it because the optimizer is different?
-    to_tensor = transforms.ToTensor()
-    content_image = to_tensor(content_image).unsqueeze(0).to(device)
-    style_image = to_tensor(style_image).unsqueeze(0).to(device)
+    content_image = load_image(content_path)
+    style_image = load_image(style_path)
+
+    num_steps = int(MAX_STEPS * strength / 100)
 
     model, style_losses, content_losses = get_style_model_and_losses(content_image, style_image)
 

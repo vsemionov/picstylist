@@ -9,23 +9,26 @@ from PIL import Image
 from worker import iterative
 
 
-MAX_SIZE = 512
+MAX_SIZE = 128
 
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')
 fast_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
 
-def load_image(image_path):
+def _load_image(image_path):
     image = Image.open(image_path).convert('RGB')
-    tensor = tf.constant(image, dtype=tf.float32)
-    size = tf.cast(tf.shape(tensor)[:-1], tf.float32)
+    size = image.size
     long_edge = max(size)
     if long_edge > MAX_SIZE:
         scale = MAX_SIZE / long_edge
-        size = tf.maximum(tf.cast(tf.round(size * scale), tf.int32), 1)
-        tensor = tf.image.resize(tensor, size, method=tf.image.ResizeMethod.BICUBIC, antialias=True)
-    return tensor[tf.newaxis, :] / 255
+        size = [max(round(s * scale), 1) for s in size]
+        image = image.resize(size, resample=Image.Resampling.BILINEAR)
+    return image
+
+
+def load_image(image_path):
+    return tf.constant(_load_image(image_path), dtype=tf.float32)[tf.newaxis, :] / 255
 
 
 def to_image(tensor):
@@ -55,7 +58,7 @@ def fast_style_transfer(base_path, content_filename, style_filename, strength, r
 
 
 def iterative_style_transfer(base_path, content_filename, style_filename, strength, result_filename):
-    content_path = base_path / content_filename
-    style_path = base_path / style_filename
-    output = iterative.style_transfer(content_path, style_path, strength)
+    content_image = _load_image(base_path / content_filename)
+    style_image = _load_image(base_path / style_filename)
+    output = iterative.style_transfer(content_image, style_image, strength)
     return save_image(output, base_path / result_filename)

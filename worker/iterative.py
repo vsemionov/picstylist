@@ -5,20 +5,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from torchvision import transforms
+import torchvision.transforms as transforms
 from torchvision.models import vgg19, VGG19_Weights
 
-from PIL import Image
 
+NUM_STEPS = 300
 
-MAX_SIZE = 128
-NUM_STEPS = 320
-
-CONTENT_LAYERS = ['conv_5']
+CONTENT_LAYERS = ['conv_4']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
-MAX_STYLE_WEIGHT = 1e4
-CONTENT_WEIGHT = 1e-2
+MAX_STYLE_WEIGHT = 1_000_000
+CONTENT_WEIGHT = 1
 
 
 logger = logging.getLogger(__name__)
@@ -31,6 +28,9 @@ cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
 
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
 cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
+
+to_tensor = transforms.ToTensor()
+to_image = transforms.ToPILImage()
 
 
 def gram_matrix(input):
@@ -130,7 +130,6 @@ def get_style_model_and_losses(content_image, style_image):
 
 
 def run_style_transfer(content_image, style_image, content_weight, style_weight):
-    # TODO: tune optimizer
     model, content_losses, style_losses = get_style_model_and_losses(content_image, style_image)
 
     work_image = content_image
@@ -139,10 +138,10 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     model.eval()
     model.requires_grad_(False)
 
-    optimizer = optim.LBFGS([work_image], max_iter=1)
+    optimizer = optim.LBFGS([work_image])
 
     step = 0
-    while step < NUM_STEPS:
+    while step <= NUM_STEPS:
         def closure():
             nonlocal step
 
@@ -166,9 +165,9 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
             loss.backward()
 
             step += 1
-            if step % 50 == 0 or step == NUM_STEPS:
-                logger.info('Step %d/%d:', step, NUM_STEPS)
-                logger.info('Style loss : %.2f Content loss: %.2f', style_loss.item(), content_loss.item())
+            if step % 50 == 0:
+                logger.info('step %d/%d:', step, NUM_STEPS)
+                logger.info('style loss: %.2f content loss: %.2f', style_loss.item(), content_loss.item())
 
             return loss
 
@@ -180,21 +179,9 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     return work_image
 
 
-def load_image(image_path):
-    image = Image.open(image_path).convert('RGB')
-    tensor = transforms.ToTensor()(image)
-    size = tensor.shape[1:]
-    long_edge = max(size)
-    if long_edge > MAX_SIZE:
-        scale = MAX_SIZE / long_edge
-        size = [max(round(s * scale), 1) for s in size]
-        tensor = transforms.Resize(size, interpolation=transforms.InterpolationMode.BICUBIC, antialias=True)(tensor)
-    return tensor.unsqueeze(0).to(device)
-
-
-def style_transfer(content_path, style_path, strength):
-    content_image = load_image(content_path)
-    style_image = load_image(style_path)
+def style_transfer(content_image, style_image, strength):
+    content_image = to_tensor(content_image).unsqueeze(0).to(device, torch.float)
+    style_image = to_tensor(style_image).unsqueeze(0).to(device, torch.float)
     style_weight = MAX_STYLE_WEIGHT * strength / 100
     output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight)
-    return transforms.ToPILImage()(output[0])
+    return to_image(output[0])

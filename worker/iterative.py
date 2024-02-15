@@ -10,27 +10,24 @@ from torchvision.models import vgg19, VGG19_Weights
 
 
 NUM_STEPS = 300
-
 CONTENT_LAYERS = ['conv_4']
 STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
-
 MAX_STYLE_WEIGHT = 1_000_000
 CONTENT_WEIGHT = 1
 
 
 logger = logging.getLogger(__name__)
 
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.set_default_device(device)
 
 cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
-
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
 cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
 
 to_tensor = transforms.ToTensor()
 to_image = transforms.ToPILImage()
+convert_image = lambda image: to_tensor(image).unsqueeze(0).to(device, torch.float)
 
 
 def gram_matrix(input):
@@ -180,8 +177,8 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
 
 
 def style_transfer(content_image, style_image, strength):
-    content_image = to_tensor(content_image).unsqueeze(0).to(device, torch.float)
-    style_image = to_tensor(style_image).unsqueeze(0).to(device, torch.float)
+    content_image = convert_image(content_image)
+    style_image = convert_image(style_image)
     style_weight = MAX_STYLE_WEIGHT * strength / 100
     output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight)
     return to_image(output[0])

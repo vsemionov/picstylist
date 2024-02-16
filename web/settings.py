@@ -153,10 +153,10 @@ def configure(app):
         scheduler.cancel(job)
         job.delete()
     start_time = datetime.utcnow()
-    scheduler.schedule(start_time, 'worker.tasks.log_stats', description='log_stats', id='log_stats', interval=60,
-        timeout=30)
+    scheduler.schedule(start_time, 'worker.tasks.log_stats', description='log_stats', id='log_stats',
+        interval=(60 * 60), timeout=30)
     scheduler.schedule(start_time, 'worker.tasks.cleanup_data', description='cleanup_data',
-        args=[JOB_KWARGS['iterative']], id='cleanup_data', interval=(15 * 60), timeout=30)
+        args=[JOB_KWARGS['iterative']], id='cleanup_data', interval=(60 * 60), timeout=30)
     scheduler.schedule(start_time + timedelta(minutes=1.1), 'worker.tasks.health_check', description='health_check',
         id=config.HEALTH_CHECK_JOB_ID, interval=config.HEALTH_CHECK_INTERVAL, timeout=30, at_front=True)
     scheduler.cron('0 3 * * *', 'worker.tasks.maintenance', description='maintenance', id='maintenance', timeout=30)

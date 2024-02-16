@@ -29,9 +29,9 @@
 
     const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
-    const updateInterval = stateData ? stateData.updateInterval * 1000 : null;
-    const requestTimeout = stateData ? stateData.requestTimeout * 1000 : null;
-    const endTime = stateData ? Date.now() + stateData.updateTimeout * 1000 : null;
+    const updateInterval = stateData?.updateInterval * 1000;
+    const requestTimeout = stateData?.requestTimeout * 1000;
+    const endTime = Date.now() + stateData?.updateTimeout * 1000;
 
     let terminalStatus = false;
     let listenSocket = null;

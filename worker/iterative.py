@@ -162,7 +162,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
             loss.backward()
 
             step += 1
-            if step % 1 == 0:
+            if step % 50 == 0:
                 logger.info('Step %d/%d:', step, NUM_STEPS)
                 logger.info('Content loss: %.2f, style loss: %.2f', content_loss.item(), style_loss.item())
 

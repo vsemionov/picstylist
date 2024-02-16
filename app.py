@@ -23,6 +23,7 @@ def get_session_id(create=False):
     if session_id is None and create:
         session_id = uuid.uuid4().hex
         session['id'] = session_id
+        session.permanent = True
     return session_id
 
 

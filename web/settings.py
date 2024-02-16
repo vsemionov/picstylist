@@ -110,6 +110,7 @@ def configure(app):
     # Flask
     app.config['DATABASE'] = str(get_data_dir(app) / config.DATABASE)
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+    app.config['PERMANENT_SESSION_LIFETIME'] = 30 * 24 * 60 * 60
     app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE_MB * 1024 * 1024 * 3 // 2
 
     # Logging

@@ -31,12 +31,12 @@ ALLOWED_FORMATS = ['JPEG', 'PNG']
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 DEFAULT_STRENGTH = 75
 RESULT_FORMAT = ('png', 'image/png')
-RESULT_TTL_MINUTES = 30
+RESULT_TTL_HOURS = 2
 JOB_KWARGS_BASE = {
     'job_timeout': 30,
-    'result_ttl': RESULT_TTL_MINUTES * 60,
-    'ttl': 30 * 60,
-    'failure_ttl': 30 * 60
+    'result_ttl': RESULT_TTL_HOURS * 60 * 60,
+    'ttl': 2 * 60 * 60,
+    'failure_ttl': 2 * 60 * 60
 }
 JOB_KWARGS = {'fast': JOB_KWARGS_BASE, 'iterative': {**JOB_KWARGS_BASE, 'job_timeout': 60 * 60}}
 USE_WEBSOCKET = True

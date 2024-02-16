@@ -43,8 +43,9 @@ def listen(job_id):
             last_send = time.time()
         return status is not None and status not in terminal_status
 
-    end_time = time.time() + settings.STATUS_UPDATE_TIMEOUT
+    start_time = time.time()
     job = get_job_or_abort(job_id)
+    end_time = start_time + job.ttl + job.timeout
     state = (None, None)
     last_send = 0.0
     app.logger.info('Listen: %s', job_id)

@@ -41,7 +41,7 @@ class Worker(SimpleWorker):
     def __init__(self, *args, **kwargs):
         # preload libraries
         import worker.tasks
-        import worker.model
+        import worker.models
 
         super().__init__(*args, **kwargs)
         self.log_result_lifespan = False

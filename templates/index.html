@@ -24,7 +24,7 @@
   <h1 class="mb-5">{% block title %}Stylize Images With AI{% endblock %}</h1>
   <div class="row mb-5">
     <div class="col-12 col-md-6 col-lg-4 text-center mb-4 mb-lg-0">
-      <div class="mb-2">1) Select an image to style:</div>
+      <div class="mb-2">1) Select an image to stylize:</div>
       <div>
         <img class="img-thumbnail ps-image" src="{{ url_for('static',
           filename='images/horse-1201143_640.jpg') }}" alt="">
@@ -71,6 +71,15 @@
       {%- endfor %}
       At most <strong>{{ settings.MAX_RESOLUTION_MP }} megapixels</strong> per image.
       Total size must not exceed <strong>{{ settings.MAX_UPLOAD_SIZE_MB }} MB</strong>.
+    </div>
+    <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-3 mb-sm-4">
+      {{ form.model.label(class='form-label') }}
+      {% for subfield in form.model %}
+        <div class="form-check">
+          {{ subfield(class='form-check-input') }}
+          {{ subfield.label(class='form-check-label') }}
+        </div>
+      {% endfor %}
     </div>
     <div class="col-8 col-sm-6 col-md-5 col-lg-4 col-xl-3 mb-4">
       {{ form_field(form.strength, class='form-range') }}

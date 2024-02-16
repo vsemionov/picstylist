@@ -29,9 +29,9 @@
 
     const stateDataElement = document.getElementById('state-data')
     const stateData = stateDataElement ? JSON.parse(stateDataElement.textContent) : null;
-    const updateInterval = stateData ? stateData.updateInterval * 1000 : null;
-    const requestTimeout = stateData ? stateData.requestTimeout * 1000 : null;
-    const endTime = stateData ? Date.now() + stateData.updateTimeout * 1000 : null;
+    const updateInterval = stateData?.updateInterval * 1000;
+    const requestTimeout = stateData?.requestTimeout * 1000;
+    const endTime = Date.now() + stateData?.updateTimeout * 1000;
 
     let terminalStatus = false;
     let listenSocket = null;
@@ -51,6 +51,10 @@
         } else if (status === 'failed' || status === 'stopped' || status === 'canceled') {
             processingElement.hidden = true;
             document.getElementById('job-error').hidden = false;
+            terminalStatus = true;
+        } else if (status == null) {
+            processingElement.hidden = true;
+            document.getElementById('job-expired').hidden = false;
             terminalStatus = true;
         } else {
             processingElement.hidden = false;
@@ -72,6 +76,9 @@
             } else {
                 processingElement.hidden = true;
                 document.getElementById('update-timeout').hidden = false;
+                if (listenSocket != null) {
+                    listenSocket.close();
+                }
             }
         }
     }
@@ -109,9 +116,14 @@
                 setState(response.data.status, response.data.position);
             })
             .catch(error => {
-                processingElement.hidden = true;
-                document.getElementById('update-error').hidden = false;
-                document.getElementById('update-error-reason').innerHTML = error.message;
+                const status = error.response?.status;
+                if (status === 404 || status === 410) {
+                    setState(null);
+                } else {
+                    processingElement.hidden = true;
+                    document.getElementById('update-error').hidden = false;
+                    document.getElementById('update-error-details').innerHTML = error.message;
+                }
             });
     }
 })();

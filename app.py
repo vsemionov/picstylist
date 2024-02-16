@@ -56,15 +56,17 @@ def index():
         job_dir = settings.get_jobs_dir(app) / job_id
         content_filename = Path(secure_filename(content_image.filename))
         style_filename = secure_filename(style_image.filename)
-        result_filename = f'{content_filename.stem} (styled).{settings.RESULT_FORMAT[0]}'
+        result_filename = f'{content_filename.stem} (stylized).{settings.RESULT_FORMAT[0]}'
         job_dir.mkdir(parents=True, exist_ok=True)
         content_image.save(job_dir / content_filename)
         style_image.save(job_dir / style_filename)
 
+        model = form.model.data
+        func = {'fast': 'fast_style_transfer', 'iterative': 'iterative_style_transfer'}[model]
         args = job_id, str(content_filename), style_filename, strength, result_filename
         meta = {'session_id': session_id}
-        job_queue.enqueue('worker.tasks.style_transfer', description='style_transfer', args=args, job_id=job_id,
-            meta=meta, **settings.JOB_KWARGS)
+        job_queue.enqueue(f'worker.tasks.{func}', description=func, args=args, job_id=job_id, meta=meta,
+            **settings.JOB_KWARGS[model])
         app.logger.info('Enqueued job: %s', job_id)
 
         redirect_url = url_for('result', job_id=job_id)
@@ -106,7 +108,9 @@ def result(job_id):
     position = job_queue.get_job_position(job) if status == 'queued' else None
     filename = job.args[-1]
     cancel_form = forms.CancelForm()
-    return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form)
+    update_timeout = job.ttl + job.timeout
+    return render_template('result.html', status=status, position=position, filename=filename, cancel_form=cancel_form,
+        update_timeout=update_timeout)
 
 
 @app.route('/x/<job_id>/<path:filename>')

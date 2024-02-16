@@ -23,18 +23,28 @@
       <a class="btn btn-secondary" href="{{ upload_url }}">Upload again</a>
     </p>
     <p class="text-body-tertiary">
-      Your image will be available for <strong>{{ settings.RESULT_TTL_MINUTES }} minutes</strong>.
+      Your image will be available for <strong>{{ settings.RESULT_TTL_HOURS }} hours</strong>.
     </p>
   </div>
   <div id="job-error" hidden>
     <h2>Error</h2>
-    <p>There was a problem processing your image.</p>
+    <p>There was a problem processing your images.</p>
+    <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
+  </div>
+  <div id="job-expired" hidden>
+    <h2>Timed out</h2>
+    <p>
+      Your images waited in the queue too long and were dropped.
+      Uploaded images can wait at most <strong>{{ settings.QUEUE_TTL_HOURS }} hours</strong>.
+      We're sorry for the inconvenience.
+      You're welcome to try again.
+    </p>
     <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
   <div id="update-error" hidden>
     <h2>Error</h2>
     <p>Unable to retrieve the status of your image.</p>
-    <p>Reason: <span id="update-error-reason"></span></p>
+    <p><small>Details: <span id="update-error-details"></span></small></p>
     <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
   <div id="update-timeout" hidden>
@@ -49,7 +59,7 @@
       'initialQueuePosition': position,
       'listenUrl': url_for('listen', job_id=job_id) if settings.USE_WEBSOCKET else none,
       'pollUrl': url_for('status', job_id=job_id),
-      'updateTimeout': settings.STATUS_UPDATE_TIMEOUT,
+      'updateTimeout': update_timeout,
       'updateInterval': settings.STATUS_UPDATE_INTERVAL,
       'requestTimeout': settings.UPDATE_REQUEST_TIMEOUT,
       'imageUrl': image_url

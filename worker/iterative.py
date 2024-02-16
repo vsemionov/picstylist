@@ -182,3 +182,14 @@ def style_transfer(content_image, style_image, strength):
     style_weight = MAX_STYLE_WEIGHT * strength / 100
     output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight)
     return to_image(output[0])
+
+
+n = 0
+last_layer = None
+for i in range(len(cnn)):
+    if isinstance(cnn[i], nn.Conv2d):
+        n += 1
+        name = f'conv_{n}'
+        if name in CONTENT_LAYERS or name in STYLE_LAYERS:
+            last_layer = i
+cnn = cnn[:(last_layer + 1)]

@@ -52,6 +52,10 @@
             processingElement.hidden = true;
             document.getElementById('job-error').hidden = false;
             terminalStatus = true;
+        } else if (status == null) {
+            processingElement.hidden = true;
+            document.getElementById('job-expired').hidden = false;
+            terminalStatus = true;
         } else {
             processingElement.hidden = false;
             if (position != null) {
@@ -112,9 +116,14 @@
                 setState(response.data.status, response.data.position);
             })
             .catch(error => {
-                processingElement.hidden = true;
-                document.getElementById('update-error').hidden = false;
-                document.getElementById('update-error-reason').innerHTML = error.message;
+                const status = error.response?.status;
+                if (status === 404 || status === 410) {
+                    setState(null);
+                } else {
+                    processingElement.hidden = true;
+                    document.getElementById('update-error').hidden = false;
+                    document.getElementById('update-error-details').innerHTML = error.message;
+                }
             });
     }
 })();

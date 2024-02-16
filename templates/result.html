@@ -31,10 +31,20 @@
     <p>There was a problem processing your image.</p>
     <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
+  <div id="job-expired" hidden>
+    <h2>Timed out</h2>
+    <p>
+      Your images waited in the queue too long and were dropped.
+      Uploaded images can wait at most <strong>{{ settings.QUEUE_TTL_HOURS }} hours</strong>.
+      We're sorry for the inconvenience.
+      You're welcome to try again.
+    </p>
+    <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
+  </div>
   <div id="update-error" hidden>
     <h2>Error</h2>
     <p>Unable to retrieve the status of your image.</p>
-    <p>Reason: <span id="update-error-reason"></span></p>
+    <p><small>Details: <span id="update-error-details"></span></small></p>
     <a class="btn btn-primary" href="{{ upload_url }}">Try again</a>
   </div>
   <div id="update-timeout" hidden>

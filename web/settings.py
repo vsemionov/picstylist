@@ -39,8 +39,8 @@ QUEUE_TTL_HOURS = 2
 JOB_KWARGS_BASE = {
     'job_timeout': 30,
     'result_ttl': RESULT_TTL_HOURS * 60 * 60,
-    'ttl': 2 * 60 * 60,
-    'failure_ttl': QUEUE_TTL_HOURS * 60 * 60
+    'ttl': QUEUE_TTL_HOURS * 60 * 60,
+    'failure_ttl': 2 * 60 * 60
 }
 JOB_KWARGS = {'fast': JOB_KWARGS_BASE, 'iterative': {**JOB_KWARGS_BASE, 'job_timeout': 60 * 60}}
 USE_WEBSOCKET = True

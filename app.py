@@ -40,38 +40,38 @@ def get_job_or_abort(job_id):
 
 
 @app.route('/', methods=['GET', 'POST'])
-@limiter.limit(settings.RATE_LIMIT, methods=['POST'])
 def index():
     form = forms.UploadForm()
     if form.validate_on_submit():
         if job_queue.count >= settings.get_max_queue_size(job_queue):
             return render_template('errors/busy.html')
 
-        content_image = form.content_image.data
-        style_image = form.style_image.data
-        strength = form.strength.data
-
-        session_id = get_session_id(create=True)
-        job_id = base64.urlsafe_b64encode(os.urandom(8)).decode().rstrip('=')
-
-        job_dir = settings.get_jobs_dir(app) / job_id
-        content_filename = Path(secure_filename(content_image.filename))
-        style_filename = secure_filename(style_image.filename)
-        result_filename = f'{content_filename.stem} (stylized).{settings.RESULT_FORMAT[0]}'
-        job_dir.mkdir(parents=True, exist_ok=True)
-        content_image.save(job_dir / content_filename)
-        style_image.save(job_dir / style_filename)
-
         model = form.model.data
-        func = {'fast': 'fast_style_transfer', 'iterative': 'iterative_style_transfer'}[model]
-        args = job_id, str(content_filename), style_filename, strength, result_filename
-        meta = {'session_id': session_id}
-        job_queue.enqueue(f'worker.tasks.{func}', description=func, args=args, job_id=job_id, meta=meta,
-            **settings.JOB_KWARGS[model])
-        app.logger.info('Enqueued job: %s', job_id)
+        with limiter.limit(settings.RATE_LIMITS[model]):
+            content_image = form.content_image.data
+            style_image = form.style_image.data
+            strength = form.strength.data
 
-        redirect_url = url_for('result', job_id=job_id)
-        return redirect(redirect_url)
+            session_id = get_session_id(create=True)
+            job_id = base64.urlsafe_b64encode(os.urandom(8)).decode().rstrip('=')
+
+            job_dir = settings.get_jobs_dir(app) / job_id
+            content_filename = Path(secure_filename(content_image.filename))
+            style_filename = secure_filename(style_image.filename)
+            result_filename = f'{content_filename.stem} (stylized).{settings.RESULT_FORMAT[0]}'
+            job_dir.mkdir(parents=True, exist_ok=True)
+            content_image.save(job_dir / content_filename)
+            style_image.save(job_dir / style_filename)
+
+            func = {'fast': 'fast_style_transfer', 'iterative': 'iterative_style_transfer'}[model]
+            args = job_id, str(content_filename), style_filename, strength, result_filename
+            meta = {'session_id': session_id}
+            job_queue.enqueue(f'worker.tasks.{func}', description=func, args=args, job_id=job_id, meta=meta,
+                **settings.JOB_KWARGS[model])
+            app.logger.info('Enqueued job: %s', job_id)
+
+            redirect_url = url_for('result', job_id=job_id)
+            return redirect(redirect_url)
 
     return render_template('index.html', form=form)
 

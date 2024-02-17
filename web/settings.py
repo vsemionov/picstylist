@@ -23,7 +23,10 @@ from web import wsapi
 from web import utils
 
 
-RATE_LIMIT = '5/minute;50/hour;200/day'
+RATE_LIMITS = {
+    'fast': '5/minute;50/hour;200/day',
+    'iterative': '5/hour;20/day'
+}
 MAX_QUEUE_SIZE_PER_WORKER = 100
 MAX_UPLOAD_SIZE_MB = 10
 MAX_RESOLUTION_MP = 25

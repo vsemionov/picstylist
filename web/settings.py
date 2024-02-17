@@ -34,7 +34,7 @@ ALLOWED_FORMATS = ['JPEG', 'PNG']
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 DEFAULT_STRENGTH = 75
 RESULT_FORMAT = ('png', 'image/png')
-RESULT_TTL_HOURS = 2
+RESULT_TTL_HOURS = 8
 QUEUE_TTL_HOURS = 2
 JOB_KWARGS_BASE = {
     'job_timeout': 30,

@@ -1,3 +1,4 @@
-horse-1201143_640.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/064d5512e4c5b8f233ae50e2a208328ed6096eee/images/horse-1201143_640.jpg
-28849625005_e531638923_c.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/064d5512e4c5b8f233ae50e2a208328ed6096eee/images/28849625005_e531638923_c.jpg
-horse-1201143_640_styled.png https://raw.githubusercontent.com/vsemionov/picstylist-images/84eb8c6fc5d6abb4cf859d44126f979718fd20d7/images/horse-1201143_640_styled.png
+portrait-108386.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/126d92afbb91f804d568ea405cff9646867a8894/images/portrait-108386.jpg
+portrait-108386-sides.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/126d92afbb91f804d568ea405cff9646867a8894/images/portrait-108386-sides.jpg
+portrait-108386-stylized.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/126d92afbb91f804d568ea405cff9646867a8894/images/portrait-108386-stylized.jpg
+tissue-2923443.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/126d92afbb91f804d568ea405cff9646867a8894/images/tissue-2923443.jpg

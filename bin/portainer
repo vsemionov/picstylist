@@ -20,7 +20,7 @@ docker pull portainer/portainer-ce:$PORTAINER_VERSION
 docker run -d -p 8443:9443 --name portainer --restart=$restart \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v portainer_data:/data \
-    -v "$(pwd)"/conf/ssl:/certs \
+    -v "$(pwd)"/conf/ssl:/certs:ro \
     -m 128m \
     --log-driver local \
     portainer/portainer-ce:$PORTAINER_VERSION \

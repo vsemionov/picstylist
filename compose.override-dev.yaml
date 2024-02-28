@@ -2,20 +2,20 @@ services:
   nginx:
     ports:
       - 80:80
-    restart: 'no'
+    restart: no
   web:
     volumes:
       - ./data:/app/data
     ports:
       - 8000:8000
-    restart: 'no'
+    restart: no
   worker:
     volumes:
       - ./data:/app/data
-    restart: 'no'
+    restart: no
   scheduler:
-    restart: 'no'
+    restart: no
   redis:
     ports:
       - 6379:6379
-    restart: 'no'
+    restart: no

@@ -73,13 +73,7 @@ class Normalization(nn.Module):
         return (img - self.mean) / self.std
 
 
-def get_style_model_and_losses(content_image, style_image):
-    normalization = Normalization(cnn_normalization_mean, cnn_normalization_std)
-    model = nn.Sequential(normalization)
-
-    content_losses = []
-    style_losses = []
-
+def get_layers():
     block = 1
     conv = 0
     for layer in cnn.children():
@@ -98,20 +92,34 @@ def get_style_model_and_losses(content_image, style_image):
             conv = 0
         else:
             raise RuntimeError(f'Unrecognized layer: {layer.__class__.__name__}')
+        yield name, layer
 
+
+def get_style_model_and_losses(content_image, style_image):
+    normalization = Normalization(cnn_normalization_mean, cnn_normalization_std)
+    model = nn.Sequential(normalization)
+
+    content_losses = []
+    style_losses = []
+
+    c = 1
+    s = 1
+    for name, layer in get_layers():
         model.add_module(name, layer)
 
         if name in CONTENT_LAYERS:
             target = model(content_image)
             content_loss = ContentLoss(target)
-            model.add_module(f'content_loss_{block}_{conv}', content_loss)
+            model.add_module(f'content_loss_{c}', content_loss)
             content_losses.append(content_loss)
+            c += 1
 
         if name in STYLE_LAYERS:
             target_feature = model(style_image)
             style_loss = StyleLoss(target_feature)
-            model.add_module(f'style_loss_{block}_{conv}', style_loss)
+            model.add_module(f'style_loss_{s}', style_loss)
             style_losses.append(style_loss)
+            s += 1
 
     last = -1
     for i, layer in enumerate(model):
@@ -173,13 +181,8 @@ def style_transfer(content_image, style_image, strength):
     return to_image(output[0])
 
 
-# TODO
-n = 0
-last_layer = None
-for i in range(len(cnn)):
-    if isinstance(cnn[i], nn.Conv2d):
-        n += 1
-        name = f'conv_{n}'
-        if name in CONTENT_LAYERS or name in STYLE_LAYERS:
-            last_layer = i
-cnn = cnn[:(last_layer + 1)]
+last = -1
+for i, (name, _) in enumerate(get_layers()):
+    if name in CONTENT_LAYERS or name in STYLE_LAYERS:
+        last = i
+cnn = cnn[:last + 1]

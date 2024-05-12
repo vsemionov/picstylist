@@ -17,6 +17,7 @@ STYLE_LAYERS = ['conv1_1', 'conv2_1', 'conv3_1', 'conv4_1', 'conv5_1']
 MAX_STYLE_WEIGHT = 1_000_000
 CONTENT_WEIGHT = 1
 TV_WEIGHT = 5e-6
+NOISE = 0.1, 0.45  # scaling reduces losses a tiny bit
 
 
 logger = logging.getLogger(__name__)
@@ -142,7 +143,7 @@ def get_style_model_and_losses(content_image, style_image):
 def run_style_transfer(content_image, style_image, content_weight, style_weight, tv_weight):
     model, content_losses, style_losses = get_style_model_and_losses(content_image, style_image)
 
-    work_image = torch.rand(content_image.size())
+    work_image = torch.rand(content_image.size()) * NOISE[0] + NOISE[1]
     work_image.requires_grad_(True)
 
     model.eval()

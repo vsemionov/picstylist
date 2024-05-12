@@ -48,7 +48,7 @@ class ContentLoss(nn.Module):
         if input.size() == self.target.size():
             self.loss = F.mse_loss(input, self.target)
         else:
-            self.loss = 0
+            self.loss = torch.tensor(0)
         return input
 
 
@@ -143,14 +143,8 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
 
         model(work_image)
 
-        content_loss = 0
-        style_loss = 0
-        for cl in content_losses:
-            content_loss = content_loss + cl.loss
-        for sl in style_losses:
-            style_loss = style_loss + sl.loss
-        content_loss = content_loss * content_weight
-        style_loss = style_loss * style_weight
+        content_loss = torch.stack([cl.loss for cl in content_losses]).sum() * content_weight
+        style_loss = torch.stack([sl.loss for sl in style_losses]).sum() * style_weight
         loss = content_loss + style_loss
 
         optimizer.zero_grad()

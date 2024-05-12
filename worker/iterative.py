@@ -170,7 +170,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     with torch.no_grad():
         work_image.clamp_(0, 1)
 
-    return work_image
+    return work_image.detach()
 
 
 def style_transfer(content_image, style_image, strength):

@@ -162,7 +162,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight,
 
         content_loss = torch.stack([cl.loss for cl in content_losses]).sum() * content_weight
         style_loss = torch.stack([sl.loss for sl in style_losses]).sum() * style_weight
-        tv_loss = tv_loss_fn(work_image) * tv_weight
+        tv_loss = (tv_loss_fn(work_image) * tv_weight) if tv_weight else torch.tensor(0)
         loss = content_loss + style_loss + tv_loss
 
         optimizer.zero_grad()
@@ -171,8 +171,8 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight,
         step += 1
 
         if step % 50 == 0 or step in (1, NUM_STEPS):
-            logger.info('Step: %d/%d, content loss: %.2e, style loss: %.2e', step, NUM_STEPS, content_loss.item(),
-                style_loss.item())
+            logger.info('Step: %d/%d, content loss: %.2e, style loss: %.2e, tv loss: %.2e', step, NUM_STEPS,
+                content_loss.item(), style_loss.item(), tv_loss.item())
 
         return loss
 

@@ -75,11 +75,10 @@ class Normalization(nn.Module):
 
 def get_style_model_and_losses(content_image, style_image):
     normalization = Normalization(cnn_normalization_mean, cnn_normalization_std)
+    model = nn.Sequential(normalization)
 
     content_losses = []
     style_losses = []
-
-    model = nn.Sequential(normalization)
 
     block = 1
     conv = 0

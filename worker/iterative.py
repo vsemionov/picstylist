@@ -12,10 +12,11 @@ from torchvision.models import vgg19, VGG19_Weights
 NUM_STEPS = 320
 LEARNING_RATE = 1.0
 LBFGS_KWARGS = {'history_size': 10}
-CONTENT_LAYERS = ['conv4_2']
+CONTENT_LAYERS = ['conv3_2']  # alternative: conv4_1 (or coarser: conv4_2)
 STYLE_LAYERS = ['conv1_1', 'conv2_1', 'conv3_1', 'conv4_1', 'conv5_1']
 MAX_STYLE_WEIGHT = 1_000_000
 CONTENT_WEIGHT = 1
+TV_WEIGHT = 5e-6
 
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,14 @@ class StyleLoss(nn.Module):
         G = gram_matrix(input)
         self.loss = F.mse_loss(G, self.target)
         return input
+
+
+class TotalVariationLoss:
+    def __call__(self, input):
+        dx = input[:, :, :, 1:] - input[:, :, :, :-1]
+        dy = input[:, :, 1:, :] - input[:, :, :-1, :]
+        loss = torch.sum(torch.abs(dx)) + torch.sum(torch.abs(dy)) / (dx.numel() + dy.numel())
+        return loss
 
 
 class Normalization(nn.Module):
@@ -130,7 +139,7 @@ def get_style_model_and_losses(content_image, style_image):
     return model, content_losses, style_losses
 
 
-def run_style_transfer(content_image, style_image, content_weight, style_weight):
+def run_style_transfer(content_image, style_image, content_weight, style_weight, tv_weight):
     model, content_losses, style_losses = get_style_model_and_losses(content_image, style_image)
 
     work_image = torch.rand(content_image.size())
@@ -139,6 +148,7 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
     model.eval()
 
     optimizer = optim.LBFGS([work_image], lr=LEARNING_RATE, max_iter=NUM_STEPS, **LBFGS_KWARGS)
+    tv_loss_fn = TotalVariationLoss()
 
     step = 0
 
@@ -152,7 +162,8 @@ def run_style_transfer(content_image, style_image, content_weight, style_weight)
 
         content_loss = torch.stack([cl.loss for cl in content_losses]).sum() * content_weight
         style_loss = torch.stack([sl.loss for sl in style_losses]).sum() * style_weight
-        loss = content_loss + style_loss
+        tv_loss = tv_loss_fn(work_image) * tv_weight
+        loss = content_loss + style_loss + tv_loss
 
         optimizer.zero_grad()
         loss.backward()
@@ -177,7 +188,7 @@ def style_transfer(content_image, style_image, strength):
     content_image = convert_image(content_image).unsqueeze(0)
     style_image = convert_image(style_image).unsqueeze(0)
     style_weight = MAX_STYLE_WEIGHT * strength / 100
-    output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight)
+    output = run_style_transfer(content_image, style_image, CONTENT_WEIGHT, style_weight, TV_WEIGHT)
     return to_image(output[0])
 
 

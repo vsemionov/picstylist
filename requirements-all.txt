@@ -61,7 +61,6 @@ rq==1.16.2
 rq-dashboard==0.7.0.2
 rq-scheduler==0.13.1
 sentry-sdk==2.1.1
-setuptools==69.5.1
 simple-websocket @ git+https://github.com/miguelgrinberg/simple-websocket.git@632ec52ce1fce4908b9733e3d24935b2a0514472
 six==1.16.0
 sympy==1.12
@@ -69,6 +68,7 @@ tensorboard==2.16.2
 tensorboard-data-server==0.7.2
 tensorflow==2.16.1
 tensorflow-hub==0.16.1
+tensorflow-io-gcs-filesystem==0.37.0
 termcolor==2.4.0
 tf_keras==2.16.0
 torch==2.2.2
@@ -77,7 +77,6 @@ types-python-dateutil==2.9.0.20240316
 typing_extensions==4.11.0
 urllib3==2.2.1
 Werkzeug==3.0.3
-wheel==0.43.0
 wrapt==1.16.0
 wsproto==1.2.0
 WTForms==3.1.2

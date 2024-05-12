@@ -35,7 +35,6 @@ rq==1.16.2
 rq-dashboard==0.7.0.2
 rq-scheduler==0.13.1
 sentry-sdk==2.1.1
-setuptools==69.5.1
 simple-websocket @ git+https://github.com/miguelgrinberg/simple-websocket.git@632ec52ce1fce4908b9733e3d24935b2a0514472
 six==1.16.0
 types-python-dateutil==2.9.0.20240316

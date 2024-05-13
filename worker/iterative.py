@@ -7,7 +7,7 @@ import torch.optim as optim
 
 import torchvision.transforms as transforms
 
-from worker import weights
+from . import weights
 
 
 NUM_STEPS = 320

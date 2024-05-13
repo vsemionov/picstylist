@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-from worker import weights
+from . import weights
 
 
 MAX_SIZE = 400

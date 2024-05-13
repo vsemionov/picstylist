@@ -1,7 +1,6 @@
 from PIL import Image
 
-from worker import fast
-from worker import iterative
+from . import fast, iterative
 
 
 FAST_MAX_SIZE = 512

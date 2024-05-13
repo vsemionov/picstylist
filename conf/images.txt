@@ -1,4 +1,4 @@
-portrait-108386-sides.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/8f640e7ab625eedbcee90de4c7e8e972d51d38fc/images/portrait-108386-sides.jpg
-woman-8431035_1280.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/8f640e7ab625eedbcee90de4c7e8e972d51d38fc/images/woman-8431035_1280.jpg
-wave_crop.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/8f640e7ab625eedbcee90de4c7e8e972d51d38fc/images/wave_crop.jpg
-output25.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/8f640e7ab625eedbcee90de4c7e8e972d51d38fc/images/output25.jpg
+before-after.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/6f37ad9c5544e5a5c65906da4583072dfb88922a/images/before-after.jpg
+woman-8431035_1280.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/6f37ad9c5544e5a5c65906da4583072dfb88922a/images/woman-8431035_1280.jpg
+wave_crop.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/6f37ad9c5544e5a5c65906da4583072dfb88922a/images/wave_crop.jpg
+output25.jpg https://raw.githubusercontent.com/vsemionov/picstylist-images/6f37ad9c5544e5a5c65906da4583072dfb88922a/images/output25.jpg

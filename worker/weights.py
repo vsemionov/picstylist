@@ -9,7 +9,7 @@ def get_vgg_model():
 
 def get_hub_model():
     import tensorflow_hub as hub
-    os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')
+    os.environ['TFHUB_CACHE_DIR'] = str(Path.home() / '.cache' / 'tfhub')
     return hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
 
 

@@ -9,7 +9,7 @@ from PIL import Image
 from worker import iterative
 
 
-MAX_SIZE = 512
+MAX_SIZE = 400
 
 
 os.environ['TFHUB_CACHE_DIR'] = str(Path(__file__).parent.parent / 'models')

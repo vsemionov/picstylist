@@ -6,7 +6,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 import torchvision.transforms as transforms
-from torchvision.models import vgg19, VGG19_Weights
+
+from worker import weights
 
 
 NUM_STEPS = 320
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.set_default_device(device)
 
-cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval().requires_grad_(False)
+cnn = weights.get_vgg_model().features.eval().requires_grad_(False)
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
 cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
 

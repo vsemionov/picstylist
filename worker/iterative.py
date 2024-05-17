@@ -66,7 +66,7 @@ class StyleLoss(nn.Module):
         return input
 
 
-class TotalVariationLoss:
+class TotalVariationLoss(nn.Module):
     def __call__(self, input):
         dx = input[:, :, :, 1:] - input[:, :, :, :-1]
         dy = input[:, :, 1:, :] - input[:, :, :-1, :]

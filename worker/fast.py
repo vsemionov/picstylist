@@ -5,9 +5,6 @@ from PIL import Image
 from . import weights
 
 
-MAX_SIZE = 400
-
-
 model = weights.get_hub_model()
 
 

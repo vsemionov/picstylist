@@ -57,7 +57,7 @@ class ContentLoss(nn.Module):
 
 class StyleLoss(nn.Module):
     def __init__(self, target_feature):
-        super(StyleLoss, self).__init__()
+        super().__init__()
         self.target = gram_matrix(target_feature)
 
     def forward(self, input):
@@ -76,7 +76,7 @@ class TotalVariationLoss:
 
 class Normalization(nn.Module):
     def __init__(self, mean, std):
-        super(Normalization, self).__init__()
+        super().__init__()
         self.mean = mean.view(-1, 1, 1)
         self.std = std.view(-1, 1, 1)
 

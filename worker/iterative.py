@@ -110,6 +110,9 @@ def get_style_model_and_losses(content_image, style_image):
     normalization = Normalization(cnn_normalization_mean, cnn_normalization_std)
     model = nn.Sequential(normalization)
 
+    content_target = model(content_image)
+    style_target = model(style_image)
+
     content_losses = []
     style_losses = []
 
@@ -118,16 +121,17 @@ def get_style_model_and_losses(content_image, style_image):
     for name, layer in get_layers():
         model.add_module(name, layer)
 
+        content_target = layer(content_target)
+        style_target = layer(style_target)
+
         if name in CONTENT_LAYERS:
-            target = model(content_image)
-            content_loss = ContentLoss(target)
+            content_loss = ContentLoss(content_target)
             model.add_module(f'content_loss_{c}', content_loss)
             content_losses.append(content_loss)
             c += 1
 
         if name in STYLE_LAYERS:
-            target_feature = model(style_image)
-            style_loss = StyleLoss(target_feature)
+            style_loss = StyleLoss(style_target)
             model.add_module(f'style_loss_{s}', style_loss)
             style_losses.append(style_loss)
             s += 1

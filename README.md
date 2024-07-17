@@ -1,4 +1,7 @@
 # PicStylist
+A web app that lets you transfer the style of one image to another (neural style transfer).
+
+Hosted at: https://www.picstylist.com/
 
 ## Resources
  - Digital Ocean

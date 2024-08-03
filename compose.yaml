@@ -22,7 +22,7 @@ services:
       driver: local
     depends_on:
       - redis
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: curl -f -sS -m 5 http://localhost:8000/ >/dev/null || exit 1
     deploy:
@@ -48,7 +48,7 @@ services:
       driver: local
     depends_on:
       - redis
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: (set -e; info=$(rq info -W -u redis://$$REDIS_HOST?socket_timeout=5 | fgrep -iv error | egrep '(idle|busy)' | egrep -o '(\b[[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}\b' | fgrep -v 127.0.0.1); for ip in $(awk '/32 host/ {print f} {f=$2}' </proc/net/fib_trie | sort | uniq); do echo "$$info" | fgrep $$ip >/dev/null && break; done) || exit 1
     deploy:
@@ -67,7 +67,7 @@ services:
       driver: local
     depends_on:
       - redis
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: python -c 'import os; import sys; import socket; import redis; ip = socket.gethostbyname(socket.gethostname()); cl = redis.Redis.from_url(os.environ["RQ_REDIS_URL"]).client_list(); any(c["addr"].split(":")[0] == ip and c["cmd"] != "client|list" for c in cl) or sys.exit(1)' || exit 1
     deploy:
@@ -88,7 +88,7 @@ services:
       driver: local
     depends_on:
       - web
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: curl -f -sS -m 5 http://localhost/static/picstylist.css >/dev/null || exit 1
     deploy:
@@ -104,7 +104,7 @@ services:
       - redis_data:/data
     logging:
       driver: local
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: timeout 5 redis-cli ping >/dev/null || exit 1
     deploy:

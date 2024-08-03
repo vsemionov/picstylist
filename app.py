@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import Forbidden, NotFound
 from jinja2 import TemplateNotFound
 
-from common import history
+from common import VERSION, history
 from web import settings
 from web import forms
 from web import utils
@@ -143,7 +143,7 @@ def server_status():
 @auth.login_required
 def admin():
     status = utils.check_health(app, job_queue)
-    return render_template('admin/admin.html', status=status)
+    return render_template('admin/admin.html', version=VERSION, status=status)
 
 
 @app.route('/admin/stats/')

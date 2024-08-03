@@ -2,6 +2,7 @@
 
 {% block content %}
   <h1>{% block title %}Admin{% endblock %}</h1>
+  <p>System version: {{ version }}</p>
   <p>
     Server status:
     {% if status %}

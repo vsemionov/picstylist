@@ -2,7 +2,7 @@
 
 set -e
 
-PORTAINER_VERSION="2.20.2"
+PORTAINER_VERSION="2.20.3"
 
 cd "$(dirname "$0")"/..
 

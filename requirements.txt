@@ -19,7 +19,7 @@ rq
 rq-dashboard
 rq-scheduler
 sentry-sdk
-simple-websocket @ git+https://github.com/miguelgrinberg/simple-websocket.git@632ec52ce1fce4908b9733e3d24935b2a0514472
+simple-websocket
 tensorflow
 tensorflow-hub
 torch==2.2.2

@@ -2,9 +2,9 @@ FROM python:3.11.9 AS base
 
 WORKDIR /app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt \
-    && rm requirements.txt
+COPY lockfile.txt ./
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r lockfile.txt \
+    && rm lockfile.txt
 
 
 FROM base AS web

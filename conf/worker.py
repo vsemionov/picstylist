@@ -1,5 +1,6 @@
 import os
 import sys
+import functools
 
 from rq import SimpleWorker
 import sentry_sdk
@@ -51,4 +52,4 @@ assert os.getenv('RQ_WORKER_CLASS') == fqn or fqn in sys.argv
 
 app_env = os.environ['APP_ENV']
 service_name = os.environ['SERVICE_NAME']
-sentry_sdk.init(SENTRY_DSN, release=VERSION, environment=app_env, server_name=service_name)
+sentry_sdk.init = functools.partial(sentry_sdk.init, release=VERSION, environment=app_env, server_name=service_name)

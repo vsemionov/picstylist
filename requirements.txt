@@ -15,14 +15,14 @@ pipdeptree
 python-dotenv
 redis
 requests
-rq
-rq-dashboard
-rq-scheduler
+rq==1.16.2  # update to 2.0.0 causes errors when starting service web
+rq-dashboard==0.8.2.2
+rq-scheduler==0.13.1
 sentry-sdk
 simple-websocket
 tensorflow
 tensorflow-hub
-torch==2.2.2
+torch==2.2.2  # version 2.2.2 is the last to support macos intel
 torchvision==0.17.2
 wrapt
 WTForms

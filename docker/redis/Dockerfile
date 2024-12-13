@@ -1,4 +1,4 @@
-FROM redis:7.4.1
+FROM redis:7.2.6
 
 WORKDIR /app
 
